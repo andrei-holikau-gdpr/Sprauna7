@@ -1,0 +1,18 @@
+﻿@page "/TestMailKit"
+
+@attribute [Authorize(Policy = "AdminOnly")]
+
+@using Plugins.MailKitSp.Services;
+@inject Plugins.MailKitSp.Interfaces.IEmailService EmailService
+
+<h1 class="h3">TestMailKit</h1>
+<br/>
+
+<Button @onclick="OnClickTestEmail">TestEmail</Button>
+
+@code {
+    private async Task OnClickTestEmail()
+    {
+        await EmailService.SendEmailAsync("kudesnik.Net@gmail.com", "MailKit Тема письма", "Now:" + DateTime.Now.ToLongTimeString());
+    }
+}

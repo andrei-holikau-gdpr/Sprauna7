@@ -1,0 +1,26 @@
+﻿@using Gap.CoreBusiness;
+
+<span class="h4">@Title</span>
+
+<ul class="result-strana-not-processed">
+    @foreach (var itemRS in ResultCountryList)
+    {
+        <li>@itemRS?.Country?.Name</li>
+    }
+</ul>
+
+<style>
+    .result-strana-not-processed li{
+        display: inline-block;
+        padding: 5px 10px;
+    }
+</style>
+
+@code {
+    #region Parameter
+    [Parameter]
+    public List<ResultCountry> ResultCountryList { get; set; } = new();
+    [Parameter]
+    public string Title { get; set; } = "";
+    #endregion
+}

@@ -1,0 +1,142 @@
+﻿.parent {
+    width: 95%;
+    padding: 0px;
+    margin: 10px 0px;
+    border-radius: 6px;
+}
+
+.package-parent .package-content {
+    background-color: #F1F1F1;
+    border-radius: 6px;
+    width: 720px;
+}
+
+    .parent div {
+        display: inline-block;
+    }
+
+    .thd {
+        width: 95%;
+        margin: 10px;
+    }
+
+    .thd div {
+        display: inline-block;
+    }
+
+    .parent hr {
+        margin: 0px;
+    }
+    
+    .header_0 {
+        width: 100%;
+    }
+    
+    .header_1 {
+        width: 47%;
+        padding: 10px;
+        text-align:left;
+    }
+    .header_2 {
+        width: 47%;
+        padding: 10px;
+        text-align: right;
+    }
+
+.child {
+    width: 19%;
+    padding: 5px;
+    white-space: nowrap; /* Текст не переносится */
+    overflow: hidden; /* Обрезаем всё за пределами блока */
+    text-overflow: ellipsis; /* Добавляем многоточие */
+    text-align: center;
+}
+
+.thcd {
+    width: 18%;
+    padding: 5px;
+    white-space: nowrap; /* Текст не переносится */
+    overflow: hidden; /* Обрезаем всё за пределами блока */
+    text-overflow: ellipsis; /* Добавляем многоточие */
+    text-align: center;
+    font-weight: 900;
+}
+
+    .footer_0{
+        width:100%;
+        vertical-align:middle;
+    }
+
+    .footer_1 {
+        width: 47%;
+        padding: 10px;
+        text-align: left;
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    .footer_2 {
+        width: 47%;
+        padding: 10px;
+        text-align: right;
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    ul li {
+        float: left;
+        padding: 5px;
+        width: 160px;
+        list-style-type: none;
+    }
+
+.purchase::before {
+    content: "■";
+    margin: 0px 10px 0px 20px;
+    width: 14px;
+    height: 14px;
+    color: #F8D186;
+}
+
+.header_2 span{
+    padding: 0px;
+}
+
+    .header_2 span .btn-link {
+        padding: 0px 5px 0 5px;
+    }
+
+
+.package-parent:hover {
+    background-color: #DFF0FF;
+}
+
+.package-parent:hover .package-content{
+    background-color: #DFF0FF;
+}
+
+.all-packages .footer_1 {
+    display: flex !important;
+}
+
+.all-packages .form-check {
+    padding-right: 10px;
+}
+
+.package-parent {
+    display: flex;    
+}
+
+.package-checkbox {
+    padding: 5px 10px 5px 10px;
+}
+
+.package-content {
+    padding: 0px 20px;
+}
+
+.package-checkbox {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+}

@@ -1,0 +1,114 @@
+	 SpLog, app.Run,, Time:12:09:39
+Now listening on: https://localhost:7113
+Now listening on: http://localhost:5252
+Application started. Press Ctrl+C to shut down.
+Hosting environment: Development
+Content root path: D:\VisualStudioProjects\Sprauna7\Sprauna7Publish
+	 SpLog, Index.OnInitializedAsync.Run  Time:12:09:47
+Executed DbCommand (155ms) [Parameters=[@__p_0='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[Email], [a].[EmailConfirmed], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[ProfilePicture], [a].[SecurityStamp], [a].[TwoFactorEnabled], [a].[UserName], [a].[firstName], [a].[lastName]
+FROM [AspNetUsers] AS [a]
+WHERE [a].[Id] = @__p_0
+Executed DbCommand (13ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[ReceiverId], [r].[Birthdate], [r].[BirthdateForm], [r].[City], [r].[Country], [r].[CreatedAt], [r].[CurrentUserId], [r].[Description], [r].[Email], [r].[FirstName], [r].[Flat], [r].[Fullname], [r].[Hide], [r].[House], [r].[HouseBuildingNumber], [r].[Iin], [r].[Index], [r].[IsDefault], [r].[Nationality], [r].[Passport], [r].[PassportDateForm], [r].[PassportHumanDate], [r].[PassportID], [r].[PassportIssueDate], [r].[PassportIssuedBy], [r].[PassportScan], [r].[PassportSeries], [r].[Phone], [r].[Region], [r].[SbsId], [r].[SecondName], [r].[Street], [r].[Surname], [r].[Type], [r].[UpdatedAt]
+FROM [Receivers] AS [r]
+	 SpLog, Index.OnInitializedAsync.Run  Time:12:10:01
+Executed DbCommand (16ms) [Parameters=[@__p_0='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[Email], [a].[EmailConfirmed], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[ProfilePicture], [a].[SecurityStamp], [a].[TwoFactorEnabled], [a].[UserName], [a].[firstName], [a].[lastName]
+FROM [AspNetUsers] AS [a]
+WHERE [a].[Id] = @__p_0
+Executed DbCommand (14ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[ReceiverId], [r].[Birthdate], [r].[BirthdateForm], [r].[City], [r].[Country], [r].[CreatedAt], [r].[CurrentUserId], [r].[Description], [r].[Email], [r].[FirstName], [r].[Flat], [r].[Fullname], [r].[Hide], [r].[House], [r].[HouseBuildingNumber], [r].[Iin], [r].[Index], [r].[IsDefault], [r].[Nationality], [r].[Passport], [r].[PassportDateForm], [r].[PassportHumanDate], [r].[PassportID], [r].[PassportIssueDate], [r].[PassportIssuedBy], [r].[PassportScan], [r].[PassportSeries], [r].[Phone], [r].[Region], [r].[SbsId], [r].[SecondName], [r].[Street], [r].[Surname], [r].[Type], [r].[UpdatedAt]
+FROM [Receivers] AS [r]
+Executed DbCommand (18ms) [Parameters=[@__currentUserId_0='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']
+SELECT [p].[PurchaseId], [p].[AgreeWithTools], [p].[CombineParcels], [p].[CurrentUserId], [p].[DeliveryType], [p].[DepartmentDeliveryParcelId], [p].[Description], [p].[Lock], [p].[Name], [p].[PackageId], [p].[ReceiverId], [p].[SbsTrackId], [p].[Shop], [p].[Surname], [p].[TrackNumber], [p].[Wait], [r].[ReceiverId], [r].[Birthdate], [r].[BirthdateForm], [r].[City], [r].[Country], [r].[CreatedAt], [r].[CurrentUserId], [r].[Description], [r].[Email], [r].[FirstName], [r].[Flat], [r].[Fullname], [r].[Hide], [r].[House], [r].[HouseBuildingNumber], [r].[Iin], [r].[Index], [r].[IsDefault], [r].[Nationality], [r].[Passport], [r].[PassportDateForm], [r].[PassportHumanDate], [r].[PassportID], [r].[PassportIssueDate], [r].[PassportIssuedBy], [r].[PassportScan], [r].[PassportSeries], [r].[Phone], [r].[Region], [r].[SbsId], [r].[SecondName], [r].[Street], [r].[Surname], [r].[Type], [r].[UpdatedAt]
+FROM [Purchases] AS [p]
+INNER JOIN [Receivers] AS [r] ON [p].[ReceiverId] = [r].[ReceiverId]
+WHERE [p].[CurrentUserId] = @__currentUserId_0
+Executed DbCommand (21ms) [Parameters=[@__p_0='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [d].[DepartmentDeliveryParcelId], [d].[Address], [d].[AddressForMap], [d].[Description], [d].[GipermallId], [d].[Hide], [d].[RegionId]
+FROM [DepartmentDeliveryParcels] AS [d]
+WHERE [d].[DepartmentDeliveryParcelId] = @__p_0
+Executed DbCommand (8ms) [Parameters=[@__p_0='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [d].[DepartmentDeliveryParcelId], [d].[Address], [d].[AddressForMap], [d].[Description], [d].[GipermallId], [d].[Hide], [d].[RegionId]
+FROM [DepartmentDeliveryParcels] AS [d]
+WHERE [d].[DepartmentDeliveryParcelId] = @__p_0
+Executed DbCommand (49ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [p].[PackageId], [p].[CurrentUserId], [p].[Description], [p].[InvoiceId], [p].[IsCollectivePackage], [p].[NumberPackage], [p].[PriceBYN], [p].[PricePLN], [p].[Status], [p].[TrackNumber], [p].[Weight]
+FROM [PackageSp] AS [p]
+Executed DbCommand (9ms) [Parameters=[@__PackageId_0='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+SELECT [p].[PurchaseId], [p].[AgreeWithTools], [p].[CombineParcels], [p].[CurrentUserId], [p].[DeliveryType], [p].[DepartmentDeliveryParcelId], [p].[Description], [p].[Lock], [p].[Name], [p].[PackageId], [p].[ReceiverId], [p].[SbsTrackId], [p].[Shop], [p].[Surname], [p].[TrackNumber], [p].[Wait], [r].[ReceiverId], [r].[Birthdate], [r].[BirthdateForm], [r].[City], [r].[Country], [r].[CreatedAt], [r].[CurrentUserId], [r].[Description], [r].[Email], [r].[FirstName], [r].[Flat], [r].[Fullname], [r].[Hide], [r].[House], [r].[HouseBuildingNumber], [r].[Iin], [r].[Index], [r].[IsDefault], [r].[Nationality], [r].[Passport], [r].[PassportDateForm], [r].[PassportHumanDate], [r].[PassportID], [r].[PassportIssueDate], [r].[PassportIssuedBy], [r].[PassportScan], [r].[PassportSeries], [r].[Phone], [r].[Region], [r].[SbsId], [r].[SecondName], [r].[Street], [r].[Surname], [r].[Type], [r].[UpdatedAt]
+FROM [Purchases] AS [p]
+INNER JOIN [Receivers] AS [r] ON [p].[ReceiverId] = [r].[ReceiverId]
+WHERE [p].[PackageId] = @__PackageId_0
+Failed executing DbCommand (17ms) [Parameters=[@p0='?' (Size = 4000), @p1='?' (Size = 4000), @p2='?' (Size = 4000), @p3='?' (Size = 4000), @p4='?' (DbType = Int32), @p5='?' (Size = 4000), @p8='?' (DbType = Int32), @p6='?' (DbType = Double), @p7='?' (DbType = Int32), @p9='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+SET NOCOUNT ON;
+INSERT INTO [Invoices] ([AccountNo], [CurrentUserId], [Description], [InvoiceNo], [PackageId], [Url])
+OUTPUT INSERTED.[InvoiceId]
+VALUES (@p0, @p1, @p2, @p3, @p4, @p5);
+UPDATE [PackageSp] SET [PriceBYN] = @p6, [Status] = @p7
+OUTPUT 1
+WHERE [PackageId] = @p8;
+DELETE FROM [Purchases]
+OUTPUT 1
+WHERE [PurchaseId] = @p9;
+An exception occurred in the database while saving changes for context type 'Plugins.DataStore.SQL.SpraunaContext'.
+Microsoft.EntityFrameworkCore.DbUpdateException: An error occurred while saving the entity changes. See the inner exception for details.
+ ---> Microsoft.Data.SqlClient.SqlException (0x80131904): Invalid object name 'Invoices'.
+   at Microsoft.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   at Microsoft.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, Boolean callerHasConnectionLock, Boolean asyncClose)
+   at Microsoft.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean& dataReady)
+   at Microsoft.Data.SqlClient.SqlDataReader.TryConsumeMetaData()
+   at Microsoft.Data.SqlClient.SqlDataReader.get_MetaData()
+   at Microsoft.Data.SqlClient.SqlCommand.FinishExecuteReader(SqlDataReader ds, RunBehavior runBehavior, String resetOptionsString, Boolean isInternal, Boolean forDescribeParameterEncryption, Boolean shouldCacheForAlwaysEncrypted)
+   at Microsoft.Data.SqlClient.SqlCommand.RunExecuteReaderTds(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, Boolean isAsync, Int32 timeout, Task& task, Boolean asyncWrite, Boolean inRetry, SqlDataReader ds, Boolean describeParameterEncryptionRequest)
+   at Microsoft.Data.SqlClient.SqlCommand.RunExecuteReader(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, TaskCompletionSource`1 completion, Int32 timeout, Task& task, Boolean& usedCache, Boolean asyncWrite, Boolean inRetry, String method)
+   at Microsoft.Data.SqlClient.SqlCommand.RunExecuteReader(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, String method)
+   at Microsoft.Data.SqlClient.SqlCommand.ExecuteReader(CommandBehavior behavior)
+   at Microsoft.Data.SqlClient.SqlCommand.ExecuteDbDataReader(CommandBehavior behavior)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReader(RelationalCommandParameterObject parameterObject)
+   at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.Execute(IRelationalConnection connection)
+ClientConnectionId:4672bfb8-60e9-446d-afaf-790aa7b2df3c
+Error Number:208,State:1,Class:16
+   --- End of inner exception stack trace ---
+   at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.Execute(IRelationalConnection connection)
+   at Microsoft.EntityFrameworkCore.SqlServer.Update.Internal.SqlServerModificationCommandBatch.Execute(IRelationalConnection connection)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.Execute(IEnumerable`1 commandBatches, IRelationalConnection connection)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalDatabase.SaveChanges(IList`1 entries)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChanges(IList`1 entriesToSave)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChanges(StateManager stateManager, Boolean acceptAllChangesOnSuccess)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.<>c.<SaveChanges>b__107_0(DbContext _, ValueTuple`2 t)
+   at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerExecutionStrategy.Execute[TState,TResult](TState state, Func`3 operation, Func`3 verifySucceeded)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChanges(Boolean acceptAllChangesOnSuccess)
+   at Microsoft.EntityFrameworkCore.DbContext.SaveChanges(Boolean acceptAllChangesOnSuccess)
+An exception occurred in the database while saving changes for context type 'Plugins.DataStore.SQL.SpraunaContext'.
+Microsoft.EntityFrameworkCore.DbUpdateException: An error occurred while saving the entity changes. See the inner exception for details.
+ ---> Microsoft.Data.SqlClient.SqlException (0x80131904): Invalid object name 'Invoices'.
+   at Microsoft.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   at Microsoft.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, Boolean callerHasConnectionLock, Boolean asyncClose)
+   at Microsoft.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean& dataReady)
+   at Microsoft.Data.SqlClient.SqlDataReader.TryConsumeMetaData()
+   at Microsoft.Data.SqlClient.SqlDataReader.get_MetaData()
+   at Microsoft.Data.SqlClient.SqlCommand.FinishExecuteReader(SqlDataReader ds, RunBehavior runBehavior, String resetOptionsString, Boolean isInternal, Boolean forDescribeParameterEncryption, Boolean shouldCacheForAlwaysEncrypted)
+   at Microsoft.Data.SqlClient.SqlCommand.RunExecuteReaderTds(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, Boolean isAsync, Int32 timeout, Task& task, Boolean asyncWrite, Boolean inRetry, SqlDataReader ds, Boolean describeParameterEncryptionRequest)
+   at Microsoft.Data.SqlClient.SqlCommand.RunExecuteReader(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, TaskCompletionSource`1 completion, Int32 timeout, Task& task, Boolean& usedCache, Boolean asyncWrite, Boolean inRetry, String method)
+   at Microsoft.Data.SqlClient.SqlCommand.RunExecuteReader(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, String method)
+   at Microsoft.Data.SqlClient.SqlCommand.ExecuteReader(CommandBehavior behavior)
+   at Microsoft.Data.SqlClient.SqlCommand.ExecuteDbDataReader(CommandBehavior behavior)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReader(RelationalCommandParameterObject parameterObject)
+   at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.Execute(IRelationalConnection connection)
+ClientConnectionId:4672bfb8-60e9-446d-afaf-790aa7b2df3c
+Error Number:208,State:1,Class:16
+   --- End of inner exception stack trace ---
+   at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.Execute(IRelationalConnection connection)
+   at Microsoft.EntityFrameworkCore.SqlServer.Update.Internal.SqlServerModificationCommandBatch.Execute(IRelationalConnection connection)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.Execute(IEnumerable`1 commandBatches, IRelationalConnection connection)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalDatabase.SaveChanges(IList`1 entries)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChanges(IList`1 entriesToSave)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChanges(StateManager stateManager, Boolean acceptAllChangesOnSuccess)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.<>c.<SaveChanges>b__107_0(DbContext _, ValueTuple`2 t)
+   at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerExecutionStrategy.Execute[TState,TResult](TState state, Func`3 operation, Func`3 verifySucceeded)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChanges(Boolean acceptAllChangesOnSuccess)
+   at Microsoft.EntityFrameworkCore.DbContext.SaveChanges(Boolean acceptAllChangesOnSuccess)

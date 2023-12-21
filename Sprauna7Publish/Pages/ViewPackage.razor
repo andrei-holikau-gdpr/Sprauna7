@@ -1,0 +1,114 @@
+﻿@page "/ViewPackage/{PackageId}"
+@attribute [Authorize()]
+
+@using System.Reflection;
+@using System.Diagnostics.CodeAnalysis;
+
+@inject NavigationManager NavigationManager
+
+@inject IGetPackageByIdUseCase GetPackageByIdUseCase
+
+
+@*@if(!IsModal){
+    <h1 class="card-title h5">
+        <NavLink class="nav-link" href="packages">
+            <span class="oi oi-list-rich" aria-hidden="true"></span> 
+            Информация по посылке
+        </NavLink>
+    </h1>
+}*@
+<br/>
+@if (package != null && package.PackageId > 0)
+{
+    <div>
+        <b>Номер посылки:</b>
+        <p>@package.TrackNumber</p>
+        <hr />
+    </div>
+    
+    <div>
+        <b>Трек-номер:</b>
+        <p>@package.TrackNumber</p>
+        <hr />
+    </div>
+    
+    <div>
+        <b>Статус:</b>
+        <p>@package.Status</p>
+        <hr />
+    </div>
+    
+    <div>
+        <b>Получатель:</b>
+        <p></p>
+        <hr />
+    </div>
+    
+    <div>
+        <b>Адрес доставки:</b>
+        <p></p>
+        <hr />
+    </div>
+    
+    <div>
+        <b>Список товаров:</b>
+        <p></p>
+        <hr />
+    </div>
+    
+    <div>
+        <b>Вес:</b>
+        <p>@package.Weight</p>
+        <hr />
+    </div>
+
+@*    <ViewProperties 
+        Properties="PropertiesList" 
+        ObjectWithProperties="package" />*@
+}
+
+<ConsoleLoggerSp Owner="SbsTracks" LogerEnable="@LogerEnable">
+    <ConsoleLogger @ref="Logger" />
+</ConsoleLoggerSp>
+
+@code {
+    #region Parameters
+
+    [Parameter]
+    public string? PackageId { get; set; }    
+    [Parameter]
+    public bool IsModal { get; set; } = false;
+
+    #endregion
+
+    #region private fields
+
+    [NotNull]
+    private ConsoleLogger? Logger { get; set; }
+    private bool LogerEnable = false;
+
+    private Package package = new();
+    List<PropertyInfo>? PropertiesList = new();
+
+    #endregion
+
+    #region Private methods / Override methods
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();        
+
+        if (int.TryParse(this.PackageId, out int iPackageId))
+        {        
+            package = GetPackageByIdUseCase.Execute(iPackageId);
+
+            if (package != null)
+            {
+                PropertiesList = typeof(Package).GetProperties().ToList<PropertyInfo>();
+            }
+        }
+    }
+
+    #endregion
+
+}

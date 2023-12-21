@@ -1,0 +1,104 @@
+﻿@*@attribute [Authorize(Roles = "Admin, Superuser")]*@
+@*@attribute [Authorize(Policy = "AdminOnly")]*@
+
+<AuthorizeView Policy="AdminOnly">
+    <style>
+        .admin-canvas hr {
+            margin: 0px;
+        }
+
+        .admin-canvas ul {
+            margin: 10px 10px;
+            padding: 10px 10px;
+        }
+    </style>
+
+    <div class="admin-canvas" >
+        <ul class="navMenuAdmin" >
+
+            <li class="nav-item px-3">
+                <NavLink class="nav-link AdminPanel" href="AdminPanel">
+                    <Tooltip Placement="Placement.Top" Title="Links For Admin">
+                        <i class="bi bi-window-stack"></i>
+                        <div class="sp-navlink-text">
+                            AdminPanel
+                        </div>
+                    </Tooltip>
+                </NavLink>
+            </li>
+
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="ExpressPay" id="lnkExpressPay">
+                    <Tooltip Placement="Placement.Top" Title="ExpressPay">
+                        <span class="bi bi-strava" aria-hidden="true"></span>
+                        <div class="sp-navlink-text">
+                            ExpressPay
+                        </div>
+                    </Tooltip>
+                </NavLink>
+            </li>
+
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="AdminPvzs">
+                    <Tooltip Placement="Placement.Top" Title="Пункты выдачи посылок">
+                        <span class="bi bi-building" aria-hidden="true"></span>
+                        <div class="sp-navlink-text">
+                            Pvz
+                        </div>
+                    </Tooltip>
+                </NavLink>
+            </li>                
+
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="/AdminDiscounts">
+                    <Tooltip Placement="Placement.Top" Title="Скидки">
+                        <span class="bi bi-percent" aria-hidden="true"></span>
+                        <div class="sp-navlink-text">
+                            Скидки
+                        </div>
+                    </Tooltip>
+                </NavLink>
+            </li>
+
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="/UsersAdmin">
+                    <Tooltip Placement="Placement.Top" Title="Пользователи">
+                        <i class="bi bi-people"></i>
+                        <div class="sp-navlink-text UsersAdmin">
+                            Пользователи
+                        </div>
+                    </Tooltip>
+                </NavLink>
+            </li>
+
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="/LoggerViewer">
+                    <Tooltip Placement="Placement.Top" Title="LoggerViewer">
+                        <i class="bi bi-device-ssd"></i>
+                        <div class="sp-navlink-text LogViewer">
+                            Logs
+                        </div>
+                    </Tooltip>
+                </NavLink>
+            </li>
+
+@*            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="/ToDoList">
+                    <Tooltip Placement="Placement.Top" Title="ToDoList">
+                        <i class="bi bi-bar-chart-steps"></i>
+                        <div class="sp-navlink-text">
+                            ToDoList
+                        </div>
+                    </Tooltip>
+                </NavLink>
+            </li>*@
+
+        </ul>
+    </div>
+   
+</AuthorizeView>
+
+
+@code {
+
+}

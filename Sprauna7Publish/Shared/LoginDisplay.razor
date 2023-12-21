@@ -1,0 +1,92 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@inject NavigationManager navigationManager
+
+<AuthorizeView>
+    <Authorized>
+        <a href="Identity/Account/Manage">@context.User.Identity?.Name!</a>
+        @* Сюда вставляем ссылку на страницу регистрации *@
+        <a href="Identity/Account/Register">Регистрация</a>
+        <form method="post" action="Identity/Account/LogOut?returnUrl=%2F">
+            <button type="submit" class="nav-link btn btn-link">Выйти</button>
+        </form>
+    </Authorized>
+    <NotAuthorized>
+
+        @if (!DisplayLoader.HasValue)
+        {
+            @*<button class="btn btn-primary" @onclick="OnClickLoader">OnClickLoader</button>*@
+            <div @onclick="OnClickDisableLoader">
+                <LoaderMini></LoaderMini>
+            </div>
+        }
+        else
+        {
+                <div class="ld-outer">
+                    <div class="ld-inner">
+                        <div class="ld-card">
+                            <div style="text-align:center;">
+                            <h1>Sprauna </h1>
+                            <img src="\images\sp-qr-code.png" width="100" height="100"/>
+
+                            </div>
+                            <br />
+
+                            <div class="outer login-display">
+                                <div class="inner">
+                                    <a href="Identity/Account/Register">
+                                        <div class="login-link">
+                                            Регистрация
+                                        </div>
+                                    </a>
+
+                                </div>
+                                <div class="inner">
+                                    <a href="Identity/Account/Login">
+                                        <div class="login-link">
+                                            Вход
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+        @* Здесь удаляем и переносим в авторизированную зону*@
+        
+        }
+    </NotAuthorized>
+</AuthorizeView>
+
+@code{
+
+    #region Private Fields
+
+    private int? DisplayLoader = null;
+
+    #endregion
+    // ---
+    #region Protected Override Methods
+
+    //protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override void OnAfterRender(bool firstRender)
+    {
+        OnClickDisableLoader();
+    }
+
+    #endregion
+    // ---
+    #region Private Methods / Events
+
+    private void OnClickDisableLoader()
+    {
+        if (DisplayLoader == null)
+        {
+            DisplayLoader = 1;
+            StateHasChanged();
+        }
+    }
+
+    #endregion
+}

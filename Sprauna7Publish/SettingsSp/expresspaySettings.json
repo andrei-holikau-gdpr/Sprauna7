@@ -1,0 +1,8 @@
+{
+  "ExpresspaySettings": {
+    "token": "6d1f6e66c55e49438216143c2ec36f64",
+    "signature": "blazor",
+
+    "UrlGetInvoices": "https://api.express-pay.by/v1/invoices"
+  }
+}

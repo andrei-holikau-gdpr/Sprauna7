@@ -1,0 +1,54 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+	<NoWarn>10012;</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\css\SpProfile.css" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BootstrapBlazor" Version="7.8.6" />
+    <PackageReference Include="BootstrapBlazor.FontAwesome" Version="7.4.2" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.51" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="7.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="7.0.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.9">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Plugins.Converters\Plugins.Converters.csproj" />
+    <ProjectReference Include="..\Plugins.Currency\Plugins.Currencies.csproj" />
+    <ProjectReference Include="..\Plugins.DataStore.InMemory\Plugins.DataStore.InMemory.csproj" />
+    <ProjectReference Include="..\Plugins.DataStore.SQL\Plugins.DataStore.SQL.csproj" />
+    <ProjectReference Include="..\Plugins.ExpressPay\Plugins.ExpressPay.csproj" />
+    <ProjectReference Include="..\Plugins.MailKitSp\Plugins.MailKitSp.csproj" />
+    <ProjectReference Include="..\Plugins.MailSp\Plugins.MailSp.csproj" />
+    <ProjectReference Include="..\Plugins.ShopByShop.InMemory\Plugins.ShopByShop.InMemory.csproj" />
+    <ProjectReference Include="..\Plugins.ShopByShop\Plugins.ShopByShop.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="logger\" />
+    <Folder Include="files\" />
+    <Folder Include="wwwroot\files\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="BootstrapBlazor.Analyzers" Version="1.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,579 @@
+﻿@page "/EditPurchase/{PurchaseId}"
+
+@using CoreBusiness.ShopByShop.Models;
+@using Plugins.Converters;
+@using System.Text.RegularExpressions;
+@using UseCases.ProductsSpUseCases;
+@using UseCases.ShopByShop.UseCaseInterfaces;
+@using static CoreBusiness.ComponentEnums;
+
+@inject NavigationManager NavigationManager
+@inject IJSRuntime jsRuntime;
+
+@inject IEditPurchaseUseCase EditPurchaseUseCase
+@inject IGetPurchaseByIdUseCase GetPurchaseByIdUseCase
+@inject IGetProductsSpByPurchaseUseCase GetProductsSpByPurchaseUseCase
+
+@inject IDeleteProductSpUseCase DeleteProductSpUseCase
+@inject IAddProductSpUseCase AddProductSpUseCase
+
+@inject IGetDepartmentDpByIdUseCase GetDepartmentDpByIdUseCase
+@inject IGetReceiverByIdUseCase GetReceiverByIdUseCase
+@inject IGetPackageByIdUseCase GetPackageByIdUseCase
+
+@inject IAddTrackSbsUseCase AddTrackSbsUseCase
+@inject IEditTrackSbsUseCase EditTrackSbsUseCase
+
+@inject ILogger<EditPurchaseComponent> LoggerInFile
+
+<div style="max-width:770px;">
+    <h1 class="h3">Изменить покупку</h1>
+
+    @if (ErrorMessages.Count > 0)
+    {
+        <ErrorMessagesComponent ErrorMessages="ErrorMessages" />
+    }
+
+    @if (purchase != null)
+    {
+        <!-- Товары в покупке -->
+        <div class="card p-3">
+            <div class="container ">
+                <div class="row">
+                    <div class="col-sm-12 col-lg-12 p-1">
+                        <h2 class="h3">
+                            Товары в покупке
+                    
+                            <button @onclick="@LoadAllProductSp" id="loadAllProductSp" class="btn btn-link">
+                                <i class="bi bi-arrow-clockwise"></i>
+                            </button>
+                        </h2>
+                    </div>
+
+                    @if (productSps != null && productSps.Count() >0)
+                        {
+                            @foreach (var productSp in productSps)
+                            {
+                                <div class=" col-sm-12 col-lg-12 p-1 border-bottom border-dark-subtle bg-light">
+                                    <div class="d-inline-block p-1" style="vertical-align: top;">
+                                        <img src="@productSp.UrlToImage" 
+                                            style="width:100px; height:100px" />
+                                    
+                                    </div>
+                                    <div class="d-inline-block p-1 bg-light">
+                                        @productSp.ProductTypeAndBrand
+                                        <br /> @ProductSpOptions.Quantity: @productSp.Quantity
+                                        <br />
+                                        <span class="d-inline-block text-truncate" style="max-width: 250px;">
+                                            <a href="@productSp.UrlToProduct">@productSp.UrlToProduct</a>
+                                        </span>                                     
+                                        <br /> @ProductSpOptions.Price: @productSp.Price 
+                                        <br /> @ProductSpOptions.TrackNumber: @productSp.TrackNumber
+                                    </div>
+                                    <div class="d-inline-block p-1 bg-light" style="float: right;">
+                                        <button type="button" @onclick="@( () => OnClickEditProductSp(productSp) )"
+                                            class="btn btn-link" data-bs-toggle="modal" data-bs-target="#editModal_@productSp.ProductSpId">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+
+                                        <!-- Модальное окно редактирования товара -->
+                                        <div class="modal fade" id="editModal_@productSp.ProductSpId" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h1 class="modal-title fs-5" id="exampleModalLabel">
+                                                            Изменить товар (Id: @productSp.ProductSpId)
+                                                        </h1>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                                                    </div>
+
+                                                    <div class="modal-body">
+                                                        @if (productSp.ProductSpId > 0)
+                                                        {
+                                                            <EditProductSpComponent ProductSpId="@productSp.ProductSpId.ToString()"
+                                                                    OnEditCallback="@OnEditProductSp" />
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <button type="button" @onclick="@( () => OnClickDeleteProductSp(productSp.ProductSpId) )"
+                                            class="btn btn-link">
+                                            <i class="bi bi-trash3"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+                        }
+
+                    <div class="col-sm-12 col-lg-12 p-1">
+                        <button type="button" class="btn btn-primary" 
+                        data-bs-toggle="modal" data-bs-target="#addModal">
+                            Добавить товар
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br/>
+        <EditForm Model="purchase" OnValidSubmit="OnValidSubmit">
+            <DataAnnotationsValidator></DataAnnotationsValidator>
+            <ValidationSummary></ValidationSummary>
+
+            <div class="card p-3">
+                <div class="container ">
+                    <div class="row">
+                        @* Surname *@
+                        <div class="col-sm-12 col-lg-12 p-1">
+                            <div class="form-group">
+                                <label for="Surname">@PurchaseOptions.Surname</label>
+                                <InputText id="Surname" @bind-Value="purchase.Surname" class="form-control"></InputText>
+                            </div>
+                        </div>
+                        @* Name *@
+                        <div class="col-sm-12 col-lg-12 p-1">
+                            <div class="form-group">
+                                <label for="name">@PurchaseOptions.Name</label>
+                                <InputText id="name" @bind-Value="purchase.Name" class="form-control"></InputText>
+                            </div>
+                        </div>
+                        @* Shop *@
+                        <div class="col-sm-12 col-lg-12 p-1">
+                            <div class="form-group">
+                                <label for="Shop">@PurchaseOptions.Shop</label>
+                                <InputText id="Shop" @bind-Value="purchase.Shop" class="form-control"></InputText>
+                            </div>
+                        </div>
+                        @* DepartmentDeliveryParce *@
+                        <div class="col-sm-12 col-lg-12 p-1">
+                            <div class="form-group">
+                                <b>Пункт выдачи посылки</b>
+                                <br />
+                                <a class="btn btn-link" data-bs-toggle="modal" data-bs-target="#pvModal">
+                                    <div>
+                                        @if (selectDepartmentId > 0)
+                                        {
+                                            <i class="bi bi-geo-alt" style="padding: 0px 10px;"></i>
+                                            @GetDepartmentDpByIdUseCase.Execute(selectDepartmentId).Address<br />
+                                        } else {
+                                                <span>Выбрать</span>
+                                        }
+                                    </div>
+                                </a>
+                                @*<InputNumber id="DepartmentDeliveryParcelId" @bind-Value="purchase.DepartmentDeliveryParcelId" class="form-control"></InputNumber>*@
+                            </div>
+                        </div>
+                        @* Receiver *@
+                        <div class="col-sm-12 col-lg-12 p-1">
+                            <div class="form-group">
+                                <b>Получатель</b><br />
+                                <a class="btn btn-link" data-bs-toggle="modal" data-bs-target="#ReceiversModal">
+                                    <div>                                    
+                                        @if (selectReceiverId > 0)
+                                        {
+                                            <i class="bi bi-person" style="padding: 0px 10px;"></i>
+                                            @ReceiverOptions.GetFIO( GetReceiverByIdUseCase.Execute(selectReceiverId) )
+                                        } else {
+                                            <span>Выбрать</span>
+                                        }
+                                    </div>
+                                </a>
+                                @*<InputNumber id="DepartmentDeliveryParcelId" @bind-Value="purchase.DepartmentDeliveryParcelId" class="form-control"></InputNumber>*@
+                            </div>
+                        </div>
+                        @* Description *@
+                        <div class="col-sm-12 col-lg-12 p-1">
+                            <div class="form-group">
+                                <label for="description">Описание</label>
+                                <InputText id="description" @bind-Value="purchase.Description" class="form-control"></InputText>
+                            </div>
+                        </div>
+                        @* <legend> CombineParcels </legend> *@
+                        <div class="col-sm-12 col-lg-12 p-1">
+                           <div class="form-group">
+                               <InputRadioGroup Name="combineParcels" @bind-Value="purchase.CombineParcels">
+
+                                   <InputRadio Name="combineParcels" Value="@CombineParcels.SendWithoutUnit" />
+                                       Я хочу отправить посылку сразу без объединения с другими посылками<br/>
+
+                                   <InputRadio Name="combineParcels" Value="@CombineParcels.SendWithUnit" />
+                                       Я хочу объеденить эту посылку с другой посылкой<br/>       
+
+                               </InputRadioGroup>   
+                           
+                               @if(purchase.CombineParcels == CombineParcels.SendWithUnit)
+                                {
+                                   <button type="button" class="btn btn-link"
+                                       data-bs-toggle="modal" data-bs-target="#PackagesModal">
+                                       Выбрать посылку для объединения
+                                       <i class="bi bi-arrow-right"></i>
+                                   </button>
+                       
+                                   @if (selectPackageId > 0)
+                                   {
+                                       <div>
+                                           <i class="bi bi-box" style="padding: 0px 10px;"></i>
+                                           <span>Посылка будет объединена с посылкой №:</span>
+                                            @GetPackageByIdUseCase.Execute(selectPackageId).NumberPackage <button disabled>(Посмотреть посылку)</button>
+                                       </div>
+                                   }                        
+                                }
+                            </div>
+                        </div>
+                        <br/>
+                        @* AgreeWithTools *@
+                        <div class="col-sm-12 col-lg-12 p-1">
+                            <div class="form-group">
+                                <InputCheckbox id="AgreeWithTools" @bind-Value="purchase.AgreeWithTools"
+                                           class="form-check" style="float:left;"/>
+                                <label for="AgreeWithTools" style="padding-left: 5px;">@PurchaseOptions.AgreeWithTools</label>
+                            </div>
+                        </div>
+
+                        <br />
+                        @* Buttons *@
+                        <div class="col-sm-12 col-lg-12 p-1">
+                            @if (!purchase.AgreeWithTools)
+                            {
+                                <button type="submit" class="btn btn-primary m-1" disabled>Сохранить</button>
+                            }
+                            else
+                            {
+                                <button type="submit" class="btn btn-primary m-1">Сохранить</button>
+                            }
+                            <button type="button" class="btn btn-link m-1" @onclick="OnCancel">Отменить</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                
+        </EditForm>
+
+        @* Модальное окно добавления товара *@
+        <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Добавить товар</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <AddProductSpComponent PurchaseId="@purchase.PurchaseId.ToString()"
+                                           OnAddCallback="@OnAddProductSp" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* Модальное окно выбора пункта выдачи *@
+        <div class="modal fade" id="pvModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Выбор пункта выдачи</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <SelectPvz OnSelectedCallback="OnSelectedDepartment" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* Модальное окно выбора получателя *@
+        <div class="modal fade" id="ReceiversModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Выбор получателя</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <SelectReceiver OnSelectedCallback="OnSelectedReceiver" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* Модальное окно выбора посылок для обьединения *@
+        <div class="modal fade" id="PackagesModal" tabindex="-1" aria-labelledby="selectPackagesModal" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Выбор посылки для обьединения</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                    </div>
+                    <div class="modal-body">
+                        <SelectPackage OnSelectedCallback="@OnSelectedPackage" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    }
+
+    <ConsoleLoggerSp Owner="EditPurchaseComponent" LogerEnable="@LogerEnable">
+        <ConsoleLogger @ref="Logger" />
+    </ConsoleLoggerSp>
+</div>
+
+@code {
+    #region Parameters
+
+    [Parameter]
+    public string? PurchaseId { get; set; }
+
+    #endregion
+
+    #region private fields
+
+    private Purchase? purchase;
+    private IEnumerable<ProductSp>? productSps;
+    private ProductSp productSp = new ProductSp();
+    private int selectDepartmentId { get; set; } = 0;
+    private int selectReceiverId { get; set; } = 0;
+    private int selectPackageId;
+    //private int selectProductSpId;
+    //private int selectPurchaseId;
+    private string strSendWithoutUnit = "";
+
+    [NotNull]
+    private ConsoleLogger? Logger { get; set; }
+    private bool LogerEnable = true;
+
+    private List<string> ErrorMessages = new();
+
+    #endregion
+
+    #region override methods
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        purchase = new Purchase();
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        if (int.TryParse(this.PurchaseId, out int iPurchaseId))
+        {
+            var tempItem = GetPurchaseByIdUseCase.Execute(iPurchaseId);
+            this.purchase = PurchaseOptions.CopyPurchase(tempItem);
+            this.purchase.PurchaseId = tempItem.PurchaseId; /// !!! for update
+
+            productSps = GetProductsSpByPurchaseUseCase.Execute(iPurchaseId);
+
+            this.purchase.ProductSps = productSps.ToList();
+
+            selectDepartmentId = purchase.DepartmentDeliveryParcelId;
+            selectReceiverId = purchase.ReceiverId;
+        }
+    }
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        //if()
+        Logger.Log($"PurchaseId: {purchase?.PurchaseId}");
+        Logger.Log($"SbsTrackId: {purchase?.SbsTrackId}");
+        // jsRuntime.InvokeVoidAsync("scrollToTop");
+    }
+
+    #endregion
+
+    void OnSelectedPackage(int selectPackageId)
+    {
+        this.selectPackageId = selectPackageId;
+        //JS.InvokeVoidAsync("ModalBtnCloseOnClick");
+    }
+
+    void OnSelectedDepartment(int selectDepartmentId)
+    {
+        this.selectDepartmentId = selectDepartmentId;
+        purchase.DepartmentDeliveryParcelId = selectDepartmentId;
+        //JS.InvokeVoidAsync("ModalBtnCloseOnClick");
+    }
+
+    void OnSelectedReceiver(int selectReceiverId)
+    {
+        this.selectReceiverId = selectReceiverId;
+        purchase.ReceiverId = selectReceiverId;
+        //JS.InvokeVoidAsync("ModalBtnCloseOnClick");
+    }
+
+    private void OnRadio(ChangeEventArgs e)
+    {
+        if (e != null && e.Value != null)
+        {
+            strSendWithoutUnit = (string)e.Value;
+            StateHasChanged();
+
+            if (strSendWithoutUnit == PurchaseOptions.sendWithoutUnitOptions[0])
+            {
+                jsRuntime.InvokeVoidAsync("showModalUnit");
+            }
+        }
+    }
+
+    #region private methods
+
+    private void OnCancel() => NavigationManager.NavigateTo($"/{PurchaseOptions.NameMany}");
+
+    private bool RunValidationForSbs()
+    {
+        ErrorMessages.Clear();
+
+        if (purchase == null)
+        {
+            ErrorMessages.Add("NoValid. Purchase = Null\n");
+            //System.Console.WriteLine("NoValid. Purchase = Null");
+        } 
+        else 
+        {
+            if (string.IsNullOrWhiteSpace(purchase.CurrentUserId))
+                ErrorMessages.Add(ErrorMessageText.UserNotDefined);
+
+            if (purchase.ProductSps == null || purchase.ProductSps.Count() == 0)
+                ErrorMessages.Add("Товары не добавлены.");
+
+            if (!Regex.IsMatch(purchase.Surname, @"^([A-Za-z]+)(\d+)?$"))
+                ErrorMessages.Add("Фамилия указана неверно. Заполните на английском без пробелов и спецсимволов\n");
+
+            if (!Regex.IsMatch(purchase.Name, @"^([A-Za-z]+)(\d+)?$"))
+                ErrorMessages.Add("Имя указано неверно. Заполните на английском без пробелов и спецсимволов\n");
+
+            if (purchase.DepartmentDeliveryParcelId == 0)
+                ErrorMessages.Add("Не выбран пункт выдачи посылки. ");
+
+            if (purchase.ReceiverId == 0)
+                ErrorMessages.Add("Не выбран получатель. ");
+
+            if (purchase.AgreeWithTools == false)
+                ErrorMessages.Add("Обязательно согласие с условиями раздела “Инструкция”\n");
+        }
+
+        return ErrorMessages.Count() > 0 ? false : true;
+    }
+
+    private async Task OnValidSubmit()
+    {
+        var isValidForSbs = RunValidationForSbs();
+        if (isValidForSbs)
+        {
+            EditPurchaseUseCase.Execute(purchase);
+
+            purchase.DepartmentDeliveryParcelId = selectDepartmentId;
+
+            try
+            {
+                this.purchase.ProductSps = productSps.ToList();
+
+                int recipientId = GetReceiverByIdUseCase.Execute(purchase.ReceiverId).SbsId;
+                var pvz = GetDepartmentDpByIdUseCase.Execute(purchase.DepartmentDeliveryParcelId).GipermallId.ToString();
+
+                var trackItem = TrackConverter.ConvertToTrackItem(purchase, recipientId, pvz);
+
+                bool editedIsTrue = false;
+
+                if (purchase.SbsTrackId == null || purchase.SbsTrackId == 0)
+                {
+                    // Если у посылки не указан id из SBS, то добавляем
+                    int? TrackItemId = await AddTrackSbsUseCase.ExecuteAsync(trackItem);
+                    if (TrackItemId != null)
+                    {
+                        purchase.SbsTrackId = (int)TrackItemId;
+                        EditPurchaseUseCase.Execute(purchase);
+                        var eId = purchase.PurchaseId;
+                    }
+                } else {
+                    // Если у посылки указан id из SBS, то обновляем
+                    /* Old
+                        TrackItem trackItem = new()
+                        {
+                        Code = DateTime.Now.ToShortTimeString(),
+                        Surname = purchase.Surname,
+                        UserName = purchase.Name,
+                        Store = purchase.Shop,
+                        // RecipientId = 1,
+                        RecipientId = GetReceiverByIdUseCase.Execute(purchase.ReceiverId).SbsId,
+                        Pvz = GetDepartmentDpByIdUseCase.Execute(purchase.DepartmentDeliveryParcelId).GipermallId.ToString(), // ToDo: Remove crutch "70130010"
+                                                                                                                              //Pvz = purchase.DepartmentDeliveryParcelId.ToString(),
+                        Wait = 0,
+                        Agree = purchase.AgreeWithTools ? 1 : 0,
+                        Comment = purchase.Description
+                    };
+                    */
+
+                    editedIsTrue = await EditTrackSbsUseCase.ExecuteAsync(trackItem);
+                }
+                if (!editedIsTrue)
+                {
+                    NavigationManager.NavigateTo($"/{PurchaseOptions.NameMany}");
+                } else
+                {
+                    ErrorMessages.Add("Посылка не обновлена !");                    
+                }
+            }
+            catch (Exception ex)
+            {
+                string MessageForLogger = "\t SpLog,"
+                    + $"Date: {DateTime.Now.ToLongDateString()},"
+                    + $"Time: {DateTime.Now.ToLongTimeString()},"
+                    + $"AddPurchasePage -> OnValidSubmit(),"
+                    + $"Exception: {ex.Message}";
+
+                LoggerInFile.LogInformation(MessageForLogger);
+                Logger.Log(MessageForLogger);
+            }
+        }
+    }
+
+    private void OnCkickSendWithoutUnit()
+    {
+        //if (purchase.SendWithoutUnit == PurchaseOptions.sendWithoutUnitOptions[0])
+        //{
+        //    JS.InvokeVoidAsync("showModalUnit");
+        //}
+    }
+
+    private void OnAddProductSp()
+    {
+        LoadAllProductSp();
+        StateHasChanged();
+        jsRuntime.InvokeVoidAsync("onClickloadAllProductSp");
+    }
+
+    private void OnEditProductSp()
+    {
+        LoadAllProductSp();
+        StateHasChanged();
+        jsRuntime.InvokeVoidAsync("onClickloadAllProductSp");
+    }
+
+    private void OnClickEditProductSp(ProductSp single)
+    {
+        //NavigationManager.NavigateTo($"/edit{ProductSpOptions.NameSingle}/{single.ProductSpId}");
+    }
+
+    private void OnClickDeleteProductSp(int id)
+    {
+        DeleteProductSpUseCase.Delete(id);
+        LoadAllProductSp();
+    }
+
+    private void LoadAllProductSp()
+    {
+        if (int.TryParse(this.PurchaseId, out int iPurchaseId))
+        {
+            productSps = GetProductsSpByPurchaseUseCase.Execute(iPurchaseId);
+            purchase.ProductSps = productSps?.ToList();
+        }
+    }
+    #endregion
+
+}

@@ -1,0 +1,25 @@
+﻿@page "/AdminExchangeRates"
+@attribute [Authorize(Policy = "AdminOnly")]
+
+@using Plugins.Currencies
+
+<h1 class="h3">Курс Газпромбанка</h1>
+<br />
+<a href="https://belgazprombank.by/upload/courses.xml" target="_blank">Курс головного офиса </a><br/>
+<br />
+<i>currency: </i><b class="currencyValue">@currency.currency</b>
+<br/>
+<i>Units: </i><b class="unitsValue">@currency.Units</b>
+<br />
+<i>buy: </i><b class="buyValue">@currency.buy</b>
+<br />
+<i>sell: </i><b class="sellValue">@currency.sell</b>
+<br />
+
+@code {
+    #region Private fields
+
+    private Currency currency = new Currency();
+
+    #endregion
+}

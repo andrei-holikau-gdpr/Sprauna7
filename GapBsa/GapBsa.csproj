@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="Pages\CountriesPg.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Blazor.Bootstrap" Version="1.10.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Gap.CoreBusiness\Gap.CoreBusiness.csproj" />
+    <ProjectReference Include="..\Gap.Plugins.DataStore.InMemory\Gap.Plugins.DataStore.InMemory.csproj" />
+    <ProjectReference Include="..\Gap.UseCases\Gap.UseCases.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Pages\CountriesPg.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Pages\CountriesPg.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Pages\CountriesPg.razor" />
+  </ItemGroup>
+
+</Project>

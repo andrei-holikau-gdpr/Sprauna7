@@ -1,0 +1,170 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@inject IAuthorizationService AuthorizationService
+
+<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
+    <nav class="flex-column">
+
+        <AuthorizeView>
+            <Authorized>
+
+                <ul class="nav flex-column navMenu">
+
+                   <li class="nav-item px-3">
+                       <NavLink class="nav-link" href="purchases">
+                            <Tooltip Placement="Placement.Top" Title="Покупки">
+                                @*<span class="bi bi-basket" aria-hidden="true"></span>*@
+                                <img src="/images/icons/1-pokupki.png" />
+                                
+                                <div class="sp-navlink-text">
+                                    Покупки
+                                </div>
+                            </Tooltip>
+                       </NavLink>
+                   </li>
+
+                    <li class="nav-item px-3">
+                        <NavLink class="nav-link" href="packages">
+                            <Tooltip Placement="Placement.Top" Title="Посылки">
+                                @*<span class="bi bi-box2-fill" aria-hidden="true"></span>*@
+                                <img src="/images/icons/2-posilki.svg" />
+                                <div class=" sp-navlink-text">
+                                    Посылки
+                                </div>
+                            </Tooltip>
+                        </NavLink>
+                    </li>
+
+                    <li class="nav-item px-3">
+                        <NavLink class="nav-link" href="receivers">
+                            <Tooltip Placement="Placement.Top" Title="Получатели" class="lnkReceivers">
+                                @*<span class="bi bi-file-person" aria-hidden="true"></span>*@
+                                <img src="/images/icons/3-poluchateli.svg" />
+                                <div class=" sp-navlink-text">
+                                    Получатели
+                                </div>
+                            </Tooltip>
+                        </NavLink>
+                    </li>
+
+                    <li class="nav-item px-3">
+                        <NavLink class="nav-link" href="cost-delivery">
+                            <Tooltip Placement="Placement.Top" Title="Стоимость доставки">
+                                @*<span class="bi bi-tag" aria-hidden="true"></span>*@
+                                <img src="/images/icons/4-stoimost-dostavki.svg" />
+                                <div class=" sp-navlink-text">
+                                    Стоимость доставки
+                                </div>
+                            </Tooltip>
+                        </NavLink>
+                    </li>
+
+                    <li class="nav-item px-3">
+                        <NavLink class="nav-link" href="MyAddressInPoland">
+                            <Tooltip Placement="Placement.Top" Title="Мой адрес в Польше">
+                                @*<span class="bi bi-pin-map" aria-hidden="true"></span>*@
+                                <img src="/images/icons/5-adres-v-polche.svg" />
+                                <div class=" sp-navlink-text">
+                                    Мой адрес в Польше
+                                </div>
+                            </Tooltip>
+                        </NavLink>
+                    </li>
+
+                    <li class="nav-item px-3">
+                        <NavLink class="nav-link" href="PageHelp">
+                            <Tooltip Placement="Placement.Top" Title="Помощь">
+                                @*<span class="bi bi-info-circle" aria-hidden="true"></span>*@
+                                <img src="/images/icons/6-pomoch.svg" />
+                                <div class=" sp-navlink-text">
+                                    Помощь
+                                </div>
+                            </Tooltip>
+                        </NavLink>
+                    </li>
+
+                    <li class="nav-item px-3">
+                        <NavLink class="nav-link" href="History">
+                            <Tooltip Placement="Placement.Top" Title="История">
+                                @*<span class="bi bi-strava" aria-hidden="true"></span>*@
+                                <img src="/images/icons/7-history.svg" />
+                                <div class=" sp-navlink-text">
+                                    История
+                                </div>
+                            </Tooltip>
+                        </NavLink>
+                    </li>
+
+                    <li class="nav-item px-3">
+                        <NavLink class="nav-link" href="Discounts">
+                            <Tooltip Placement="Placement.Top" Title="Скидки">
+                                @*<span class="bi bi-percent" aria-hidden="true"></span>*@
+                                <img src="/images/icons/8-skidki.svg" />
+                                <div class=" sp-navlink-text">
+                                    Скидки
+                                </div>
+                            </Tooltip>
+                        </NavLink>
+                    </li>
+
+                    <li class="nav-item px-3">
+                        <br/>
+                        <NavLink class="nav-link" href="/identity/account/logout?returnUrl=panel.sprauna.by" Match="NavLinkMatch.All">
+                            <Tooltip Placement="Placement.Top" Title="Выйти">
+                                @*<span class="oi oi-power-standby" aria-hidden="true"></span>*@
+                                <div class=" sp-navlink-text">
+                                    Выйти
+                                </div>
+                            </Tooltip>
+                        </NavLink>
+                        <br/>
+                    </li>                    
+                </ul>
+
+                
+            </Authorized>
+            <NotAuthorized>
+                @* //ToDo: Здесь удаляем и переносим в авторизированную зону*@
+                <ul class="nav flex-column">
+                    <li class="nav-item px-3">
+                        <NavLink class="nav-link" href="Identity/Account/Register">
+                            <span class="bi bi-box-arrow-in-right" aria-hidden="true"></span> Регистрация
+                        </NavLink>
+                    </li>
+
+                    <li class="nav-item px-3">
+                        <NavLink class="nav-link" href="Identity/Account/Login">
+                            <span class="bi bi-box-arrow-in-right" aria-hidden="true"></span> Вход
+                        </NavLink>
+                    </li>
+                </ul>
+            </NotAuthorized>
+        </AuthorizeView>
+
+    </nav>
+</div>
+
+@code {
+    #region Public fields / Parameters
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationStateTask { get; set; }
+
+    #endregion
+    // ---
+    #region Private fiels
+
+    private bool collapseNavMenu = true;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    #endregion
+    // ---
+    #region Private methods
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+
+    #endregion
+}

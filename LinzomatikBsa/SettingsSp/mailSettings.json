@@ -1,0 +1,10 @@
+{
+  "MailSettings": {
+    "SmtpServer": "smtp.gmail.com",
+    "SmtpPort": 587,
+    "SmtpUsername": "kudesnik.Net@gmail.com",
+    "SmtpPassword": "bfyq jugs oczo alqq",
+    "SenderEmail": "kudesnik.Net@gmail.com",
+    "SenderName": "Администрация сайта boxnail.by"
+  }
+}

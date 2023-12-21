@@ -1,0 +1,417 @@
+﻿@page "/EditReceiver/{ReceiverId}"
+
+@using Plugins.Converters;
+@using System.Text.RegularExpressions;
+@using UseCases.ShopByShop.UseCaseInterfaces;
+
+@inject IJSRuntime JS
+@inject NavigationManager NavigationManager
+
+@inject IEditReceiverUseCase EditReceiverUseCase
+@inject IGetReceiverByIdUseCase GetReceiverByIdUseCase
+
+@inject IEditRecipientSbsUseCase EditRecipientSbsUseCase
+
+<div class="container">
+    <div class="row m-2">
+        <div class="col-sm-12 col-lg-5 p-1">
+            <h1 class="h3">Изменить получателя</h1>
+        </div>
+
+        <div class="col-sm-12 col-lg-7 p-1">
+            <button type="button" class="btn btn-link" @onclick="OnClickSetDemoData">Заполнить тестовыми данными</button>
+        </div>
+    </div>
+</div>
+
+@if (ErrorMessages.Count > 0)
+{
+    <ul style="color:red;">
+        @foreach (var message in ErrorMessages)
+        {
+            <li>
+                @message
+            </li>
+        }
+    </ul>
+}
+
+@if (receiver != null)
+{
+    <EditForm Model="receiver" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator></DataAnnotationsValidator>
+        <ValidationSummary></ValidationSummary>
+
+        <div class="card p-3">
+            <div class="container ">
+                <div class="row">
+
+                    <div class="col-sm-12 col-lg-3 p-1" style="display:none;">
+                        <div class="form-floating">
+                            <label for="floatingCurrentUserId">CurrentUserId</label>
+                            <InputText id="floatingCurrentUserId" @bind-Value="receiver.CurrentUserId" 
+                                    class="form-control"></InputText>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-12 col-lg-12 p-1">
+                        <h3>Паспортные данные и ИНН</h3>
+                    </div>
+                    <div class="col-sm-12 col-lg-3 p-1">
+                        <div class="form-floating">
+                            <InputText id="floatingNationality" @bind-Value="receiver.Nationality"
+                                   class="form-control" placeholder=" "></InputText>
+                            <label for="floatingNationality">@ReceiverOptions.Nationality</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-3 p-1">
+                        <div class="form-floating">
+                            <InputText id="floatingPassportSeries" @bind-Value="receiver.PassportSeries"
+                                   class="form-control" placeholder=" "></InputText>
+                            <label for="floatingPassportSeries">@ReceiverOptions.PassportSeries</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-3 p-1">
+                        <div class="form-floating">
+                            <InputText id="floatingPassportID" @bind-Value="receiver.PassportID"
+                                   class="form-control" placeholder=" "></InputText>
+                            <label for="floatingPassportID">@ReceiverOptions.PassportID</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-3 p-1">
+                        <div class="form-floating">
+                            <InputDate id="floatingPassportIssueDate" @bind-Value="receiver.PassportIssueDate"
+                                   class="form-control" placeholder=" "></InputDate>
+                            <label for="floatingPassportIssueDate">@ReceiverOptions.PassportIssueDate</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-6 p-1">
+                        <div class="form-floating">
+                            <InputText id="floatingPassportIssuedBy" @bind-Value="receiver.PassportIssuedBy"
+                                   class="form-control" placeholder=" "></InputText>
+                            <label for="floatingPassportIssuedBy">@ReceiverOptions.PassportIssuedBy</label>
+                        </div>
+                    </div>
+
+                    @*Личный номер паспорта*@
+                    <div class="col-sm-12 col-lg-6 p-1">
+                        <div class="form-floating">
+                            <InputText id="floatingIin" @bind-Value="receiver.Iin"
+                                   class="form-control" placeholder=""></InputText>
+                            <label for="floatingIin">Личный номер паспорта</label>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-12 col-lg-3 p-1">
+                        <div class="form-floating">
+                            <InputText id="floatingSecondName" @bind-Value="receiver.SecondName"
+                                   class="form-control" placeholder="Иванов"></InputText>
+                            <label for="floatingSecondName">@ReceiverOptions.SecondName</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-3 p-1">
+                        <div class="form-floating">
+                            <InputText id="floatingFirstName" @bind-Value="receiver.FirstName"
+                                   class="form-control" placeholder="Иван"></InputText>
+                            <label for="floatingFirstName">@ReceiverOptions.FirstName</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-3 p-1">
+                        <div class="form-floating">
+                            <InputText id="floatingSurname" @bind-Value="receiver.Surname"
+                                   class="form-control" placeholder="Иванович"></InputText>
+                            <label for="floatingSurname">@ReceiverOptions.Surname</label>
+                        </div>
+                    </div>
+                    @*Birthdate*@
+                    <div class="col-sm-12 col-lg-3 p-1">
+                        <div class="form-floating">
+                            <InputDate id="Birthdate" @bind-Value="receiver.Birthdate"
+                                   class="form-control" placeholder=" "></InputDate>
+                            <label for="Birthdate">Дата рождения</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-12 p-1">
+                        <br />
+                        <h3>Адрес регистрации</h3>
+                    </div>
+                    <div class="col-sm-12 col-lg-3 p-1">
+                        <div class="form-group">
+                            <label for="Country">@ReceiverOptions.Country</label>
+                            <InputSelect id="Country" @bind-Value="receiver.Country" class="form-select">
+                                @foreach (var country in ReceiverOptions.countries)
+                                {
+                                    <option value="@country">@country</option>
+                                }
+                            </InputSelect>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-3 p-1">
+                        <div class="form-group">
+                            <label for="Region">@ReceiverOptions.Region</label>
+                            <InputSelect id="Region" @bind-Value="receiver.Region" class="form-select">
+                                @foreach (var region in ReceiverOptions.regions)
+                                {
+                                    <option value="@region">@region</option>
+                                }
+                            </InputSelect>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-3 p-1">
+                        <div class="form-group">
+                            <label for="City">@ReceiverOptions.City</label>
+                            <InputText id="City" @bind-Value="receiver.City" class="form-control"></InputText>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-12 p-1"></div>
+                    <div class="col-sm-12 col-lg-3 p-1">
+                        <div class="form-group">
+                            <label for="Street">@ReceiverOptions.Street</label>
+                            <InputText id="Street" @bind-Value="receiver.Street"
+                                   class="form-control" placeholder="Ул. Червякова"></InputText>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-2 p-1">
+                        <div class="form-group">
+                            <label for="House">@ReceiverOptions.House</label>
+                            <InputNumber id="House" @bind-Value="receiver.House"
+                                     class="form-control" Min=1></InputNumber>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-2 p-1">
+                        <div class="form-group">
+                            <label for="HouseBuildingNumber">@ReceiverOptions.HouseBuildingNumber</label>
+                            <InputText id="HouseBuildingNumber" @bind-Value="receiver.HouseBuildingNumber"
+                                   class="form-control"></InputText>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-2 p-1">
+                        <div class="form-group">
+                            <label for="Flat">@ReceiverOptions.Flat</label>
+                            <InputNumber id="Flat" @bind-Value="receiver.Flat"
+                                     class="form-control" Min=1></InputNumber>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-5 p-1">
+                        <div class="form-group">
+                            <label for="Index">@ReceiverOptions.Index</label>
+                            <InputText id="Index" @bind-Value="receiver.Index" class="form-control"></InputText>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-7 p-1" style="height:100%; vertical-align:middle;">
+                        <br /><a href="https://google.com">Узнать свой индекс</a>
+                    </div>
+                    <div class="col-sm-12 col-lg-6 p-1">
+                        <div class="form-group">
+                            <label for="Phone">@ReceiverOptions.Phone</label>
+                            <InputText id="Phone" @bind-Value="receiver.Phone"
+                                   class="form-control" placeholder="+375 (29) 999-99-99"></InputText>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-6 p-1">
+                        <div class="form-group">
+                            <label for="Email">Email</label>
+                            <InputText id="Email" @bind-Value="receiver.Email"
+                                   class="form-control" placeholder="ivan@gmail.com"></InputText>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-6 p-1">
+                        <div class="form-group">
+                            <label for="PassportScan">@ReceiverOptions.PassportScan (модуль в разработке)</label>
+                            <InputText id="PassportScan" @bind-Value="receiver.PassportScan" class="form-control"></InputText>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-3 p-1"></div>
+                    <div class="col-sm-12 col-lg-6 p-1">
+                        Пункт выдачи
+                    </div>
+                    <div class="col-sm-12 col-lg-6 p-1"></div>
+                    <div class="col-sm-12 col-lg-6 p-1">
+                        <div class="form-group">
+                            <label for="description">Описание</label>
+                            <InputText id="description" @bind-Value="receiver.Description" class="form-control"></InputText>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-12 p-1"></div>
+                    <div class="col-sm-12 col-lg-12 p-1">
+                        <button type="submit" class="btn btn-primary">Сохранить и выйти</button>
+                        <button type="button" class="btn btn-primary" @onclick="OnCancel">Отменить</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </EditForm>
+}
+
+@code {
+    #region public Parameters
+
+    [Parameter]
+    public string ReceiverId { get; set; } = "0";
+
+    [Parameter]
+    public bool IsModal { get; set; } = false;
+
+    [Parameter]
+    public EventCallback OnEditCallback { get; set; }
+
+    [Parameter]
+    public EventCallback OnCanselCallback { get; set; }
+
+    #endregion
+    // ---
+    #region Private fiels
+
+    [NotNull]
+    private ConsoleLogger? Logger { get; set; }
+    private bool LogerEnable = true;
+
+    private List<string> ErrorMessages = new();
+
+    private Receiver receiver = new Receiver();
+
+    #endregion
+    // ---
+    #region Private methods / Override methods
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        if (int.TryParse(this.ReceiverId, out int iReceiverId))
+        {
+            var tempItem = GetReceiverByIdUseCase.Execute(iReceiverId);
+            this.receiver = ReceiverOptions.CopyReceiver(tempItem);
+            this.receiver.ReceiverId = tempItem.ReceiverId;
+        }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        JS.InvokeVoidAsync("setMask");
+    }
+
+    #endregion
+    // ---
+    #region private methods
+
+    private bool RunValidationForSbs()
+    {
+        var result = true;
+        ErrorMessages.Clear();
+
+        // FirstName
+        if (!Regex.IsMatch(receiver.FirstName, @"^([а-яА-ЯёЁ]+)(\d+)?$"))
+        {
+            ErrorMessages.Add("Имя указана некорректно. Заполните на русском без пробелов и спецсимволов. ");
+            result = false;
+        }
+        // SecondName
+        if (!Regex.IsMatch(receiver.SecondName, @"^([а-яА-ЯёЁ]+)(\d+)?$"))
+        {
+            ErrorMessages.Add("Фамилия указано некорректно. Заполните на русском без пробелов и спецсимволов. ");
+            result = false;
+        }
+
+        // Surname
+        if (!Regex.IsMatch(receiver.Surname, @"^([а-яА-ЯёЁ]+)(\d+)?$"))
+        {
+            ErrorMessages.Add("Отчество указано некорректно. Заполните на русском без пробелов и спецсимволов. ");
+            result = false;
+        }
+
+        // Email
+        if (!Regex.IsMatch(receiver.Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+        {
+            ErrorMessages.Add("Email указан некорректно.");
+            result = false;
+        }
+
+        // Index
+        //if (!Regex.IsMatch(receiver.Index, @"^\\d+$"))
+        //{
+        //    ErrorMessages.Add("Индекс указан некорректно.");
+        //    result = false;
+        //}
+
+        //bool Phone_IsValid = System.Text.RegularExpressions.Regex
+        //    .IsMatch(receiver.ContactNumber, @"^\\+?(375|7)");
+
+        //if (!Phone_IsValid)
+        //    ErrorMessage += "Телефон указан некорректно.\n";
+
+        return result;
+    }
+
+    private async Task OnValidSubmit()
+    {
+        var isValidForSbs = RunValidationForSbs();
+        if (isValidForSbs)
+        {
+            receiver.UpdatedAt = DateTime.Now;
+            EditReceiverUseCase.Execute(receiver);
+
+            var receiverItem = receiver.ConvertToReceiverItem();
+            var recipientSbsId = await EditRecipientSbsUseCase.ExecuteAsync(receiverItem);
+
+
+            if (!IsModal)
+            {
+                NavigationManager.NavigateTo($"/{ReceiverOptions.NameMany}");
+            }
+            else
+            {
+                await OnEditCallback.InvokeAsync();
+            }
+        }
+    }
+
+    private void OnCancel()
+    {
+        if (!IsModal)
+        {
+        NavigationManager.NavigateTo($"/{ReceiverOptions.NameMany}");
+        }
+        else
+        {
+            OnCanselCallback.InvokeAsync();
+        }
+    }
+
+    /// <summary>
+    /// Заполнение демо данными
+    /// </summary>
+    private void OnClickSetDemoData()
+    {
+        receiver.Nationality = "Гражданство 111";
+        receiver.PassportSeries = "Серия паспорта 111";
+        receiver.PassportID = "Номер паспорта 111";
+
+        receiver.PassportIssuedBy = "Кем выдан 111";
+        receiver.SecondName = "Фамилия 111";
+        receiver.FirstName = "Имя 111";
+        receiver.Surname = "Отчество 111";
+        receiver.Country = "Беларусь";
+        receiver.Region = "Минская область";
+        receiver.City = "Город 111";
+        receiver.Street = "Улица 111";
+        receiver.House = 111;
+        receiver.HouseBuildingNumber = "Корпус 111";
+        receiver.Flat = 111;
+        receiver.Index = "212000";
+        receiver.Phone = "+375 29 123 12 12";
+        receiver.PassportScan = "Скан паспорта 111";
+        receiver.Iin = "123123123";
+
+        receiver.PassportIssueDate = DateTime.Now;
+        receiver.Birthdate = DateTime.Now;
+        receiver.UpdatedAt = DateTime.Now;
+    }
+
+    #endregion
+}

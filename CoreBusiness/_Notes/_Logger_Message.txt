@@ -1,0 +1,8 @@
+﻿                var MessageForLogger = SpHelper.GetMessageForLogger(
+                    "Sprauna7Publish",
+                    "AddPurchasePage", "OnValidSubmit()", "", "", 
+                    ex.Message
+                );
+
+                LoggerInFile.LogInformation(MessageForLogger);
+                Logger.Log(MessageForLogger);

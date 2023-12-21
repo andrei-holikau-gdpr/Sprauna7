@@ -1,0 +1,44 @@
+Executed DbCommand (22ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT 1
+Executed DbCommand (23ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT OBJECT_ID(N'[__EFMigrationsHistory]');
+Executed DbCommand (9ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT 1
+Executed DbCommand (8ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT OBJECT_ID(N'[__EFMigrationsHistory]');
+Executed DbCommand (9ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [MigrationId], [ProductVersion]
+FROM [__EFMigrationsHistory]
+ORDER BY [MigrationId];
+Applying migration '20230907151419_CreateIdentitySchema_5'.
+Executed DbCommand (10ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+ALTER TABLE [Invoices] ADD [Amount] nvarchar(max) NULL;
+Executed DbCommand (7ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+ALTER TABLE [Invoices] ADD [Created] nvarchar(max) NULL;
+Executed DbCommand (9ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+ALTER TABLE [Invoices] ADD [Expiration] nvarchar(max) NULL;
+Executed DbCommand (9ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+ALTER TABLE [Invoices] ADD [Status] int NOT NULL DEFAULT 0;
+Executed DbCommand (10ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+UPDATE [Purchases] SET [TrackNumber] = N'07.09.2023 15:14:19'
+WHERE [PurchaseId] = 1;
+SELECT @@ROWCOUNT;
+Executed DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+UPDATE [Purchases] SET [TrackNumber] = N'07.09.2023 15:14:19'
+WHERE [PurchaseId] = 2;
+SELECT @@ROWCOUNT;
+Executed DbCommand (23ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+UPDATE [Purchases] SET [TrackNumber] = N'07.09.2023 15:14:19'
+WHERE [PurchaseId] = 3;
+SELECT @@ROWCOUNT;
+Executed DbCommand (14ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+UPDATE [Receivers] SET [PassportIssueDate] = '2023-09-07T18:14:19.2585226+03:00'
+WHERE [ReceiverId] = 1;
+SELECT @@ROWCOUNT;
+Executed DbCommand (8ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+UPDATE [Receivers] SET [PassportIssueDate] = '2023-09-07T18:14:19.2585238+03:00'
+WHERE [ReceiverId] = 2;
+SELECT @@ROWCOUNT;
+Executed DbCommand (8ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+VALUES (N'20230907151419_CreateIdentitySchema_5', N'7.0.9');

@@ -1,0 +1,58 @@
+	 SpLog, app.Run,, Time:11:49:36
+Now listening on: https://localhost:7113
+Now listening on: http://localhost:5252
+Application started. Press Ctrl+C to shut down.
+Hosting environment: Development
+Content root path: D:\VisualStudioProjects\Sprauna7\Sprauna7Publish
+Executed DbCommand (73ms) [Parameters=[@__p_0='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[Email], [a].[EmailConfirmed], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[ProfilePicture], [a].[SecurityStamp], [a].[TwoFactorEnabled], [a].[UserName], [a].[firstName], [a].[lastName]
+FROM [AspNetUsers] AS [a]
+WHERE [a].[Id] = @__p_0
+Executed DbCommand (28ms) [Parameters=[@__user_Id_0='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+SELECT [a].[Id], [a].[ClaimType], [a].[ClaimValue], [a].[UserId]
+FROM [AspNetUserClaims] AS [a]
+WHERE [a].[UserId] = @__user_Id_0
+Executed DbCommand (59ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[ReceiverId], [r].[Birthdate], [r].[BirthdateForm], [r].[City], [r].[Country], [r].[CreatedAt], [r].[CurrentUserId], [r].[Description], [r].[Email], [r].[FirstName], [r].[Flat], [r].[Fullname], [r].[Hide], [r].[House], [r].[HouseBuildingNumber], [r].[Iin], [r].[Index], [r].[IsDefault], [r].[Nationality], [r].[Passport], [r].[PassportDateForm], [r].[PassportHumanDate], [r].[PassportID], [r].[PassportIssueDate], [r].[PassportIssuedBy], [r].[PassportScan], [r].[PassportSeries], [r].[Phone], [r].[Region], [r].[SbsId], [r].[SecondName], [r].[Street], [r].[Surname], [r].[Type], [r].[UpdatedAt]
+FROM [Receivers] AS [r]
+	 SpLog, Index.OnInitializedAsync.Run  Time:11:49:45
+Executed DbCommand (9ms) [Parameters=[@__p_0='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[Email], [a].[EmailConfirmed], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[ProfilePicture], [a].[SecurityStamp], [a].[TwoFactorEnabled], [a].[UserName], [a].[firstName], [a].[lastName]
+FROM [AspNetUsers] AS [a]
+WHERE [a].[Id] = @__p_0
+	 SpLog, Index.OnInitializedAsync.Run  Time:11:49:58
+Executed DbCommand (15ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[ReceiverId], [r].[Birthdate], [r].[BirthdateForm], [r].[City], [r].[Country], [r].[CreatedAt], [r].[CurrentUserId], [r].[Description], [r].[Email], [r].[FirstName], [r].[Flat], [r].[Fullname], [r].[Hide], [r].[House], [r].[HouseBuildingNumber], [r].[Iin], [r].[Index], [r].[IsDefault], [r].[Nationality], [r].[Passport], [r].[PassportDateForm], [r].[PassportHumanDate], [r].[PassportID], [r].[PassportIssueDate], [r].[PassportIssuedBy], [r].[PassportScan], [r].[PassportSeries], [r].[Phone], [r].[Region], [r].[SbsId], [r].[SecondName], [r].[Street], [r].[Surname], [r].[Type], [r].[UpdatedAt]
+FROM [Receivers] AS [r]
+Executed DbCommand (39ms) [Parameters=[@__currentUserId_0='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']
+SELECT [p].[PurchaseId], [p].[AgreeWithTools], [p].[CombineParcels], [p].[CurrentUserId], [p].[DeliveryType], [p].[DepartmentDeliveryParcelId], [p].[Description], [p].[Lock], [p].[Name], [p].[PackageId], [p].[ReceiverId], [p].[SbsTrackId], [p].[Shop], [p].[Surname], [p].[TrackNumber], [p].[Wait], [r].[ReceiverId], [r].[Birthdate], [r].[BirthdateForm], [r].[City], [r].[Country], [r].[CreatedAt], [r].[CurrentUserId], [r].[Description], [r].[Email], [r].[FirstName], [r].[Flat], [r].[Fullname], [r].[Hide], [r].[House], [r].[HouseBuildingNumber], [r].[Iin], [r].[Index], [r].[IsDefault], [r].[Nationality], [r].[Passport], [r].[PassportDateForm], [r].[PassportHumanDate], [r].[PassportID], [r].[PassportIssueDate], [r].[PassportIssuedBy], [r].[PassportScan], [r].[PassportSeries], [r].[Phone], [r].[Region], [r].[SbsId], [r].[SecondName], [r].[Street], [r].[Surname], [r].[Type], [r].[UpdatedAt]
+FROM [Purchases] AS [p]
+INNER JOIN [Receivers] AS [r] ON [p].[ReceiverId] = [r].[ReceiverId]
+WHERE [p].[CurrentUserId] = @__currentUserId_0
+Executed DbCommand (21ms) [Parameters=[@__p_0='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [d].[DepartmentDeliveryParcelId], [d].[Address], [d].[AddressForMap], [d].[Description], [d].[GipermallId], [d].[Hide], [d].[RegionId]
+FROM [DepartmentDeliveryParcels] AS [d]
+WHERE [d].[DepartmentDeliveryParcelId] = @__p_0
+Executed DbCommand (11ms) [Parameters=[@__p_0='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [d].[DepartmentDeliveryParcelId], [d].[Address], [d].[AddressForMap], [d].[Description], [d].[GipermallId], [d].[Hide], [d].[RegionId]
+FROM [DepartmentDeliveryParcels] AS [d]
+WHERE [d].[DepartmentDeliveryParcelId] = @__p_0
+Executed DbCommand (60ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [p].[PackageId], [p].[CurrentUserId], [p].[Description], [p].[InvoiceId], [p].[IsCollectivePackage], [p].[NumberPackage], [p].[PriceBYN], [p].[PricePLN], [p].[Status], [p].[TrackNumber], [p].[Weight]
+FROM [PackageSp] AS [p]
+Executed DbCommand (9ms) [Parameters=[@__PackageId_0='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+SELECT [p].[PurchaseId], [p].[AgreeWithTools], [p].[CombineParcels], [p].[CurrentUserId], [p].[DeliveryType], [p].[DepartmentDeliveryParcelId], [p].[Description], [p].[Lock], [p].[Name], [p].[PackageId], [p].[ReceiverId], [p].[SbsTrackId], [p].[Shop], [p].[Surname], [p].[TrackNumber], [p].[Wait], [r].[ReceiverId], [r].[Birthdate], [r].[BirthdateForm], [r].[City], [r].[Country], [r].[CreatedAt], [r].[CurrentUserId], [r].[Description], [r].[Email], [r].[FirstName], [r].[Flat], [r].[Fullname], [r].[Hide], [r].[House], [r].[HouseBuildingNumber], [r].[Iin], [r].[Index], [r].[IsDefault], [r].[Nationality], [r].[Passport], [r].[PassportDateForm], [r].[PassportHumanDate], [r].[PassportID], [r].[PassportIssueDate], [r].[PassportIssuedBy], [r].[PassportScan], [r].[PassportSeries], [r].[Phone], [r].[Region], [r].[SbsId], [r].[SecondName], [r].[Street], [r].[Surname], [r].[Type], [r].[UpdatedAt]
+FROM [Purchases] AS [p]
+INNER JOIN [Receivers] AS [r] ON [p].[ReceiverId] = [r].[ReceiverId]
+WHERE [p].[PackageId] = @__PackageId_0
+Failed executing DbCommand (129ms) [Parameters=[@p0='?' (Size = 4000), @p1='?' (Size = 4000), @p2='?' (Size = 4000), @p3='?' (Size = 4000), @p4='?' (DbType = Int32), @p5='?' (Size = 4000), @p8='?' (DbType = Int32), @p6='?' (DbType = Double), @p7='?' (DbType = Int32), @p9='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+SET NOCOUNT ON;
+INSERT INTO [Invoices] ([AccountNo], [CurrentUserId], [Description], [InvoiceNo], [PackageId], [Url])
+OUTPUT INSERTED.[InvoiceId]
+VALUES (@p0, @p1, @p2, @p3, @p4, @p5);
+UPDATE [PackageSp] SET [PriceBYN] = @p6, [Status] = @p7
+OUTPUT 1
+WHERE [PackageId] = @p8;
+DELETE FROM [Purchases]
+OUTPUT 1
+WHERE [PurchaseId] = @p9;

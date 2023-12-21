@@ -1,0 +1,101 @@
+﻿@using System.Net.Http.Json
+@*@inject HttpClient httpClient*@
+@using Gap2.CoreBusiness
+@using Gap2.Plugins.DataStore.InMemory;
+
+@page "/Answer"
+
+<h3>Answer</h3>
+
+<MudTable T="Answer" Items="@Answers.Take(4)" Hover="true" Breakpoint="Breakpoint.Sm" @ref="mudTable"
+          RowClass="cursor-pointer" RowClassFunc="@SelectedRowClassFunc" OnRowClick="RowClickEvent">
+    <HeaderContent>
+        <MudTh>Id</MudTh>
+        <MudTh>NotionId</MudTh>
+        <MudTh>Name</MudTh>
+
+        <MudTh>Question</MudTh>
+        <MudTh>Jurisdiction</MudTh>
+
+        <MudTh>Yes</MudTh>
+        <MudTh>No</MudTh>
+@*        <MudTh>Probability</MudTh>*@
+
+        <MudTh>Position</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Id">@context.Id</MudTd>
+        <MudTd DataLabel="NotionId">
+            <MudTextField @bind-Value="@context.NotionId" Label="Standard" Variant="Variant.Text"></MudTextField>
+        </MudTd>
+        <MudTd DataLabel="Name">@context.Name</MudTd>
+
+        <MudTd DataLabel="Question">@*@context.Name*@</MudTd>
+        <MudTd DataLabel="Jurisdiction">@*@context.Name*@</MudTd>
+
+        <MudTd DataLabel="Yes">@context.YesDigitalEquivalent</MudTd>
+        <MudTd DataLabel="No">@context.NoDigitalEquivalent</MudTd>
+        @*<MudTd DataLabel="Probability">@context.ProbabilityDigitalEquivalent</MudTd>*@
+    
+        <MudTd DataLabel="Position">@context.Position</MudTd>
+    </RowTemplate>
+</MudTable>
+<MudExpansionPanels Style="flex: 1;">
+    <MudExpansionPanel Text="Show inline-clicked event log">
+        @foreach (var message in clickedEvents)
+        {
+            <MudText>@message</MudText>
+        }
+        @if (clickedEvents.Count > 0)
+        {
+            <div class="d-flex">
+                <MudSpacer />
+                <MudButton Class="mt-3" ButtonType="ButtonType.Button" Variant="Variant.Filled" OnClick="@(() => clickedEvents.Clear())">Clear events</MudButton>
+            </div>
+        }
+    </MudExpansionPanel>
+</MudExpansionPanels>
+
+@code {
+    #region private fields
+    TestDataGenerator testDataGenerator;
+    IEnumerable<Answer> Answers;
+
+    private int selectedRowNumber = -1;
+    private MudTable<Answer> mudTable;
+    private List<string> clickedEvents = new();
+    #endregion
+    #region protected override
+    protected override void OnInitialized()
+    {
+        TestDataGenerator testDataGenerator = new TestDataGenerator();
+        Answers = testDataGenerator.GenerateAnswers();
+    }
+    #endregion
+    #region private methods
+    private void RowClickEvent(TableRowClickEventArgs<Answer> tableRowClickEventArgs)
+    {
+        clickedEvents.Add("Row has been clicked");
+    }
+
+    private string SelectedRowClassFunc(Answer element, int rowNumber)
+    {
+        if (selectedRowNumber == rowNumber)
+        {
+            selectedRowNumber = -1;
+            clickedEvents.Add("Selected Row: None");
+            return string.Empty;
+        }
+        else if (mudTable.SelectedItem != null && mudTable.SelectedItem.Equals(element))
+        {
+            selectedRowNumber = rowNumber;
+            clickedEvents.Add($"Selected Row: {rowNumber}");
+            return "selected";
+        }
+        else
+        {
+            return string.Empty;
+        }
+    }
+    #endregion
+}

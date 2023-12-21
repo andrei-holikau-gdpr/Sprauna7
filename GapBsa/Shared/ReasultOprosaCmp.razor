@@ -1,0 +1,92 @@
+﻿@using Gap.CoreBusiness;
+<h2>Результат</h2>
+
+@foreach (var item in ProcessToConsiderList)
+{
+    <Accordion AlwaysOpen="true">
+        <AccordionItem IsActive="true" >
+            <TitleTemplate>
+                <Icon Name="IconName.Map" Class="me-1" /> Процесс: <b>@item.Name</b>
+            </TitleTemplate>
+            <Content>
+                <ResultCountryAccordionCmp Title="Применяется"
+                                          ResultCountryList="ResultCountryListApplies"
+                                      AccordionId="accordion-Applies" /><hr />
+                <ResultCountryAccordionCmp Title="Не применяется"
+                                          ResultCountryList="ResultCountryListNotApplies"
+                                      AccordionId="accordion-NotApplies" /><hr />
+                <ResultCountryUlCmp Title="Не обработан"
+                                          ResultCountryList="ResultCountryListNotProcessed" />
+            </Content>
+        </AccordionItem>
+    </Accordion>
+<br/>
+}
+
+@code {
+    #region Parameters
+    [Parameter]
+    public List<ProcessToConsider> ProcessToConsiderList { get; set; } = new();
+    [Parameter]
+    public List<ResultCountry> ResultCountryList { get; set; } = new();
+
+    #endregion
+
+    #region
+    private string DemoDescription = "Placeholder content for this accordion, which is intended to demonstrate the"
+                                        + "<code>.accordion-flush</code>"
+                                        + " class. This is the second item\'s accordion body."
+                                        + "Let\'s imagine this being filled with some actual content.";
+    #endregion
+    #region private
+    private List<ResultCountry> ResultCountryListApplies { get; set; } = new();
+    private List<ResultCountry> ResultCountryListNotApplies { get; set; } = new();
+    private List<ResultCountry> ResultCountryListNotProcessed { get; set; } = new();
+    #endregion
+    #region Override
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        ProcessToConsiderList.AddRange(
+            new List<ProcessToConsider>()
+            {
+                new(){ Id = 1, Name= "IT" },
+                new(){ Id = 1, Name= "Маркетинг" }
+            }
+        );
+
+        ResultCountryList.AddRange(
+            new List<ResultCountry>()
+            {
+                new (){ Id = 1, Country = new(){ Id= 1, Name = "Китай" },
+                    StatusGap = StatusGapEnum.Applies, Description = DemoDescription },
+                new (){ Id = 2, Country = new(){ Id= 2, Name = "ОАЭ" },
+                    StatusGap = StatusGapEnum.Applies, Description = DemoDescription },
+
+                new (){ Id = 3, Country = new(){ Id= 3, Name = "Германия" },
+                    StatusGap = StatusGapEnum.NotApplies, Description = DemoDescription },
+                new (){ Id = 4, Country = new(){ Id= 4, Name = "Италия" },
+                    StatusGap = StatusGapEnum.NotApplies, Description = DemoDescription },
+
+                new (){ Id = 5, Country = new(){ Id= 5, Name = "Австрия" },
+                    StatusGap = StatusGapEnum.NotProcessed, Description = DemoDescription },
+                new (){ Id = 6, Country = new(){ Id= 6, Name = "Республика Кипр" },
+                    StatusGap = StatusGapEnum.NotProcessed, Description = DemoDescription }
+            }
+        );
+
+        ResultCountryListApplies = ResultCountryList
+            .Where<ResultCountry>(rs => rs.StatusGap == StatusGapEnum.Applies).ToList();
+        ResultCountryListNotApplies = ResultCountryList
+            .Where<ResultCountry>(rs => rs.StatusGap == StatusGapEnum.NotApplies).ToList();
+        ResultCountryListNotProcessed = ResultCountryList
+            .Where<ResultCountry>(rs => rs.StatusGap == StatusGapEnum.NotProcessed).ToList();
+    }
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        
+    }
+    #endregion
+}

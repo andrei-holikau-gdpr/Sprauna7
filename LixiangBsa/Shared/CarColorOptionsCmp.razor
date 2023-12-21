@@ -1,0 +1,71 @@
+﻿@using Lixiang.CoreBusiness;
+
+<div class="hidden-up-768">
+    <MainCarousel CarOptionForComponent="CarOptionForComponent" />
+</div>
+
+<h3>@Title</h3>
+<br />
+
+    <p class="thumb">
+        @foreach (var carColorOption in CarColorOptions)
+        {
+            <img src="/img/@carColorOption.Thumbnail?.FileName" alt="@carColorOption.Name" 
+                width="50" height="50"
+                onclick="@(() => OnClickCarFasad(carColorOption))"
+                class="@(carColorOption == CarOptionForComponent ? "img-thumb curent" : "img-thumb" )" />
+        }
+    </p>
+    <strong class="li-text-font">
+        @CarOptionForComponent.Name @(CarOptionForComponent.Price > 0 ? $"{CarOptionForComponent.Price} ₽" :"")
+    </strong>
+@*    <div class="li-text-font">
+    @CarOptionForComponent.Price ₽
+    </div>*@
+    <div class="li-text-font">
+        @CarOptionForComponent.Description
+    </div>
+
+<hr />
+
+@code {
+    #region
+    [Parameter]
+    public string DivId { get; set; } = "";
+    [Parameter]
+    public string Title { get; set; } = "";
+    [Parameter]
+    public Car SelectedCar { get; set; } = new();
+    [Parameter]
+    public CarColorOption CarOptionForComponent { get; set; } = new();
+
+    [Parameter]
+    public EventCallback<CarColorOption> OnClickCarFasadCallback { get; set; }
+
+    [Parameter]
+    public List<CarColorOption> CarColorOptions { get; set; } = new();
+
+    #endregion
+    // ---
+    #region private fields
+
+    #endregion
+    //---
+    #region Protected Override methods
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+
+    #endregion
+    // ---
+    #region Private methods
+
+    private async Task OnClickCarFasad(CarColorOption carColorOption)
+    {
+        await OnClickCarFasadCallback.InvokeAsync(carColorOption);
+    }
+
+    #endregion
+}

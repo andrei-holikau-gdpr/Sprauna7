@@ -1,0 +1,40 @@
+﻿@page "/"
+@using System.Diagnostics.CodeAnalysis;
+
+<Button Color="Color.Primary" Icon="fa-solid fa-font-awesome" Text="test" />
+
+<Button OnClick="() => BackdropModal.Toggle()">ModalsNormalPopups</Button>
+
+<Modal @ref="BackdropModal" IsBackdrop="true" IsKeyboard="true" >
+    <ModalDialog Title="ModalsIsBackdropToClose" IsDraggable="true" ShowFooter="false">
+        <BodyTemplate>
+            <div>ModalsTitlePopupWindowText</div>
+        </BodyTemplate>
+    </ModalDialog>
+</Modal>
+
+<ConsoleLogger @ref="Logger" class="mt-3" />
+
+@code {
+    [NotNull]
+    private Modal? BackdropModal { get; set; }
+
+    [NotNull]
+    private ConsoleLogger? Logger { get; set; }
+
+    private Task OnShownCallbackAsync()
+    {
+        Logger.Log("Logger.Log");
+        return Task.CompletedTask;
+    }
+}
+
+@*
+<PageTitle>Index</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<SurveyPrompt Title="How is Blazor working for you?" />
+*@

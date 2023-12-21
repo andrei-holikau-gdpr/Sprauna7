@@ -1,0 +1,17 @@
+﻿
+<h3>BbModalComponent</h3>
+
+<Button OnClick="() => BackdropModal.Toggle()">ModalsNormalPopups</Button>
+
+<Modal @ref="BackdropModal" IsBackdrop="true">
+    <ModalDialog Title="ModalsIsBackdropToClose">
+        <BodyTemplate>
+            <div>ModalsTitlePopupWindowText</div>
+        </BodyTemplate>
+    </ModalDialog>
+</Modal>
+
+@code {
+    [NotNull]
+    private Modal? BackdropModal { get; set; }
+}

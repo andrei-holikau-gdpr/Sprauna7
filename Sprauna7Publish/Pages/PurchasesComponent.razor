@@ -1,0 +1,322 @@
+﻿@*Все покупки*@
+
+@attribute [Authorize()]
+@page "/purchases"
+
+@*Policy = "AdminOnly"*@
+
+@using System.Diagnostics.CodeAnalysis;
+@using Microsoft.AspNetCore.Identity
+
+@inject NavigationManager NavigationManager
+@inject IJSRuntime jsRuntime
+@inject MessageService MessageService
+
+
+@inject IViewPurchasesUseCase ViewPurchasesUseCase
+@inject IDeletePurchaseUseCase DeletePurchaseUseCase
+
+@implements IDisposable
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1 id="purchases-h1" class="card-title h3">Покупки</h1>
+            <br/>
+
+            @if (Loader)
+            {
+                <div @onclick="OnClickLoader">
+                    <LoaderMini></LoaderMini>
+                </div>
+            }
+            else
+            {
+                <TablePurchasesComponent Update="@Update"
+                    CurrentUserId="@currentUserId"
+                    SelectPurchaseId="@SelectPurchaseId" 
+                    OnClickAddCallback="@OnClickAddNewPage" 
+                    OnClickViewCallback="@OnClickView"
+                    OnClickEditCallback="@OnClickEdit" 
+                    OnClickDeleteCallback="@OnClickDelete"/>
+
+                <br />
+                <br />
+                <button type="button" @onclick="OnClickAddNewPage" class="btn btn-primary" id="btnAddPurchase">Добавить покупку</button>
+
+            }
+        </div>
+    </div>
+    <ConsoleLoggerSp Owner="PurchasesComponent" LogerEnable="@LogerEnable">
+        <ConsoleLogger @ref="Logger" />
+    </ConsoleLoggerSp>
+</div>
+
+@{ #region Modals }
+<style>
+    .ModalViewClass{
+        max-width:500px;
+    }
+</style>
+
+<!-- ModalDialog Информация о покупке -->
+<Modal @ref="ModalView" IsBackdrop="true" IsKeyboard="true" >
+    <ModalDialog  Title="Информация о покупке"
+                 IsDraggable="true" ShowCloseButton="false" Class="ModalViewClass">
+        <BodyTemplate>
+            @if (SelectPurchaseId > 0)
+            {
+                <ViewPurchase PurchaseId="@SelectPurchaseId.ToString()" />
+            }
+        </BodyTemplate>
+        <FooterTemplate>
+            <Button @onclick="((args) => OnClickBtnEdit(args, SelectPurchaseId))" IsOutline="true">Редактировать</Button>
+            <Button @onclick="((args) => OnClickBtnDelete(args, SelectPurchaseId))" IsOutline="true" Color="Color.Dark">Удалить</Button>
+            @*Color="BootstrapBlazor.Components.Button.ButtonColor.Primary"*@
+        </FooterTemplate>
+    </ModalDialog>
+</Modal>
+
+<!-- ModalDialog Добавить покупку -->
+<Modal @ref="ModalAdd" IsBackdrop="false" IsKeyboard="true">
+    <ModalDialog Title="Добавить покупку" Size="Size.Large" IsScrolling="true" ShowFooter="false" ShowHeader="false">
+        <BodyTemplate>
+            <AddPurchaseForModal IsModal="true"
+                OnAddCallback="@OnAddModalCallback" 
+                OnCanselCallback="@OnAddModalCanselCallback"
+                PurchaseId="@NewPurchaseId" />
+        </BodyTemplate>
+    </ModalDialog>
+</Modal>
+
+@{ #endregion }  
+
+
+@code {
+    #region Public fields / Parameters
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationStateTask { get; set; }
+
+    [Inject]
+    UserManager<ApplicationUser>? userManager { get; set; }
+
+    [Parameter]
+    public EventCallback OnSelectedCallback { get; set; }
+
+    #endregion
+    // ---
+    #region Private fiels Purchase
+
+    private string? currentUserId;
+
+    private int? DisplayLoader = null;
+
+    [NotNull]
+    private ConsoleLogger? Logger { get; set; }
+    private bool LogerEnable = false;
+
+    public Purchase? SelectPurchase;
+    private int SelectPurchaseId;
+
+    public bool Update = false;
+    public bool Loader = false;
+
+    private int? NewPurchaseId { get; set; }
+
+    #endregion
+    // ---
+    #region Private fields / Modal
+
+    [NotNull]
+    private Modal? ModalView { get; set; }
+    [NotNull]
+    private Modal? ModalAdd { get; set; }
+
+    #endregion
+    // ---
+    #region Private methods / Override methods
+
+    protected override async Task OnInitializedAsync()
+    {
+#pragma warning disable CS8602
+        //todo: #pragma warning disable CS8602
+        var user = (await authenticationStateTask).User;
+
+#pragma warning restore CS8602
+
+        if ((user.Identity != null) 
+            && user.Identity.IsAuthenticated 
+            && (userManager != null) )
+        {
+            //var currentUser = await userManager.GetUserAsync(user);
+            //currentUserId = currentUser?.Id;
+
+            currentUserId = userManager.GetUserId(user);
+
+            //var currentUserEmail = currentUser.Email;
+            //var currentUserPhone = currentUser.PhoneNumber;
+            //var currentUserUserName = currentUser.UserName;
+        }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if(LogerEnable) Logger.Log("PurchasesComponent -> OnAfterRender");
+    }
+
+    #endregion
+    // ---
+    #region Private methods
+
+    private async Task ShowMessage(string message, string icon, Color color)
+    {
+        await MessageService.Show(new MessageOption()
+            {
+                Content = message,
+                Icon = icon,
+                Color = color,
+                ShowDismiss = true,
+            });
+    }
+
+    #endregion
+    // ---
+    #region Private methods / OnClick CRUD
+
+    private void OnClickView(Purchase single)
+    {        
+        Logger.Log($"OnClickView PurchaseId: {single.PurchaseId}");
+        SelectPurchase = single;
+        SelectPurchaseId = single.PurchaseId;
+
+        if (SelectPurchaseId > 0)
+        {
+            Loader = true;
+            ModalView.Toggle();
+            Loader = false;
+        }
+    }
+
+    private void OnClickAddModalOpen()
+    {
+        Logger.Log("OnClickAddModalOpen()");
+        Loader = true;
+        jsRuntime.InvokeVoidAsync("DataTablesRemove");
+        ModalAdd.Toggle();
+    }
+
+    private void OnClickAddNewPage()
+    {
+        NavigationManager.NavigateTo($"/add{PurchaseOptions.NameSingle}");
+    }
+
+    private void OnAddModalCanselCallback()
+    {
+        #pragma warning disable CS4014
+        ShowMessage(ConstantSps.PURCHASE_NOT_ADDED, ConstantSps.MESSAGE_ICON_INFO, Color.Info);
+        #pragma warning restore CS4014
+
+        jsRuntime.InvokeVoidAsync("InitialiseTable");
+        Loader = false;
+        ModalAdd.Close();
+    }
+
+    private void OnAddModalCallback()
+    {
+        #pragma warning disable CS4014
+        ShowMessage(ConstantSps.PURCHASE_ADDED, ConstantSps.MESSAGE_ICON_SUCCESS, Color.Success);
+        #pragma warning restore CS4014
+
+        Loader = true;
+        jsRuntime.InvokeVoidAsync("DataTablesRemove");
+        Update = true;
+        jsRuntime.InvokeVoidAsync("InitialiseTable");
+        Loader = false;
+        ModalAdd.Close();
+
+        if (NewPurchaseId != null && NewPurchaseId > 0)
+        {
+            NavigationManager.NavigateTo($"/edit{PurchaseOptions.NameSingle}/{NewPurchaseId}");
+        }        
+    }
+
+    protected void OnClickBtnEdit(EventArgs args, int PurchaseId)
+    {
+        Logger.Log($"OnClickEdit PurchaseId: {PurchaseId}");
+        ModalView.Close();
+        NavigationManager.NavigateTo($"/edit{PurchaseOptions.NameSingle}/{PurchaseId}");
+        jsRuntime.InvokeVoidAsync("scrollToTop");
+    }
+
+
+    private void OnClickEdit(Purchase single)
+    {        
+        Logger.Log($"OnClickEdit PurchaseId: {single.PurchaseId}");
+
+        NavigationManager.NavigateTo($"/edit{PurchaseOptions.NameSingle}/{single.PurchaseId}");
+    }
+
+    protected void OnClickBtnDelete(EventArgs args, int PurchaseId)
+    {
+        SelectPurchaseId = 0;   
+        DeletePurchaseUseCase.Delete(PurchaseId, currentUserId);
+        Update = true;
+        ModalView.Close();
+        // StateHasChanged();
+    }
+
+    private void OnClickDelete(int id)
+    {
+        SelectPurchaseId = 0;
+        DeletePurchaseUseCase.Delete(id, currentUserId);
+    }
+    
+    #endregion
+    // ---
+    #region Private methods / Async Task
+
+    private Task OnShownCallbackAsync()
+    {
+        Logger.Log("Logger.Log");
+        return Task.CompletedTask;
+    }
+
+    private async Task OnSelect()
+    {
+        Logger.Log("async Task OnSelect()");
+
+        await OnSelectedCallback.InvokeAsync(SelectPurchaseId);
+    }
+
+    #endregion
+    // ---
+    #region Ppublic methods / Interface Implementation IDisposable
+
+    public void Dispose()
+    {
+        jsRuntime.InvokeVoidAsync("DataTablesRemove");
+    }
+
+    #endregion
+    // ---
+    #region Private Methods / Events
+
+    private void OnClickLoader()
+    {
+        DisplayLoader = 1;
+        StateHasChanged();
+    }
+
+    private void OnClickDisableLoader()
+    {
+        if (DisplayLoader == null)
+        {
+            DisplayLoader = 1;
+            StateHasChanged();
+        }
+    }
+
+    #endregion
+}

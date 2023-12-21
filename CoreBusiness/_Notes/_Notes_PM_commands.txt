@@ -1,0 +1,25 @@
+Tools > Nuget Package Managet > Package Manager Console
+
+		PM > Add-Migration Init
+
+(v6:01) PM > Update-Database
+
+(v6:24:03) Add-Migration CreateIdentitySchema -Context AccountContext
+
+(v6:26:24) Update-Database -Context AccountContext
+
+---
+add-migration customFields
+update-database
+---
+add-migration Add CustomFields-1
+update-database
+---
+add-migration AddCustomFieldProfilePicture
+update-database
+---
+(v 6:01:00)
+Для проекта: Plugins.DataStore.SQL
+
+Add-Migration CreateIdentitySchema -Context SpraunaContext
+Update-Database -Context SpraunaContext

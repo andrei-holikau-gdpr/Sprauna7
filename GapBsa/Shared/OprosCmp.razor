@@ -1,0 +1,122 @@
+﻿@using Gap.CoreBusiness;
+<h2>GDPR Applicability Project</h2>
+
+<Accordion AlwaysOpen="true">
+    <AccordionItem IsActive="true">
+        <TitleTemplate>
+            <Icon Name="IconName.Map" Class="me-1" /> Cпециальный блок
+        </TitleTemplate>
+        <Content>          
+            @if (ProcessToConsider?.SubProcesses != null)
+            {
+                foreach (var vopros in ProcessToConsider.SubProcesses)
+                {
+                    var countries = new List<Country>()
+                    {
+                           new Country(){ Id=1, Name="Мексика"},         
+                           new Country(){ Id=2, Name="Бразилия"},           
+                           new Country(){ Id=3, Name="РФ"}            
+                    };
+                    <CountrySelectCmp CountryList="countries" />
+                    <hr />
+                }
+            }
+        </Content>
+    </AccordionItem>
+    <AccordionItem>
+        <TitleTemplate>
+            <Icon Name="IconName.PhoneFill" Class="me-1" /> Второй Cпециальный блок
+        </TitleTemplate>
+        <Content>
+            <GapRadioButtonTempCmp Id = "flexRadio_1" 
+                Label = "Радио по умолчанию" />
+            <GapRadioButtonTempCmp Id = "flexRadio_2"
+                Label = "Радио выбранное по умолчанию"
+                Checked = "true" />
+            <hr />
+
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+                <label class="form-check-label" for="flexSwitchCheckDefault">Ввод флажка переключателя по умолчанию</label>
+            </div>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked>
+                <label class="form-check-label" for="flexSwitchCheckChecked">Выбран флажок переключателя ввода</label>
+            </div>
+            <hr />
+
+            <div class="btn-group" role="group" aria-label="Базовая группа переключателей флажков">
+                <input type="checkbox" class="btn-check" id="btncheck1" autocomplete="off">
+                <label class="btn btn-outline-primary" for="btncheck1">Флажок 1</label>
+
+                <input type="checkbox" class="btn-check" id="btncheck2" autocomplete="off">
+                <label class="btn btn-outline-primary" for="btncheck2">Флажок 2</label>
+
+                <input type="checkbox" class="btn-check" id="btncheck3" autocomplete="off">
+                <label class="btn btn-outline-primary" for="btncheck3">Флажок 3</label>
+            </div>
+            <hr />
+
+            <div class="btn-group" role="group" aria-label="Базовая группа переключателей радио">
+                <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked>
+                <label class="btn btn-outline-primary" for="btnradio1">Радио 10</label>
+
+                <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off">
+                <label class="btn btn-outline-primary" for="btnradio2">Радио 20</label>
+
+                <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off">
+                <label class="btn btn-outline-primary" for="btnradio3">Радио 30</label>
+            </div>
+        </Content>
+    </AccordionItem>
+    <AccordionItem>
+        <TitleTemplate>
+            <Icon Name="IconName.PersonFill" Class="me-1" />Общий блок
+        </TitleTemplate>
+        <Content>
+            <div class="input-group mb-3">
+                <span class="input-group-text">ФИО</span>
+                <input type="text" aria-label="Имя" class="form-control">
+                <input type="text" aria-label="Фамилия" class="form-control">
+                <input type="text" aria-label="Фамилия" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label for="exampleFormControlInput1" class="form-label">Адрес электронной почты</label>
+                <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="name@example.com">
+            </div>
+            <div class="form-floating mb-3">
+                <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
+                <label for="floatingInput">Адрес электронной почты</label>
+            </div>
+
+            <div class="mb-3">
+                <div class="input-group">
+                    <span class="input-group-text" id="basic-addon3">Ваш URL-адрес</span>
+                    <input type="text" class="form-control" id="basic-url" aria-describedby="basic-addon3">
+                </div>
+                <div class="form-text">Пример текста справки выходит за пределы группы ввода.</div>
+            </div>
+            <div class="form-floating mb-3">
+                <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px"></textarea>
+                <label for="floatingTextarea2">Комментарии</label>
+            </div>
+        </Content>
+    </AccordionItem>
+
+</Accordion>
+<br />
+<div class="d-grid gap-2">
+    <button class="btn btn-primary" type="button">Получить результат</button>
+</div>
+
+@code {
+    #region Parameters
+    [Parameter]
+    public ProcessToConsider ProcessToConsider { get; set; } = new();
+    #endregion
+    // ---
+    #region Private
+    private List<SubProcess> SubProcessList = new();
+    private List<Country> CountryList = new();
+    #endregion
+}

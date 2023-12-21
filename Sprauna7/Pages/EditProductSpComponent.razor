@@ -1,0 +1,174 @@
+﻿@page "/EditProductSp/{ProductSpId}"
+@inject NavigationManager NavigationManager
+
+@inject IEditProductSpUseCase EditProductSpUseCase
+@inject IGetProductSpByIdUseCase GetProductSpByIdUseCase
+
+@inject IViewPurchasesUseCase ViewPurchasesUseCase
+
+
+
+@if (productSp != null)
+{
+    <EditForm Model="productSp" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator></DataAnnotationsValidator>
+        <ValidationSummary></ValidationSummary>
+        <div class="container">
+            <div class="row">
+
+                <div class="col-sm-12 col-lg-6 p-1">
+                    <div class="form-group">
+                        <h3>@productSp.ProductTypeAndBrand</h3>
+                    </div>
+                </div>
+
+                <div class="col-sm-12 col-lg-6 p-1">
+                    <div class="form-group">
+                        <button type="button" class="btn btn-link" @onclick="OnClickSetDemoData">Заполнить демо данными</button>
+                    </div>
+                </div>
+
+                <div class="col-sm-12 col-lg-12 p-1"></div>
+
+                <div class="col-sm-12 col-lg-6 p-1">
+                    <div class="form-group">
+                        <label for="ProductTypeAndBrand">@ProductSpOptions.ProductTypeAndBrand</label>
+                        <InputText id="ProductTypeAndBrand" @bind-Value="productSp.ProductTypeAndBrand" class="form-control"></InputText>
+                    </div>
+                </div>
+
+                <div class="col-sm-12 col-lg-6 p-1">
+                    <div class="form-group">
+                        <label for="quantity">@ProductSpOptions.Quantity</label>
+                        <InputNumber id="quantity" @bind-Value="productSp.Quantity" class="form-control"></InputNumber>
+                    </div>
+                </div>
+                <div class="col-sm-12 col-lg-6 p-1">
+                    <div class="form-group">
+                        <label for="UrlToProduct">@ProductSpOptions.UrlToProduct</label>
+                        <InputText id="UrlToProduct" @bind-Value="productSp.UrlToProduct" class="form-control"></InputText>
+                    </div>
+                </div>
+                <div class="col-sm-12 col-lg-6 p-1">
+                    <div class="form-group">
+                        <label for="price">@ProductSpOptions.Price</label>
+                        <InputNumber id="price" @bind-Value="productSp.Price" @bind-Value:format="F2" class="form-control"></InputNumber>
+                    </div>
+                </div>
+                <div class="col-sm-12 col-lg-6 p-1">
+                    <div class="form-group">
+                        <label for="TrackNumber">@ProductSpOptions.TrackNumber</label>
+                        <InputText id="TrackNumber" @bind-Value="productSp.TrackNumber" class="form-control"></InputText>
+                    </div>
+                </div>
+                <div class="col-sm-12 col-lg-6 p-1">
+                    <div class="form-group">
+                        <label for="UrlToImage">@ProductSpOptions.UrlToImage</label>
+                        <InputText id="UrlToImage" @bind-Value="productSp.UrlToImage" class="form-control"></InputText>
+                    </div>
+                </div>
+                <div class="col-sm-12 col-lg-12 p-1">
+                    <div class="form-group">
+                        <label for="Description">@ProductSpOptions.Description</label>
+                        <InputText id="Description" @bind-Value="productSp.Description" class="form-control"></InputText>
+                    </div>
+                </div>
+                <div class="col-sm-12 col-lg-12 p-1">
+                    <button type="submit" class="btn btn-primary" 
+                    data-bs-dismiss="#editModal" data-bs-toggle="modal">
+                        Сохранить
+                    </button>
+                    <button type="button" class="btn btn-link" 
+                    data-bs-dismiss="#editModal" data-bs-toggle="modal">
+                        Отменить
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+@*            <label for="purchase">Покупка</label>
+            <select for="purchase" @bind="productSp.PurchaseId" class="form-control">
+                <option value="0"></option>
+                @foreach (var purchaseItem in purchases)
+                {
+                    <option value="@purchaseItem.PurchaseId">@purchaseItem.PurchaseId @purchaseItem.TrackNumber</option>
+                }
+            </select>*@
+        </div>
+        <div class="form-group">
+@*            <label for="category">@ProductSpOptions.Category</label>
+            <select for="category" @bind="productSp.CategoryId">
+                <option value="0"></option>
+                @foreach (var cat in categories)
+                {
+                    <option value="@cat.CategoryId">@cat.Name</option>
+                }
+            </select>*@
+        </div>
+                
+    </EditForm>
+}
+
+@*@onclick="OnEditCallback"*@
+
+@code {
+
+    [Parameter]
+    public string ProductSpId { get; set; }
+
+    [Parameter]
+    public EventCallback OnEditCallback { get; set; }
+
+    async Task OnEdit()
+    {
+        await OnEditCallback.InvokeAsync(productSp);
+    }
+
+    private ProductSp productSp;
+    private IEnumerable<Category> categories;
+    private IEnumerable<Purchase> purchases;
+
+    #region override methods
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        productSp = new ProductSp();
+        purchases = ViewPurchasesUseCase.Execute();
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        if (int.TryParse(this.ProductSpId, out int iProductSpId))
+        {
+            var tempProductSp = GetProductSpByIdUseCase.Execute(iProductSpId);
+            this.productSp = ProductSpOptions.CopyProductSp(tempProductSp);
+            this.productSp.ProductSpId = tempProductSp.ProductSpId;
+        }
+    }
+
+    #endregion
+
+    #region private methods
+
+    private void OnValidSubmit()
+    {
+        EditProductSpUseCase.Execute(productSp);
+        // NavigationManager.NavigateTo($"/{ProductSpOptions.NameMany}");
+    }
+
+    private void OnClickSetDemoData()
+    {
+        productSp.ProductTypeAndBrand = "Куртка";
+        productSp.Quantity = 2;
+        productSp.UrlToProduct = @"https://allegro.pl/oferta/rolki-regulowane-movino-cruzer-b2-rozmiar-30-33-13629326595";
+        productSp.Price = 3.45;
+        productSp.TrackNumber = "1674724";
+        productSp.UrlToImage = "https://a.allegroimg.com/s512/11a950/e008b96e45c5bf0578fc5d9f9522/Rolki-regulowane-MOVINO-CRUZER-B2-rozmiar-30-33-Marka-Movino";
+    }
+
+    #endregion
+}

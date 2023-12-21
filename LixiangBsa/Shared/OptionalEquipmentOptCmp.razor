@@ -1,0 +1,85 @@
+﻿@using Lixiang.CoreBusiness;
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h3>@Title <button type="button" @onclick="AddEptionalEquipment" class="btn btn-link">Добавить</button></h3>
+        </div>
+    </div>
+
+    @foreach (var optionalEquipment in OptionalEquipments)
+    {
+        <div class="row mb-3">
+            <div class="col-1">
+                <label for="optionId" class="form-label">Id</label>
+                <input type="text" class="form-control" id="optionId" @bind="optionalEquipment.Id" disabled>
+            </div>
+
+            <div class="col-3">
+                <label for="optionName" class="form-label">Name</label>
+                <input type="text" class="form-control" id="optionName" @bind="optionalEquipment.Name" >
+            </div>
+
+            <div class="col-1">
+                <label for="optionPrice" class="form-label">Price</label>
+                <input type="number" class="form-control" id="optionPrice" @bind="optionalEquipment.Price">
+            </div>
+
+            <div class="col-3">
+                <label for="optionDescription" class="form-label">Description</label>
+                <textarea class="form-control" id="optionDescription" rows="2" @bind="optionalEquipment.Description"></textarea>
+            </div>
+
+            <div class="col-3">
+                <UploadImageCmp SelectedFileLi="
+                                new FileLi{  FileLiId = 1,
+                                             FileName = optionalEquipment?.Thumbnail?.FileName, }"
+                            LoadedFilesCallback="LoadedFilesCallback"
+                            ParentImageHtmlTag="optionalEquipment.Thumbnail" />
+            </div>
+
+            <div class="col-3">
+                <button type="button" @onclick="@(()=>DelEptionalEquipment(optionalEquipment))" class="btn btn-link">Удалить</button>
+            </div>
+
+        </div>        
+    }
+</div>
+@code {
+    [Parameter]
+    public string? Title { get; set; }
+    [Parameter]
+    public List<SimpleOption> OptionalEquipments { get; set; } = new();
+    [Parameter]
+    public List<ImageHtmlTag> ImageHtmlTags { get; set; } = new();
+
+
+    #region Private methods
+    private void AddEptionalEquipment()
+    {
+        int maxImageId = ImageHtmlTags.Max(i => i.ImageHtmlTagId);
+        var tumb = new ImageHtmlTag(maxImageId+1, "");
+        OptionalEquipments.Add(
+            new SimpleOption() { 
+                Id = OptionalEquipments.Max(t => t.Id) + 1,
+                Thumbnail = tumb
+            });
+    }
+
+    private void DelEptionalEquipment(SimpleOption optionalEquipment)
+    {
+        OptionalEquipments.Remove(optionalEquipment);
+    }
+
+    private void LoadedFilesCallback(FileLi SelectedFileLi)
+    {
+        var img = SelectedFileLi.ParentImageHtmlTag;
+
+        // Если нашли обьект для обновления, то обновляем
+        if (img != null)
+        {
+            img.FileName = SelectedFileLi.FileName;
+        }
+    }
+    #endregion
+}

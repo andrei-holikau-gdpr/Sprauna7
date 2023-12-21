@@ -1,0 +1,9 @@
+﻿#pragma warning disable CS8602
+//todo: #pragma warning disable CS8602 
+
+#pragma warning restore CS8602
+
+CS8602
+CS8600
+BL8600
+BL0007

@@ -1,0 +1,253 @@
+Executed DbCommand (23ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT 1
+Executed DbCommand (19ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT OBJECT_ID(N'[__EFMigrationsHistory]');
+Executed DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT 1
+Executed DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT OBJECT_ID(N'[__EFMigrationsHistory]');
+Executed DbCommand (18ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [MigrationId], [ProductVersion]
+FROM [__EFMigrationsHistory]
+ORDER BY [MigrationId];
+Applying migration '20230902075519_CreateIdentitySchema_1'.
+Executed DbCommand (12ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+CREATE TABLE [Categories] (
+    [CategoryId] int NOT NULL IDENTITY,
+    [Name] nvarchar(max) NOT NULL,
+    [Description] nvarchar(max) NULL,
+    CONSTRAINT [PK_Categories] PRIMARY KEY ([CategoryId])
+);
+Executed DbCommand (11ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+CREATE TABLE [CostOfDeliveries] (
+    [CostOfDeliveryId] int NOT NULL IDENTITY,
+    [WeightKg] float NOT NULL,
+    [CostPln] float NOT NULL,
+    CONSTRAINT [PK_CostOfDeliveries] PRIMARY KEY ([CostOfDeliveryId])
+);
+Executed DbCommand (15ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+CREATE TABLE [DirectorySps] (
+    [DirectorySpId] int NOT NULL IDENTITY,
+    [DirectoryName] nvarchar(max) NOT NULL,
+    [CurrentUserId] nvarchar(max) NOT NULL,
+    CONSTRAINT [PK_DirectorySps] PRIMARY KEY ([DirectorySpId])
+);
+Executed DbCommand (22ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+CREATE TABLE [PackageSp] (
+    [PackageId] int NOT NULL IDENTITY,
+    [CurrentUserId] nvarchar(max) NOT NULL,
+    [Status] int NOT NULL,
+    [NumberPackage] nvarchar(max) NULL,
+    [TrackNumber] nvarchar(max) NULL,
+    [Weight] float NOT NULL,
+    [PricePLN] float NOT NULL,
+    [PriceBYN] float NOT NULL,
+    [IsCollectivePackage] bit NOT NULL,
+    [Description] nvarchar(max) NULL,
+    [InvoiceId] int NOT NULL,
+    CONSTRAINT [PK_PackageSp] PRIMARY KEY ([PackageId])
+);
+Executed DbCommand (11ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+CREATE TABLE [Receivers] (
+    [ReceiverId] int NOT NULL IDENTITY,
+    [CurrentUserId] nvarchar(max) NOT NULL,
+    [Nationality] nvarchar(max) NOT NULL,
+    [PassportSeries] nvarchar(4) NOT NULL,
+    [PassportID] nvarchar(7) NOT NULL,
+    [PassportIssueDate] datetime2 NOT NULL,
+    [PassportIssuedBy] nvarchar(150) NOT NULL,
+    [SecondName] nvarchar(70) NOT NULL,
+    [FirstName] nvarchar(70) NOT NULL,
+    [Surname] nvarchar(70) NOT NULL,
+    [Country] nvarchar(max) NOT NULL,
+    [Region] nvarchar(max) NOT NULL,
+    [City] nvarchar(max) NOT NULL,
+    [Street] nvarchar(max) NOT NULL,
+    [House] int NOT NULL,
+    [HouseBuildingNumber] nvarchar(max) NOT NULL,
+    [Flat] int NOT NULL,
+    [Index] nvarchar(max) NOT NULL,
+    [Phone] nvarchar(max) NOT NULL,
+    [PassportScan] nvarchar(max) NOT NULL,
+    [Description] nvarchar(max) NULL,
+    [IsDefault] bit NOT NULL,
+    [Email] nvarchar(70) NULL,
+    [Iin] nvarchar(max) NULL,
+    [Hide] int NOT NULL,
+    [Birthdate] datetime2 NULL,
+    [Type] int NULL,
+    [CreatedAt] datetime2 NULL,
+    [UpdatedAt] datetime2 NULL,
+    [Fullname] nvarchar(max) NULL,
+    [Passport] nvarchar(max) NULL,
+    [PassportHumanDate] nvarchar(max) NULL,
+    [PassportDateForm] nvarchar(max) NULL,
+    [BirthdateForm] nvarchar(max) NULL,
+    [SbsId] int NOT NULL,
+    CONSTRAINT [PK_Receivers] PRIMARY KEY ([ReceiverId])
+);
+Executed DbCommand (10ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+CREATE TABLE [Regions] (
+    [RegionId] int NOT NULL IDENTITY,
+    [Name] nvarchar(max) NOT NULL,
+    [Description] nvarchar(max) NULL,
+    CONSTRAINT [PK_Regions] PRIMARY KEY ([RegionId])
+);
+Executed DbCommand (16ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+CREATE TABLE [Invoice] (
+    [InvoiceId] int NOT NULL IDENTITY,
+    [CurrentUserId] nvarchar(max) NOT NULL,
+    [InvoiceNo] nvarchar(max) NOT NULL,
+    [AccountNo] nvarchar(max) NOT NULL,
+    [Url] nvarchar(max) NOT NULL,
+    [Description] nvarchar(max) NULL,
+    [PackageId] int NOT NULL,
+    CONSTRAINT [PK_Invoice] PRIMARY KEY ([InvoiceId]),
+    CONSTRAINT [FK_Invoice_PackageSp_PackageId] FOREIGN KEY ([PackageId]) REFERENCES [PackageSp] ([PackageId]) ON DELETE CASCADE
+);
+Executed DbCommand (13ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+CREATE TABLE [FileSps] (
+    [FileSpId] int NOT NULL IDENTITY,
+    [FileName] nvarchar(max) NOT NULL,
+    [FileNameForFileStorage] nvarchar(max) NOT NULL,
+    [FilePath] nvarchar(max) NOT NULL,
+    [CurrentUserId] nvarchar(max) NOT NULL,
+    [CreationDate] datetime2 NOT NULL,
+    [ReceiverId] int NULL,
+    CONSTRAINT [PK_FileSps] PRIMARY KEY ([FileSpId]),
+    CONSTRAINT [FK_FileSps_Receivers_ReceiverId] FOREIGN KEY ([ReceiverId]) REFERENCES [Receivers] ([ReceiverId])
+);
+Executed DbCommand (15ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+CREATE TABLE [DepartmentDeliveryParcels] (
+    [DepartmentDeliveryParcelId] int NOT NULL IDENTITY,
+    [Address] nvarchar(max) NOT NULL,
+    [AddressForMap] nvarchar(max) NULL,
+    [Description] nvarchar(max) NULL,
+    [GipermallId] int NOT NULL,
+    [Hide] int NOT NULL,
+    [RegionId] int NULL,
+    CONSTRAINT [PK_DepartmentDeliveryParcels] PRIMARY KEY ([DepartmentDeliveryParcelId]),
+    CONSTRAINT [FK_DepartmentDeliveryParcels_Regions_RegionId] FOREIGN KEY ([RegionId]) REFERENCES [Regions] ([RegionId])
+);
+Executed DbCommand (17ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+CREATE TABLE [Purchases] (
+    [PurchaseId] int NOT NULL IDENTITY,
+    [SbsTrackId] int NULL,
+    [DeliveryType] int NULL,
+    [Wait] int NULL,
+    [CurrentUserId] nvarchar(max) NOT NULL,
+    [Surname] nvarchar(70) NOT NULL,
+    [Name] nvarchar(70) NOT NULL,
+    [Shop] nvarchar(max) NOT NULL,
+    [CombineParcels] int NOT NULL,
+    [AgreeWithTools] bit NOT NULL,
+    [TrackNumber] nvarchar(max) NULL,
+    [Lock] bit NOT NULL,
+    [Description] nvarchar(max) NULL,
+    [DepartmentDeliveryParcelId] int NOT NULL,
+    [ReceiverId] int NOT NULL,
+    [PackageId] int NOT NULL,
+    CONSTRAINT [PK_Purchases] PRIMARY KEY ([PurchaseId]),
+    CONSTRAINT [FK_Purchases_DepartmentDeliveryParcels_DepartmentDeliveryParcelId] FOREIGN KEY ([DepartmentDeliveryParcelId]) REFERENCES [DepartmentDeliveryParcels] ([DepartmentDeliveryParcelId]) ON DELETE CASCADE,
+    CONSTRAINT [FK_Purchases_PackageSp_PackageId] FOREIGN KEY ([PackageId]) REFERENCES [PackageSp] ([PackageId]) ON DELETE CASCADE,
+    CONSTRAINT [FK_Purchases_Receivers_ReceiverId] FOREIGN KEY ([ReceiverId]) REFERENCES [Receivers] ([ReceiverId]) ON DELETE CASCADE
+);
+Executed DbCommand (14ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+CREATE TABLE [ProductSps] (
+    [ProductSpId] int NOT NULL IDENTITY,
+    [CurrentUserId] nvarchar(max) NOT NULL,
+    [ProductTypeAndBrand] nvarchar(70) NOT NULL,
+    [Quantity] int NOT NULL,
+    [UrlToProduct] nvarchar(max) NOT NULL,
+    [Price] float NOT NULL,
+    [UrlToImage] nvarchar(max) NOT NULL,
+    [SbsId] int NULL,
+    [TrackNumber] nvarchar(max) NULL,
+    [PurchaseNewId] int NOT NULL,
+    [CategoryId] int NOT NULL,
+    [Description] nvarchar(max) NULL,
+    CONSTRAINT [PK_ProductSps] PRIMARY KEY ([ProductSpId]),
+    CONSTRAINT [FK_ProductSps_Categories_CategoryId] FOREIGN KEY ([CategoryId]) REFERENCES [Categories] ([CategoryId]) ON DELETE CASCADE,
+    CONSTRAINT [FK_ProductSps_Purchases_PurchaseNewId] FOREIGN KEY ([PurchaseNewId]) REFERENCES [Purchases] ([PurchaseId]) ON DELETE CASCADE
+);
+Executed DbCommand (26ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+IF EXISTS (SELECT * FROM [sys].[identity_columns] WHERE [name] IN (N'CategoryId', N'Description', N'Name') AND [object_id] = OBJECT_ID(N'[Categories]'))
+    SET IDENTITY_INSERT [Categories] ON;
+INSERT INTO [Categories] ([CategoryId], [Description], [Name])
+VALUES (1, N'Описание 1', N'Одежда'),
+(2, N'Описание 2', N'Обувь'),
+(3, N'Описание 3', N'Куртка');
+IF EXISTS (SELECT * FROM [sys].[identity_columns] WHERE [name] IN (N'CategoryId', N'Description', N'Name') AND [object_id] = OBJECT_ID(N'[Categories]'))
+    SET IDENTITY_INSERT [Categories] OFF;
+Executed DbCommand (28ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+IF EXISTS (SELECT * FROM [sys].[identity_columns] WHERE [name] IN (N'CostOfDeliveryId', N'CostPln', N'WeightKg') AND [object_id] = OBJECT_ID(N'[CostOfDeliveries]'))
+    SET IDENTITY_INSERT [CostOfDeliveries] ON;
+INSERT INTO [CostOfDeliveries] ([CostOfDeliveryId], [CostPln], [WeightKg])
+VALUES (1, 44.0E0, 0.5E0),
+(2, 63.0E0, 1.0E0),
+(3, 76.0E0, 2.0E0),
+(4, 84.0E0, 3.0E0),
+(5, 114.0E0, 4.0E0),
+(6, 136.0E0, 5.0E0),
+(7, 158.0E0, 6.0E0),
+(8, 181.0E0, 7.0E0),
+(9, 203.0E0, 8.0E0),
+(10, 226.0E0, 9.0E0),
+(11, 248.0E0, 10.0E0),
+(12, 270.0E0, 11.0E0),
+(13, 293.0E0, 12.0E0),
+(14, 315.0E0, 13.0E0),
+(15, 338.0E0, 14.0E0),
+(16, 360.0E0, 15.0E0),
+(17, 382.0E0, 16.0E0),
+(18, 405.0E0, 17.0E0),
+(19, 427.0E0, 18.0E0),
+(20, 450.0E0, 19.0E0),
+(21, 472.0E0, 20.0E0),
+(22, 494.0E0, 21.0E0),
+(23, 517.0E0, 22.0E0),
+(24, 539.0E0, 23.0E0),
+(25, 562.0E0, 24.0E0),
+(26, 584.0E0, 25.0E0),
+(27, 606.0E0, 26.0E0),
+(28, 629.0E0, 27.0E0),
+(29, 651.0E0, 28.0E0),
+(30, 674.0E0, 29.0E0),
+(31, 696.0E0, 30.0E0);
+IF EXISTS (SELECT * FROM [sys].[identity_columns] WHERE [name] IN (N'CostOfDeliveryId', N'CostPln', N'WeightKg') AND [object_id] = OBJECT_ID(N'[CostOfDeliveries]'))
+    SET IDENTITY_INSERT [CostOfDeliveries] OFF;
+Executed DbCommand (37ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+IF EXISTS (SELECT * FROM [sys].[identity_columns] WHERE [name] IN (N'ReceiverId', N'Birthdate', N'BirthdateForm', N'City', N'Country', N'CreatedAt', N'CurrentUserId', N'Description', N'Email', N'FirstName', N'Flat', N'Fullname', N'Hide', N'House', N'HouseBuildingNumber', N'Iin', N'Index', N'IsDefault', N'Nationality', N'Passport', N'PassportDateForm', N'PassportHumanDate', N'PassportID', N'PassportIssueDate', N'PassportIssuedBy', N'PassportScan', N'PassportSeries', N'Phone', N'Region', N'SbsId', N'SecondName', N'Street', N'Surname', N'Type', N'UpdatedAt') AND [object_id] = OBJECT_ID(N'[Receivers]'))
+    SET IDENTITY_INSERT [Receivers] ON;
+INSERT INTO [Receivers] ([ReceiverId], [Birthdate], [BirthdateForm], [City], [Country], [CreatedAt], [CurrentUserId], [Description], [Email], [FirstName], [Flat], [Fullname], [Hide], [House], [HouseBuildingNumber], [Iin], [Index], [IsDefault], [Nationality], [Passport], [PassportDateForm], [PassportHumanDate], [PassportID], [PassportIssueDate], [PassportIssuedBy], [PassportScan], [PassportSeries], [Phone], [Region], [SbsId], [SecondName], [Street], [Surname], [Type], [UpdatedAt])
+VALUES (1, NULL, NULL, N'Минск', N'Беларусь', NULL, N'392e95bf-c5e8-42f8-a7fd-eb47b65d71f2', N'', NULL, N'Иван', 1, NULL, 0, 1, N'а', NULL, N'123123', CAST(0 AS bit), N'Беларусь', NULL, NULL, NULL, N'1234567', '2023-09-02T10:55:19.7783612+03:00', N'Кем выдан 1', N'Скан паспорта 1', N'МР', N'+375441112233', N'Минская область', 0, N'Иванов', N'ул.Ленинская', N'Иванович', NULL, NULL),
+(2, NULL, NULL, N'Могилев', N'Беларусь', NULL, N'392e95bf-c5e8-42f8-a7fd-eb47b65d71f2', N'', NULL, N'Петр', 2, NULL, 0, 2, N'с', NULL, N'212000', CAST(0 AS bit), N'Беларусь', NULL, NULL, NULL, N'1234567', '2023-09-02T10:55:19.7783630+03:00', N'Кем выдан 2', N'Скан паспорта 2', N'МР', N'+375291122234', N'Могилевская область', 0, N'Петров', N'ул.Центральная', N'Петрович', NULL, NULL);
+IF EXISTS (SELECT * FROM [sys].[identity_columns] WHERE [name] IN (N'ReceiverId', N'Birthdate', N'BirthdateForm', N'City', N'Country', N'CreatedAt', N'CurrentUserId', N'Description', N'Email', N'FirstName', N'Flat', N'Fullname', N'Hide', N'House', N'HouseBuildingNumber', N'Iin', N'Index', N'IsDefault', N'Nationality', N'Passport', N'PassportDateForm', N'PassportHumanDate', N'PassportID', N'PassportIssueDate', N'PassportIssuedBy', N'PassportScan', N'PassportSeries', N'Phone', N'Region', N'SbsId', N'SecondName', N'Street', N'Surname', N'Type', N'UpdatedAt') AND [object_id] = OBJECT_ID(N'[Receivers]'))
+    SET IDENTITY_INSERT [Receivers] OFF;
+Executed DbCommand (34ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+IF EXISTS (SELECT * FROM [sys].[identity_columns] WHERE [name] IN (N'RegionId', N'Description', N'Name') AND [object_id] = OBJECT_ID(N'[Regions]'))
+    SET IDENTITY_INSERT [Regions] ON;
+INSERT INTO [Regions] ([RegionId], [Description], [Name])
+VALUES (1, N'', N'Минск'),
+(2, N'', N'Могилев'),
+(3, N'', N'Витебск'),
+(4, N'', N'Гродно'),
+(5, N'', N'Гомель'),
+(6, N'', N'Брест'),
+(7, N'', N'Минская область'),
+(8, N'', N'Могилевская область'),
+(9, N'', N'Витебская область'),
+(10, N'', N'Гродненская область'),
+(11, N'', N'Гомельская область'),
+(12, N'', N'Брестская область');
+IF EXISTS (SELECT * FROM [sys].[identity_columns] WHERE [name] IN (N'RegionId', N'Description', N'Name') AND [object_id] = OBJECT_ID(N'[Regions]'))
+    SET IDENTITY_INSERT [Regions] OFF;
+Failed executing DbCommand (39ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+IF EXISTS (SELECT * FROM [sys].[identity_columns] WHERE [name] IN (N'PurchaseId', N'AgreeWithTools', N'CombineParcels', N'CurrentUserId', N'DeliveryType', N'DepartmentDeliveryParcelId', N'Description', N'Lock', N'Name', N'PackageId', N'ReceiverId', N'SbsTrackId', N'Shop', N'Surname', N'TrackNumber', N'Wait') AND [object_id] = OBJECT_ID(N'[Purchases]'))
+    SET IDENTITY_INSERT [Purchases] ON;
+INSERT INTO [Purchases] ([PurchaseId], [AgreeWithTools], [CombineParcels], [CurrentUserId], [DeliveryType], [DepartmentDeliveryParcelId], [Description], [Lock], [Name], [PackageId], [ReceiverId], [SbsTrackId], [Shop], [Surname], [TrackNumber], [Wait])
+VALUES (1, CAST(1 AS bit), 0, N'392e95bf-c5e8-42f8-a7fd-eb47b65d71f2', 2, 1, N'Покупка 1', CAST(0 AS bit), N'Иван', 1, 1, NULL, N'https://allegro.pl/', N'Иванов', N'02.09.2023 7:55:19', 0),
+(2, CAST(1 AS bit), 1, N'392e95bf-c5e8-42f8-a7fd-eb47b65d71f2', 2, 1, N'Покупка 2', CAST(0 AS bit), N'Иван', 1, 1, NULL, N'https://allegro.pl/', N'Новиков', N'02.09.2023 7:55:19', 0),
+(3, CAST(1 AS bit), 1, N'392e95bf-c5e8-42f8-a7fd-eb47b65d71f2', 2, 2, N'Покупка 2', CAST(0 AS bit), N'Иван', 1, 2, NULL, N'https://allegro.pl/', N'Сидоров', N'02.09.2023 7:55:19', 0);
+IF EXISTS (SELECT * FROM [sys].[identity_columns] WHERE [name] IN (N'PurchaseId', N'AgreeWithTools', N'CombineParcels', N'CurrentUserId', N'DeliveryType', N'DepartmentDeliveryParcelId', N'Description', N'Lock', N'Name', N'PackageId', N'ReceiverId', N'SbsTrackId', N'Shop', N'Surname', N'TrackNumber', N'Wait') AND [object_id] = OBJECT_ID(N'[Purchases]'))
+    SET IDENTITY_INSERT [Purchases] OFF;

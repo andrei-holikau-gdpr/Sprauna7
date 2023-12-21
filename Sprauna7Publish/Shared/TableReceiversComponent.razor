@@ -1,0 +1,201 @@
+﻿@* Таблица получателей *@
+
+@inject IJSRuntime JsRuntime
+@inject IViewReceiversUseCase ViewReceiversUseCase
+
+@if (receivers == null || receivers.Count() == 0)
+{
+    <span>Получатели еще не добавлены</span>
+}
+else
+{
+    <div class="receivers div-for-table">
+        <table id="example" class="display nowrap">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th></th>
+
+                    <th> ФИО </th>
+                    <th> @ReceiverOptions.Phone </th>
+                    <th> Паспорт </th>
+                    <th> Прописка </th>
+                    <th> 
+                        <Tooltip Placement="Placement.Top" Title="Выбран по умолчанию">
+                            <i class="bi bi-star"></i>
+                        </Tooltip>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in receivers)
+                {
+                    <tr @onclick="@( () => OnClickView(item) )">
+                        <td> @item.ReceiverId </td>
+
+                        <td>
+                            <!--
+                            @*<Tooltip Placement="Placement.Top" Title="Посмотреть подробнее">
+                                <button type="button" class="btn btn-link"
+                                @onclick="@( () => OnClickView(item) )">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </Tooltip>*@
+                            -->
+
+                            @* Рабочий код, но не нужен по дизайну
+                            <Tooltip Placement="Placement.Top" Title="Редактировать">
+                                <button type="button" class="btn btn-link"
+                                @onclick="@( () => OnClickEdit(item) )">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+                            </Tooltip>
+
+                            <Tooltip Placement="Placement.Top" Title="Удалить">
+                                <button type="button" class="btn btn-link"
+                                @onclick="@( () => OnClickDelete(item.ReceiverId) )">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </Tooltip>
+                            
+                            *@
+                        </td>
+
+                        <td> <TextOverflowWithTooltip Text="@($"{item.FirstName} {item.SecondName} {item.Surname}")" /> </td>
+                        <td> <TextOverflowWithTooltip Text="@item.Phone" /> </td>
+                        <td> <TextOverflowWithTooltip Text="@($"{item.PassportSeries} {item.PassportID}/ Выдан: {item.PassportIssuedBy}, {item.PassportIssueDate.ToShortDateString()}")" /> </td>
+                        <td> <TextOverflowWithTooltip Text="@($"{item.Country} {item.Region} {item.City} {item.Street} {item.House}{item.HouseBuildingNumber} {item.Flat} {item.Index}. Национальность:{item.Nationality}")" /> </td>
+                        <td> 
+                            @if (item.IsDefault)
+                            {
+                                <Tooltip Placement="Placement.Top" Title="Выбран по умолчанию">
+                                    <i class="bi bi-star-fill" style="color:#00A3FF;"></i>
+                                </Tooltip>
+                            } 
+                            else
+                            {
+                                <Tooltip Placement="Placement.Top" Title="Выбран по умолчанию">
+                                    <i class="bi bi-star" style="color:lightgrey;"></i>
+                                </Tooltip>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+<br /> <br />
+
+@code {
+
+    #region public Parameters
+
+    [Parameter]
+    public int SelectReceiverId { get; set; }
+
+    [Parameter]
+    public string? CurrentUserId { get; set; }
+
+#pragma warning disable BL0007
+    //todo: #pragma warning disable BL0007
+
+    [Parameter]
+    public bool Update {  
+        get
+        {
+            return update;
+        }
+        set
+        {
+            update = value;
+            if (update == true)
+            {
+                UpdateData();
+            }
+
+            update = false;
+        } 
+    }
+
+#pragma warning restore BL0007
+
+    [Parameter, NotNull]
+    public EventCallback<Receiver> OnClickViewCallback { get; set; }
+
+    [Parameter, NotNull]
+    public EventCallback<Receiver> OnClickAddCallback { get; set; }
+
+    [Parameter, NotNull]
+    public EventCallback<Receiver> OnClickEditCallback { get; set; }
+
+    [Parameter, NotNull]
+    public EventCallback<Receiver> OnClickDeleteCallback { get; set; }
+
+    [Parameter, NotNull]
+    public EventCallback OnUpdateCallback { get; set; }
+
+    #endregion
+    // ---
+    #region Private fiels
+
+    public bool update;
+
+    [NotNull]
+    private ConsoleLogger? Logger { get; set; }
+
+    private List<Receiver>? receivers;
+
+    private Receiver? SelectReceiver { get; set; }
+
+    #endregion
+    //---
+    #region Private methods / Override methods
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        LoadAll();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+            await JsRuntime.InvokeVoidAsync("InitialiseTable");
+    }
+
+    #endregion
+    // ---
+    #region private methods
+
+    private void LoadAll()
+    {
+        receivers = ViewReceiversUseCase.Execute().Where(r => r.CurrentUserId == CurrentUserId)?.OrderByDescending(n => n.ReceiverId)?.ToList();
+    }
+    private void UpdateData()
+    {
+        //JsRuntime.InvokeVoidAsync("DataTablesRemove");
+        LoadAll();
+        //JsRuntime.InvokeVoidAsync("InitialiseTable");
+    }
+
+    private void OnClickView(Receiver receiver)
+    {
+        SelectReceiverId = receiver.ReceiverId;
+        OnClickViewCallback.InvokeAsync(receiver);
+    }
+
+    private void OnClickEdit(Receiver receiver)
+    {
+        OnClickEditCallback.InvokeAsync(receiver);
+    }
+
+    private void OnClickDelete(Receiver receiver)
+    {
+        OnClickDeleteCallback.InvokeAsync(receiver);
+    }
+
+    #endregion
+
+}

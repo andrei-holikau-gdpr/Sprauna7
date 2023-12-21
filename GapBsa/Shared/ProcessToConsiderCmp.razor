@@ -1,0 +1,32 @@
+﻿@using Gap.CoreBusiness;
+
+<div id="process-@ProcessToConsiderParameter.Id" onclick="@(() => OnClickProcessToConsider(ProcessToConsiderParameter))"
+     class="card @(Seleceted ? "process-to-consider-selected" : "process-to-consider")">
+    <img src="/jpeg/@ProcessToConsiderParameter.Image" class="img-fluid" style="min-height:140px;" />
+    <div class="card-body" style="min-height:80px;">
+        <span class="card-title process-name">@((MarkupString)ProcessToConsiderParameter.Name)</span>
+    </div>
+</div>
+
+@code {
+    #region Parameters and EventCallbacks
+
+    [Parameter]
+    public ProcessToConsider ProcessToConsiderParameter { get; set; } = new();
+    [Parameter]
+    public bool Seleceted { get; set; } = false;
+
+    [Parameter]
+    public EventCallback<ProcessToConsider> OnClickProcessToConsiderCallback { get; set; }
+
+    #endregion
+    // ---
+    #region Private methods
+
+    private async Task OnClickProcessToConsider(ProcessToConsider processToConsider)
+    {
+        await OnClickProcessToConsiderCallback.InvokeAsync(processToConsider);
+    }
+
+    #endregion
+}

@@ -1,0 +1,53 @@
+﻿<div style="display:@(LogerEnable ? "block" : "none"); 
+            border:@(BodyEnable ? "solid 1px blue" : "none"); 
+            border-radius:6px;">    
+    <div style="display:@(BodyEnable ? "block" : "none"); ">
+       @ChildContent
+    </div>
+    <div class="ConsoleLoggerTitle" 
+        @onclick="@(() => BodyEnableChange())">
+        <a style="border:@(!BodyEnable ? "solid 1px  blue" : "none"); 
+                  border-radius:6px;"> 
+            @((MarkupString)Owner)&nbsp;log
+        </a>
+    </div>
+</div>
+
+@code {
+    #region public Parameters
+
+    [Parameter]
+    public string Owner { get; set; } = "";
+
+    [Parameter]
+    public bool LogerEnable { get; set; } = false;
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    #endregion
+    // ---
+    #region Private Fields
+
+    private bool BodyEnable { get; set; }
+
+    #endregion
+    // ---
+    #region Protected Methods
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender) BodyEnable = false;
+    }
+
+    #endregion
+    // ---
+    #region Private Methods
+
+    private void BodyEnableChange()
+    {
+        BodyEnable = !BodyEnable;
+    }
+
+    #endregion
+}

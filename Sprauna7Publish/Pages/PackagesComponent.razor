@@ -1,0 +1,674 @@
+﻿@page "/packages"
+
+@using Microsoft.AspNetCore.Identity;
+@using System.Diagnostics.CodeAnalysis;
+@using UseCasesSp.UseCaseInterfaces;
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@inject NavigationManager NavigationManager
+@inject IJSRuntime jsRuntime
+
+@inject ILogger<Index> logger
+@inject MessageService MessageService
+
+@inject IViewPackagesUseCase ViewPackagesUseCase
+@inject IAddPackageUseCase AddPackageUseCase
+@inject IDeletePackageUseCase DeletePackageUseCase
+@inject IGetPackagesByStatusUseCase GetPackagesByStatusUseCase
+
+@inject IEditPurchaseUseCase EditPurchaseUseCase
+@inject IGetPackageByIdUseCase GetPackageByIdUseCase
+@inject IGetInvoiceByIdUseCase GetInvoiceByIdUseCase
+
+@implements IDisposable
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="card-title h3">Посылки</h1>
+        </div>
+        <div class="col-8">
+            <p>Чем больше покупок в одной посылке, тем выгодней доставка.</p>
+        </div>
+        <div class="col-4">
+            <select @onchange="SelectedCarsChanged" class="form-select">
+                <option selected>Все статусы</option>
+                @foreach (StatusesPackage item in Enum.GetValues(typeof(StatusesPackage)))
+                {
+                    <option value="@Convert.ToInt32(item)">@PackageOptions.GetDescription(item)</option>
+                }
+            </select>
+        </div>
+    </div>
+</div>
+<br/>
+
+<div class="Region Old">
+
+        @*<InputSelect @bind-Value="@YourEnum">
+            @foreach (var value in Enum.GetValues<YourEnumType>())
+            {
+                <option value="@value">@value</option>
+            }
+        </InputSelect>*@
+
+        @*<p> @string.Join(", ", SelectedCars) </p>*@
+
+        @*<select @onchange="OnValueSpChanged">
+            @foreach(StatusesPackage item in Enum.GetValues(typeof(StatusesPackage)))
+            {
+                <option value="@item.ToString()">@item.ToString()</option>
+            }
+        </select>*@
+
+</div>
+
+@if (packages != null)
+{
+    <div>
+        <div class="thd">
+            <div class="thcd">№ посылки</div>
+            <div class="thcd">Трек номер</div>
+            <div class="thcd">Статус</div>
+            <div class="thcd">Вес, кг</div>
+            <div class="thcd">Цена, BYN</div> 
+        </div>
+    </div>
+    
+    <div class="all-packages" style="overflow-y: scroll; height:400px;">
+
+    @foreach (var item in packages)
+    {        
+        <div class="parent package-parent">
+            <div class="package-checkbox">
+                @if (item.Status == StatusesPackage.Expected
+                   || item.Status == StatusesPackage.ReceivedAtTheWarehouse)
+                    {
+                        <input class="form-check-input" type="checkbox" value="" id="@item.PackageId"
+                            @onclick="@(() => OnClickPackage(item))" />
+                    } else {
+                        <input class="form-check-input" type="checkbox" disabled
+                            style="visibility:hidden;" />
+                    }
+
+                    @*@if (item.Status == StatusesPackage.Delivered
+                        || item.Status == StatusesPackage.Problem)
+                    {
+                        <input class="form-check-input" type="checkbox" disabled 
+                            style="visibility:hidden;"/>
+                    } else {
+                    <input class="form-check-input" type="checkbox" value="" id="@item.PackageId"
+                        @onclick="@(() => OnClickPackage(item))" />
+                    }*@
+            </div>
+            <div class="package-content">
+
+            <div class="header_0">
+                <div class="header_1">
+                    @if (item.IsCollectivePackage)
+                    {
+                        <b> @ConstantSps.Package_CollectivePackage</b>
+                    } 
+                    else
+                    {
+                        <b> @ConstantSps.Package_SinglePackage</b>
+
+                        @if (item.Purchases != null)
+                        {
+                            @foreach (var purchase in item.Purchases)
+                            {
+                                <div class="purchase">
+                                    @purchase.TrackNumber
+                                </div>
+                            }
+                        }
+                    }
+                </div>
+                <div class="header_2">
+                    @if (item.InvoiceId > 0)
+                    {
+                        @if (item.Invoice == null)
+                        {
+                             <!-- Get Invoice -->
+                             item.Invoice = GetInvoiceByIdUseCase.Execute(item.InvoiceId);
+                        } 
+
+                        @switch (item.Invoice.Status)
+                        {
+                            @case StatusesInvoice.Sent:
+                                {
+                                    <b>
+                                        Оплачено, отправлено
+                                        <img src="/images/icons/Bag3.png" style="margin-left:5px;" />
+                                    </b>
+
+                                    break;
+                                }
+                            @case StatusesInvoice.AwaitingPayment:
+                                {
+                                    @if (!string.IsNullOrWhiteSpace(item.Invoice.Url))
+                                    {
+                                        <a href="@item.Invoice.Url" target="_blank">
+                                            Оплатить
+                                            <img src="/images/icons/Bag3.png" style="margin-left:5px;" />
+                                        </a>
+                                                
+                                        @*<a href="https://client.express-pay.by/show?k=4CE85708-DBE9-4369-AA77-651D525E9FFC" target="_blank">Оплатить</a>*@
+                                    }
+
+                                    break;
+                                }
+                        }
+                    }
+
+                    <AuthorizeView Policy="AdminOnly">
+                        <div class="admin-canvas">
+                            <label>id: @item.PackageId</label>
+
+                            <Button class="btn btn-link mx-1" @onclick="((args) => OnClickBtnView(args, item))" IsOutline="true">
+                                    <i class="bi bi-eye"></i>
+                            </Button>
+
+                            <Button class="btn btn-link mx-1" @onclick="((args) => OnClickBtnEdit(args, item.PackageId))" IsOutline="true">
+                                <i class="bi bi-pencil"></i>
+                            </Button>
+                            
+                        </div>
+                    </AuthorizeView>
+                </div> 
+            </div>
+            <br/>
+
+            <div class="child">
+                @if (item.IsCollectivePackage)
+                {
+                    <span style="color:blue">№ КонсПос</span>    
+                } 
+                else 
+                {
+                    <div class="purchase">@*GP000011572PL*@
+                        <Tooltip Placement="Placement.Top" Title="@item.NumberPackage">
+                            @item.NumberPackage
+                        </Tooltip>
+                    </div>
+                }
+            </div>
+            <div class="child">
+                        @if (item.IsCollectivePackage)
+                        {
+                            <span>al-1... al-2...</span>
+                            
+                        } else {
+                            <Tooltip Placement="Placement.Top" Title="@item.TrackNumber">
+                            @item.TrackNumber
+                        </Tooltip>
+                        }
+            </div>
+            <div class="child">
+                @if (item.Status == StatusesPackage.Problem){
+                    <label style="color:red;">
+                        @PackageOptions.GetDescription(item.Status)
+                    </label>
+                }else{
+                    <label>
+                        @PackageOptions.GetDescription(item.Status)
+                    </label>
+                }
+            </div>
+            <div class="child">
+                @if ((int)item.Status >= 6){
+                    <Tooltip Placement="Placement.Top" Title="кг">
+                        @((item?.Weight > 0) ? item?.Weight : "-")
+                    </Tooltip>
+                } else {
+                    <Tooltip Placement="Placement.Top" 
+                    Title="Вес появляется только когда подготовят и взвесят посылку">-</Tooltip>
+                }
+            </div>
+            <div class="child">
+                @if ((int)item.Status >= 6){
+                     <Tooltip Placement="Placement.Top" Title="BYN">
+                         @((item.PriceBYN > 0) ? item?.PriceBYN : "-")
+                     </Tooltip>
+                } else {
+                     <Tooltip Placement="Placement.Top" 
+                     Title="Цена появляется только когда статус 'Ожидает оплату'">-</Tooltip>
+                }
+            </div>
+            
+            @if (item.IsCollectivePackage)
+            {
+                <hr />
+                <div class="footer_0">
+                    <div class="footer_1">
+
+                        @if (item.Purchases != null)
+                        {
+                            @foreach (var purchase in item.Purchases)
+                            {
+                                <div class="purchase">
+                                    @purchase.TrackNumber
+                                </div>
+                            }
+                        }
+                        № одинарных п.:
+                        <div class="purchase">SBS-1</div>
+                        <div class="purchase">SBS-2</div>
+                    </div>
+                </div>
+            }
+            </div>
+        </div>
+    }
+    </div>
+}
+<br />
+<br />
+<button type="button" @onclick="OnClickSendToPB" class="btn btn-primary m-3">Отправить в PБ</button>
+<button type="button" @onclick="OnClickCombineParcels" class="btn btn-outline-primary m-3">Объеденить посылки</button>
+<button type="button" @onclick="OnClickUnCombineParcels" class="btn btn-outline-primary m-3">Разъединить посылки</button>
+
+
+<div class="view-for-test">
+@*    @if (SelectPackagesCheckBox.Count > 0)
+    {
+        <ol>
+            @foreach(Package item in SelectPackagesCheckBox)
+            {
+                <li>@item.NumberPackage</li>
+            }
+        </ol>    
+    }*@
+</div>
+
+@*<button type="button" @onclick="OnClickAdd" class="btn btn-primary">Добавить</button>*@
+
+<Modal @ref="ModalView" IsBackdrop="true" IsKeyboard="true">
+    <ModalDialog Title="@PackageOptions.InformationAboutPackage" 
+        IsDraggable="true" ShowFooter="true" IsScrolling="true">
+        <BodyTemplate>
+            @if (SelectPackageId > 0)
+            {
+                <ViewPackage PackageId="@SelectPackageId.ToString()" />
+            }
+        </BodyTemplate>
+    </ModalDialog>
+</Modal>
+
+<Modal @ref="ModalAdd" IsBackdrop="true" IsKeyboard="true">
+    <ModalDialog Title="@PackageOptions.AddPackage" IsDraggable="true" 
+        ShowFooter="false" IsScrolling="true">
+        <BodyTemplate>
+            <AddPackageComponent />
+        </BodyTemplate>
+    </ModalDialog>
+</Modal>
+
+<ConsoleLogger @ref="Logger" class="mt-3" />
+
+<div>
+    @*
+    <InputSelect id="products" @bind-Value="_selectedProductId" class="form-control">
+        <option value="@((short)Product.None)">--Select Product--</option>
+        @foreach (QuoteTypeModel product in _products)
+        {
+            <option value="@product.Id">@product.Name</option>
+        }
+    </InputSelect>
+    *@
+</div>
+
+@code {
+
+    #region Inject
+
+    [Inject]
+    UserManager<ApplicationUser>? userManager { get; set; }
+
+    #endregion
+
+    //private Offcanvas offcanvas;    private async Task ShowOffcanvasAsync()    {        await offcanvas?.ShowAsync();    }    private async Task HideOffcanvasAsync()    {        await offcanvas?.HideAsync();    }
+
+    // --- 
+    public StatusesPackage SelectedStatusesPackage { get; set; } = new(); //new string[] { };
+
+    private void SelectedCarsChanged(ChangeEventArgs e)
+    {
+        if (e.Value is not null)
+        {
+            var selectedOptionString = e?.Value?.ToString();
+            if (selectedOptionString == "Все статусы")
+            {
+                packages = ViewPackagesUseCase.Execute()?.ToList();
+            } else
+            {
+                if(string.IsNullOrWhiteSpace(selectedOptionString))
+                {
+                    logger.LogInformation($"\t SpLog, PackagesComponent.SelectedCarsChanged, selectedOptionString == IsNullOrWhiteSpace,  Time:{DateTime.Now.ToLongTimeString()}");
+                    packages = ViewPackagesUseCase.Execute()?.ToList();
+                } else
+                {
+                    SelectedStatusesPackage = (StatusesPackage)Int32.Parse(selectedOptionString);
+                    packages = GetPackagesByStatusUseCase.Execute(SelectedStatusesPackage)?.Where(p => p.CurrentUserId == currentUserId).ToList();
+                }
+            }            
+        }        
+    }
+
+    #region Constants Package
+
+    private const string OBJECT_NAME_SINGLE = "Package";
+    //private const string OBJECT_NAME_MANY = "Package";
+
+    #endregion
+    // ---
+    #region Parameters Package
+
+    [Parameter]
+    public EventCallback<int> OnSelectedCallback { get; set; }
+
+    #endregion
+    // ---
+    #region Private fields Package
+
+    [NotNull]
+    private ConsoleLogger? Logger { get; set; }
+
+    private List<Package>? packages;
+
+    public Package? SelectPackage;
+    private int SelectPackageId;
+
+    private List<Package> SelectPackagesCheckBox { get; set; } = new();
+
+    #endregion
+    // ---
+    #region Private fields / Modal
+
+    private string? currentUserId;
+
+    [NotNull]
+    private Modal? ModalView { get; set; }
+    [NotNull]
+    private Modal? ModalAdd { get; set; }
+
+    #endregion
+    // ---
+    #region Private methods / Async Task
+
+    async Task OnSelected(int selectPackageId)
+    {
+        await OnSelectedCallback.InvokeAsync(selectPackageId);
+    }
+
+    #endregion
+    // ---
+    #region Private methods / Override methods
+
+    //protected override void OnInitialized()
+    //{
+    //    base.OnInitialized();
+    //    LoadAll();
+    //}
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+            await jsRuntime.InvokeVoidAsync("InitialiseTable");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+#pragma warning disable CS8602 //todo: #pragma warning disable CS8602
+
+        if (user.Identity.IsAuthenticated)
+        {
+            var currentUser = await userManager.GetUserAsync(user);
+            currentUserId = userManager.GetUserId(user);
+        }
+#pragma warning restore CS8602
+
+        LoadAll();
+    }
+
+    #endregion
+    // ---
+    #region private methods
+
+    private void LoadAll()
+    {
+        packages = ViewPackagesUseCase.Execute()?.Where(p => p.CurrentUserId == currentUserId)?.ToList();
+    }
+
+    private void ShowMessage(string message, string icon, Color color)
+    {
+        MessageService.Show(new MessageOption()
+            {
+                Content = message,
+                Icon = icon,
+                Color = color,
+                ShowDismiss = true,
+            });
+    }
+
+    private bool CanStartCombineAndUnCombineParcels()
+    {
+        foreach (var package in SelectPackagesCheckBox)
+        {
+            if (package.Status == StatusesPackage.Problem)
+            {
+                ShowMessage(ConstantSps.Package_NoCombineParcels_IfStatusProblem, ConstantSps.MESSAGE_ICON_INFO, Color.Danger);
+                return false;
+            }
+            if (package.Status == StatusesPackage.Delivered)
+            {
+                ShowMessage(ConstantSps.Package_NoCombineParcels_IfStatusDelivered, ConstantSps.MESSAGE_ICON_INFO, Color.Danger);
+                return false;
+            }
+        }
+        return true;
+    } 
+
+    private void CombineParcels()
+    {
+        if (CanStartCombineAndUnCombineParcels())
+        {
+
+            // jsRuntime.InvokeVoidAsync("jsAlert", "Данный функционал еще в разработке");
+            Package newPackage = new()
+                {
+                    NumberPackage = "№ КонсПос",
+                    Status = StatusesPackage.Expected,
+                    IsCollectivePackage = true,
+                    Description = ""
+                };
+
+            foreach (var package in SelectPackagesCheckBox)
+            {
+                newPackage.Purchases.AddRange(package.Purchases);
+
+                foreach (var purchase in package.Purchases)
+                {
+                    purchase.PackageId = newPackage.PackageId;
+                    EditPurchaseUseCase.Execute(purchase);
+                }
+            }
+
+            AddPackageUseCase.Execute(newPackage);
+
+            DeleteSelectedPackagesCheckBox();
+        }
+    }
+
+    private void UnCombineParcels()
+    {
+        if (CanStartCombineAndUnCombineParcels())
+        {
+
+            // jsRuntime.InvokeVoidAsync("jsAlert", "Данный функционал еще в разработке");
+            List<Package> newPackages = new();
+            foreach (var package in SelectPackagesCheckBox)
+            {
+                if (!package.IsCollectivePackage)
+                {
+                    // Пропускаем одинарные посылки
+                }
+                else { 
+                    foreach (var purchase in package.Purchases)
+                    {
+                        newPackages.Add(
+                            new Package()
+                                {
+                                    NumberPackage = "new",
+                                    Status = StatusesPackage.Expected,
+                                    IsCollectivePackage = true,
+                                    Description = "",
+                                    // Purchases.Add(purchase)
+                                });
+                    }
+                }
+            }
+
+            foreach (var package in newPackages)
+            {
+                //package.Purchases.AddRange(package.Purchases);
+
+                //foreach (var purchase in package.Purchases)
+                //{
+                //    purchase.PackageId = newPackage.PackageId;
+                //    EditPurchaseUseCase.Execute(purchase);
+                //}
+            }
+
+            foreach (var newPackage in newPackages)
+            {
+                AddPackageUseCase.Execute(newPackage);
+            }         
+        }
+        //jsRuntime.InvokeVoidAsync("jsAlert", "UnCombineParcels. Данный функционал еще в разработке");
+    }
+
+    private void DeleteSelectedPackagesCheckBox()
+    {
+        foreach (var item in SelectPackagesCheckBox)
+            {
+                DeletePackageUseCase.Delete(item.PackageId);
+            }   
+    }
+
+    private void SendToPB()
+    {
+        jsRuntime.InvokeVoidAsync("jsAlert", "SendToPB. Данный функционал еще в разработке");
+    }
+
+    #endregion
+    // ---
+    #region private methods OnClick
+
+    private void OnClickAdd()
+    {
+        NavigationManager.NavigateTo($"/add{OBJECT_NAME_SINGLE}");
+    }
+
+    private void OnClickEdit(Package single)
+    {
+        NavigationManager.NavigateTo($"/edit{OBJECT_NAME_SINGLE}/{single.PackageId}");
+    }
+
+    private void OnClickBtnEdit(EventArgs args, int PackageId)
+    {
+        NavigationManager.NavigateTo($"/edit{OBJECT_NAME_SINGLE}/{PackageId}");
+    }
+
+    private void OnClickDelete(int id)
+    {
+        DeletePackageUseCase.Delete(id);
+        LoadAll();
+    }
+
+    private void OnClickSendToPB(){
+        SendToPB();
+    }
+
+    private void OnClickCombineParcels()
+    {
+        CombineParcels();
+        LoadAll();
+        StateHasChanged();
+    }
+
+    private void OnClickUnCombineParcels()
+    {
+        // jsRuntime.InvokeVoidAsync("jsAlert", "Данный функционал еще в разработке");
+
+        UnCombineParcels();
+        LoadAll();
+        StateHasChanged();
+    }
+
+    private void OnClickPackage(Package package)
+    {
+        var findPackage = SelectPackagesCheckBox.Find(p => p.PackageId == package.PackageId);
+        if (findPackage == null)
+        {
+            SelectPackagesCheckBox.Add(package);
+        }
+        else
+        {
+            SelectPackagesCheckBox.Remove(package);
+        }
+    }
+
+    #endregion
+    // ---
+    #region Private methods / OnClick CRUD Package
+
+    private void OnClickView( Package single)
+    {
+        Logger.Log($"OnClickView PurchaseId: {single.PackageId}");
+
+        SelectPackage = single;
+        SelectPackageId = single.PackageId;
+        ModalView.Toggle();
+    }
+    
+    private void OnClickBtnView(EventArgs args, Package single)
+    {
+        Logger.Log($"OnClickView PurchaseId: {single.PackageId}");
+
+        SelectPackage = single;
+        SelectPackageId = single.PackageId;
+        ModalView.Toggle();
+    }
+
+    private void OnValueSpChanged(StatusesPackage statusesPackage)
+    {
+        jsRuntime.InvokeVoidAsync("jsAlert", "statusesPackage");
+    }
+
+    #endregion
+    // ---
+    #region Ppublic methods / Interface Implementation IDisposable
+
+    public void Dispose()
+    {
+        jsRuntime.InvokeVoidAsync("DataTablesRemove");
+    }
+
+    #endregion
+
+    //private IEnumerable<SelectedItem> Statuses { get; set; } = new[]
+    //{
+    //    new SelectedItem (StatusesPackage.Draft, "Черновик") { Active = true },
+    //    new SelectedItem (StatusesPackage.OnThePackage, "На упаковке"),
+    //    new SelectedItem (StatusesPackage.AwaitingPayment, "Ожидает оплаты"),
+    //    new SelectedItem (StatusesPackage.Paid, "Оплачена"),
+    //    new SelectedItem (StatusesPackage.Sent, "Отправлена"),
+    //    new SelectedItem (StatusesPackage.Delivered, "Доставлена"),
+    //};
+
+}

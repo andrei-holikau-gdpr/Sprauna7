@@ -1,0 +1,84 @@
+﻿@page "/ExpressPay"
+@attribute [Authorize(Policy = "AdminOnly")]
+
+@using Microsoft.AspNetCore.Authorization;
+@using Plugins.Converters;
+@using Plugins.ExpressPay;
+
+@inject IViewReceiversUseCase ViewReceiversUseCase;
+
+<div>
+    <h1>ExpressPay</h1>
+    <p>Страница проверки свяязей с платежной системой</p>
+    <br/>
+    <br/>
+    <div class="col-lg-12 p-1">
+        <input type="text" @bind="@numberInvoice" />
+        <span>numberInvoice = @numberInvoice</span>
+    </div>
+    <div class="col-lg-12 p-1">
+        <button class="btn btn-primary" @onclick="OnClickAddInvoice">AddInvoice</button></div>
+    <div class="col-lg-12 p-1">
+        <button class="btn btn-primary" @onclick="OnClickGetDetailsInvoice">GetDetailsInvoice</button></div>
+    <div class="col-lg-12 p-1">
+        <button class="btn btn-primary" @onclick="OnClickGetStatusInvoice">GetStatusInvoice</button></div>
+    <div class="col-lg-12 p-1">
+        <button class="btn btn-primary" @onclick="OnClickGetListInvoices">GetListInvoices</button></div>
+    <div class="col-lg-12 p-1">
+        <button class="btn btn-primary" @onclick="OnClickGetListPayments">GetListPayments</button></div>
+    <div class="col-lg-12 p-1">
+        <button class="btn btn-primary" @onclick="OnClickGetDetailsPayment">GetDetailsPayment</button></div>
+    <div style="max-width:700px">
+        <p>@result</p>
+    </div>
+
+    <NavLink class="nav-link" href="invoices">
+        <Tooltip Placement="Placement.Top" Title="Счета">
+            <span class="bi bi-strava" aria-hidden="true"></span>
+            <div class="sp-navlink-text">
+                Счета
+            </div>
+        </Tooltip>
+    </NavLink>
+</div>
+
+
+@code {
+    #region private fields
+
+    private ExpressPayServices expressPayServices = new ExpressPayServices();
+    private string result = "";
+    private string numberInvoice = "123458";
+
+    #endregion
+    #region private methods
+
+    private void OnClickAddInvoice()
+    {
+        var receiver = ViewReceiversUseCase.Execute().First();
+        var newInvoice = InvoiceConverter.ToInvoiceDataForCreate(receiver, "185", "Info");
+        result = expressPayServices.AddInvoice(newInvoice)?.InvoiceUrl;
+    }
+    private void OnClickGetDetailsInvoice()
+    {
+        result = expressPayServices.GetDetailsInvoice(numberInvoice);
+    }    
+    private void OnClickGetStatusInvoice()
+    {
+        result = expressPayServices.GetStatusInvoice(numberInvoice);
+    }    
+    private void OnClickGetListInvoices()
+    {
+        result = expressPayServices.GetListInvoices();
+    }    
+    private void OnClickGetListPayments()
+    {
+        result = expressPayServices.GetListPayments();
+    }    
+    private void OnClickGetDetailsPayment()
+    {
+        result = expressPayServices.GetDetailsPayment();
+    }
+
+    #endregion
+}

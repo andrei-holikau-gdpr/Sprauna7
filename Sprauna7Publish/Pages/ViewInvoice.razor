@@ -1,0 +1,105 @@
+﻿@page "/ViewInvoice/{InvoiceId}"
+
+@inject NavigationManager NavigationManager
+
+@using Plugins.ExpressPay;
+@using System.Text.Json
+@using System.Text.Json.Serialization
+@using System.Reflection;
+
+@if(!IsModal){
+    <h1 class="card-title h5">
+        <NavLink class="nav-link" href="packages">
+            <span class="oi oi-list-rich" aria-hidden="true"></span> Счета на оплату
+        </NavLink>
+    </h1>
+}
+@if (invoice != null)
+{
+    <ViewProperties 
+        Properties="PropertiesList" 
+        ObjectWithProperties="invoice" />
+}
+@*
+    <button class="btn btn-primary" @onclick="@(() => GetDetailsInvoice())">GetDetailsInvoice</button>
+*@
+@code {
+
+    #region Parameters
+
+    [Parameter]
+    public string? InvoiceId { get; set; }
+
+    [Parameter]
+    public bool IsModal { get; set; } = false;
+
+    #endregion
+
+    #region private fields
+
+    [NotNull]
+    private ConsoleLogger? Logger { get; set; }
+
+    //private string DateForInvoice = ""; // DateTime.UtcNow.ToString();
+    private string jsonInvoice = ""; // DateTime.UtcNow.ToString();
+    private Invoice? invoice = new();
+
+    private List<PropertyInfo>? PropertiesList = new();
+
+    #endregion
+
+    #region Private methods / Override methods
+
+    protected void GetDetailsInvoice()
+    {
+
+    }
+
+    #endregion
+
+    #region override methods
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        if (int.TryParse(this.InvoiceId, out int iInvoiceId))
+        {
+            InvoiceExample.IsTest(true);
+            // Получить счет
+            jsonInvoice = InvoiceExample.GetDetailsInvoice(InvoiceId);
+
+            invoice = JsonSerializer.Deserialize<Invoice>(jsonInvoice);
+            if (invoice != null)
+            {
+                PropertiesList = typeof(Invoice).GetProperties().ToList<PropertyInfo>();
+            }
+        }
+    }
+
+    #endregion
+
+    /*
+    public class InvoiceDetails
+        {
+        public string? AccountNo { get; set; }
+        public int Status { get; set; }
+        public string? Created { get; set; }
+        public string? Expiration { get; set; }
+        public string? Amount { get; set; }
+        public int Currency { get; set; }
+        public string? Info { get; set; }
+        public string? Surname { get; set; }
+        public string? FirstName { get; set; }
+        public string? Patronymic { get; set; }
+        public string? City { get; set; }
+        public string? Street { get; set; }
+        public string? House { get; set; }
+        public string? Building { get; set; }
+        public string? Apartment { get; set; }
+        public int IsNameEditable { get; set; }
+        public int IsAddressEditable { get; set; }
+        public int IsAmountEditable { get; set; }
+    }
+    */
+}

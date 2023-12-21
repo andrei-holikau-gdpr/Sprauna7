@@ -1,0 +1,277 @@
+﻿@*Создаем получателя sbs*@
+
+@attribute [Authorize()]
+@page "/AddSbsRecipient"
+@using CoreBusiness.ShopByShop.Models;
+@using UseCases.ShopByShop.UseCaseInterfaces;
+
+@inject NavigationManager NavigationManager
+@inject IAddRecipientSbsUseCase AddRecipientSbsUseCase
+
+@if (IsModal)
+{
+    <div class="container">
+        <div class="row m-2">
+            <div class="col-sm-12 col-lg-5 p-1">
+
+                <h1 class="h3">AddSbsRecipient</h1>
+            </div>
+
+            <div class="col-sm-12 col-lg-7 p-1">
+                <MessageInDeveloping />
+                @*<button type="button" class="btn btn-link" @onclick="OnClickSetDemoData">@ConstantSps.BTN_SET_DEMO_DATA</button>*@
+            </div>
+        </div>
+    </div>
+}
+
+@if (recipientItem != null)
+{
+    <EditForm Model="recipientItem" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator></DataAnnotationsValidator>
+        <ValidationSummary></ValidationSummary>
+
+        @if (recipientItem.Id != null)
+        {
+            <div class="form-group"> <label for="Id">Id</label> <InputNumber id="Id" @bind-Value="recipientItem.Id" class="form-control"></InputNumber> </div>
+        }
+        @if (recipientItem.Email != null)
+        {
+            <div class="form-group"> <label for="Email">Email</label> <InputText id="Email" @bind-Value="recipientItem.Email" class="form-control"></InputText> </div>
+        }
+        @if (recipientItem.Phone != null)
+        {
+            <div class="form-group"> <label for="Phone">Phone</label> <InputText id="Phone" @bind-Value="recipientItem.Phone" class="form-control"></InputText> </div>
+        }
+        @if (recipientItem.FirstName != null)
+        {
+            <div class="form-group"> <label for="FirstName">FirstName</label> <InputText id="FirstName" @bind-Value="recipientItem.FirstName" class="form-control"></InputText> </div>
+        }
+        @if (recipientItem.MiddleName != null)
+        {
+            <div class="form-group"> <label for="MiddleName">MiddleName</label> <InputText id="MiddleName" @bind-Value="recipientItem.MiddleName" class="form-control"></InputText> </div>
+        }
+        @if (recipientItem.LastName != null)
+        {
+            <div class="form-group"> <label for="LastName">LastName</label> <InputText id="LastName" @bind-Value="recipientItem.LastName" class="form-control"></InputText> </div>
+        }
+
+        @if (recipientItem.Birthdate != null)
+        {
+            <div class="form-group">
+                <label for="Birthdate">Birthdate</label>
+                <InputDate id="Birthdate" @bind-Value="recipientItem.Birthdate"
+                       class="form-control" placeholder=""></InputDate>
+            </div>
+        }
+        @*<label for="Birthdate">Birthdate</label><br />*@
+
+        @if (recipientItem.PassportSerial != null)
+        {
+            <div class="form-group"> <label for="PassportSerial">PassportSerial</label> <InputText id="PassportSerial" @bind-Value="recipientItem.PassportSerial" class="form-control"></InputText> </div>
+        }
+
+        @if (recipientItem.PassportNumber != null)
+        {
+            <div class="form-group"> <label for="PassportNumber">PassportNumber</label> <InputText id="PassportNumber" @bind-Value="recipientItem.PassportNumber" class="form-control"></InputText> </div>
+        }
+
+        <br /><label for="PassportDate">PassportDate</label><br />
+
+        @if (recipientItem.Type != null)
+        {
+            <div class="form-group"> <label for="Type">Type</label> <InputNumber id="Type" @bind-Value="recipientItem.Type" class="form-control"></InputNumber> </div>
+        }
+
+        @if (recipientItem.PassportFounder != null)
+        {
+            <div class="form-group"> <label for="PassportFounder">PassportFounder</label> <InputText id="PassportFounder" @bind-Value="recipientItem.PassportFounder" class="form-control"></InputText> </div>
+        }
+        @if (recipientItem.Iin != null)
+        {
+            <div class="form-group"> <label for="Iin">Iin</label> <InputText id="Iin" @bind-Value="recipientItem.Iin" class="form-control"></InputText> </div>
+        }
+        @if (recipientItem.PassportAddress != null)
+        {
+            <div class="form-group"> <label for="PassportAddress">PassportAddress</label> <InputText id="PassportAddress" @bind-Value="recipientItem.PassportAddress" class="form-control"></InputText> </div>
+        }
+
+        @if (recipientItem.Hide != null)
+        {
+            <div class="form-group"> <label for="Hide">Hide</label> <InputNumber id="Hide" @bind-Value="recipientItem.Hide" class="form-control"></InputNumber> </div>
+        }
+        @*<br /><label for="Hide">Hide</label><br />*@
+
+        @if (recipientItem.CreatedAt != null)
+        {
+            <div class="form-group">
+                <label for="CreatedAt">CreatedAt</label>
+                <InputDate id="CreatedAt" @bind-Value="recipientItem.CreatedAt"
+                       class="form-control" placeholder=""></InputDate>
+            </div>
+        }
+
+        @if (recipientItem.UpdatedAt != null)
+        {
+            <div class="form-group">
+                <label for="UpdatedAt">UpdatedAt</label>
+                <InputDate id="UpdatedAt" @bind-Value="recipientItem.UpdatedAt"
+                       class="form-control" placeholder=""></InputDate>
+            </div>
+        }
+
+        @*
+            <br /><label for="CreatedAt">CreatedAt</label><br />
+            <br /><label for="UpdatedAt">UpdatedAt</label><br />
+        *@
+
+        @if (recipientItem.Region != null)
+        {
+            <div class="form-group"> <label for="Region">Region</label> <InputText id="Region" @bind-Value="recipientItem.Region" class="form-control"></InputText> </div>
+        }
+        @if (recipientItem.Street != null)
+        {
+            <div class="form-group"> <label for="Street">Street</label> <InputText id="Street" @bind-Value="recipientItem.Street" class="form-control"></InputText> </div>
+        }
+        @if (recipientItem.City != null)
+        {
+            <div class="form-group"> <label for="City">City</label> <InputText id="City" @bind-Value="recipientItem.City" class="form-control"></InputText> </div>
+        }
+        @if (recipientItem.Building != null)
+        {
+            <div class="form-group"> <label for="Building">Building</label> <InputText id="Building" @bind-Value="recipientItem.Building" class="form-control"></InputText> </div>
+        }
+        @if (recipientItem.Corpus != null)
+        {
+            <div class="form-group"> <label for="Corpus">Corpus</label> <InputText id="Corpus" @bind-Value="recipientItem.Corpus" class="form-control"></InputText> </div>
+        }
+        @if (recipientItem.Apartment != null)
+        {
+            <div class="form-group"> <label for="Apartment">Apartment</label> <InputText id="Apartment" @bind-Value="recipientItem.Apartment" class="form-control"></InputText> </div>
+        }
+        @if (recipientItem.Index != null)
+        {
+            <div class="form-group"> <label for="Index">Index</label> <InputText id="Index" @bind-Value="recipientItem.Index" class="form-control"></InputText> </div>
+        }
+        @if (recipientItem.Fullname != null)
+        {
+            <div class="form-group"> <label for="Fullname">Fullname</label> <InputText id="Fullname" @bind-Value="recipientItem.Fullname" class="form-control"></InputText> </div>
+        }
+        @if (recipientItem.Passport != null)
+        {
+            <div class="form-group"> <label for="Passport">Passport</label> <InputText id="Passport" @bind-Value="recipientItem.Passport" class="form-control"></InputText> </div>
+        }
+        @if (recipientItem.PassportHumanDate != null)
+        {
+            <div class="form-group"> <label for="PassportHumanDate">PassportHumanDate</label> <InputText id="PassportHumanDate" @bind-Value="recipientItem.PassportHumanDate" class="form-control"></InputText> </div>
+        }
+        @if (recipientItem.PassportDateForm != null)
+        {
+            <div class="form-group"> <label for="PassportDateForm">PassportDateForm</label> <InputText id="PassportDateForm" @bind-Value="recipientItem.PassportDateForm" class="form-control"></InputText> </div>
+        }
+        @if (recipientItem.BirthdateForm != null)
+        {
+            <div class="form-group"> <label for="BirthdateForm">BirthdateForm</label> <InputText id="BirthdateForm" @bind-Value="recipientItem.BirthdateForm" class="form-control"></InputText> </div>
+        }
+
+        @* Buttons *@
+        <div class="col-sm-12 col-lg-12 p-1">
+            <button type="submit" class="btn btn-primary">
+                Сохранить
+            </button>
+            <button type="button" class="btn btn-primary" @onclick="OnCancel">
+                Отменить
+            </button>
+        </div>
+    </EditForm>
+}
+
+@code {
+    #region public Parameters RecipientItem
+
+    [Parameter]
+    public bool IsModal { get; set; } = false;
+
+    [Parameter]
+    public EventCallback OnAddCallback { get; set; }
+
+    [Parameter]
+    public EventCallback OnCanselCallback { get; set; }
+
+    [Parameter]
+    public int? RecipientItemId { get; set; }
+
+    #endregion
+    // ---
+    #region private fields Purchase
+
+    private RecipientItem recipientItem = new()
+        {
+            Id = 1,
+            Email = "nov@gmail.com",
+            Phone = "+375293453255",
+            FirstName = "Сергей",
+            MiddleName = "Иванович",
+            LastName = "Иванов",
+            Birthdate = DateTime.Now, // 05.05.1980
+            PassportSerial = "КВ",
+            PassportNumber = "789",
+            PassportDate = DateTime.Now, // 05.05.2020
+            Type = 1,
+            PassportFounder = "РОВД",
+            Iin = "456",
+            PassportAddress = "PassportAddress",
+            Hide = 0,
+            CreatedAt = DateTime.Now, // 05.05.2020
+            //UpdatedAt = DateTime.Now,
+            Region = "Минск обл",
+            Street = "Ленинская",
+            City = "Минск",
+            Building = "12",
+            Corpus = "3",
+            Apartment = "4",
+            Index = "234234",
+            Fullname = "Fullname",
+            Passport = "Passport",
+            PassportHumanDate = "PassportHumanDate",
+            PassportDateForm = "PassportDateForm",
+            BirthdateForm = "BirthdateForm"
+        };
+
+    #endregion
+
+    #region private methods Purchase
+
+    private async Task OnValidSubmit()
+    {
+        RecipientItemId = await AddRecipientSbsUseCase.ExecuteAsync(recipientItem);
+
+        if (RecipientItemId != null)
+        {
+            if (!IsModal)
+            {
+                NavigationManager.NavigateTo($"/EditSbsRecipient/{RecipientItemId}");
+            }
+            else
+            {
+                await OnAddCallback.InvokeAsync();
+                recipientItem = new RecipientItem();
+                //NavigationManager.NavigateTo($"/{ReceiverOptions.NameMany}");
+            }
+        }
+    }
+
+    private void OnCancel()
+    {
+        if (!IsModal)
+        {
+            NavigationManager.NavigateTo($"/SbsRecipients");
+        }
+        else
+        {
+            OnCanselCallback.InvokeAsync();
+        }
+    }
+
+    #endregion
+}

@@ -1,0 +1,8 @@
+	 SpLog, app.Run, Time:18:41:36
+Now listening on: https://localhost:7113
+Now listening on: http://localhost:5252
+Application started. Press Ctrl+C to shut down.
+Hosting environment: Development
+Content root path: D:\VisualStudioProjects\Sprauna7\Sprauna7Publish
+Navigation failed when changing the location to https://localhost:7113/Identity/Account/Login
+Unhandled exception in circuit 'ZAP9DqC3y4amXQToLj9pSgLpkVYQLz7Pv_w_hakdlPQ'.

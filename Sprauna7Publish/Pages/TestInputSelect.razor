@@ -1,0 +1,49 @@
+﻿@page "/TestInputSelect"
+
+@*<h3>TestInputSelect</h3>
+
+<p>@comment.statusesPackage</p>*@
+
+@*        <InputSelect @bind-Value="@comment.statusesPackage">
+
+            @foreach (var country in Enum.GetValues(typeof(StatusesPackage)))
+            {
+
+        <option value="@country">@(country.DisplayName(StatusesPackage))</option>
+            }
+        </InputSelect>*@
+
+
+@code
+{
+
+    //private Comment comment = new Comment();
+
+
+
+    //public class Comment
+    //{
+
+    //    public string Name { get; set; }
+    //    public StatusesPackage statusesPackage { get; set; }
+    //}
+
+
+    //public static string DisplayName(this Enum value)
+    //    {
+    //        var key = $"{value.GetType().FullName}.{value}";
+
+    //        var displayName = DisplayNameCache.GetOrAdd(key, x =>
+    //        {
+    //            var name = (DescriptionAttribute[])value
+    //                .GetType()
+    //                .GetTypeInfo()
+    //                .GetField(value.ToString())
+    //                .GetCustomAttributes(typeof(DescriptionAttribute), false);
+
+    //            return name.Length > 0 ? name[0].Description : value.ToString();
+    //        });
+
+    //        return displayName;
+    //    }
+}

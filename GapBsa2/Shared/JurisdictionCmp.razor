@@ -1,0 +1,56 @@
+﻿@using Gap2.CoreBusiness;
+
+<MudItem xs="12">
+    <MudPaper Elevation="2" Class="pa-4" Style="min-height: 100px;">
+        <h4>@QuestionTitle</h4>
+
+        <ul>
+        @foreach (var jurisdiction in Jurisdictions)
+        {                
+                <li>
+                    @*@bind-Checked=""*@
+                <MudCheckBox  Checked="@jurisdiction.Selected"
+                    Label="@jurisdiction.Name" Color="Color.Primary"
+                    @onclick="@(() => OnClickJurisdictionsItem(jurisdiction))">
+                </MudCheckBox>
+            </li>
+        }
+        </ul>
+    </MudPaper>
+</MudItem>
+
+@code {
+    #region Parameters
+    [Parameter, EditorRequired]
+    public List<Jurisdiction> Jurisdictions { get; set; }
+    [Parameter, EditorRequired]
+    public GapResult GapResults { get; set; }
+    [Parameter]
+    public string QuestionTitle { get; set; } = "Отметьте страны в которых у Вас уже есть зарегистрированная компания, участвующая в обработке";
+
+    [Parameter]
+    public EventCallback UpdateCallback { get; set; }
+    #endregion
+
+    private void OnClickJurisdictionsItem(Jurisdiction jurisdiction)
+    {
+        //GapResults.Jurisdictions.Add(jurisdiction);
+
+        jurisdiction.Selected = !jurisdiction.Selected;
+
+        if (jurisdiction.Selected == true){
+            GapResults.Jurisdictions.Add(jurisdiction);
+        } else
+        {
+            GapResults.Jurisdictions.Remove(jurisdiction);
+        }
+
+        //GapResults.Jurisdictions.Clear();
+        //var JursSelected = Jurisdictions.Where(j => j.Selected == true);
+        //if (JursSelected?.Count() > 0)
+        //{
+        //    GapResults.Jurisdictions.AddRange(JursSelected);
+        //}
+        UpdateCallback.InvokeAsync();
+    }
+}

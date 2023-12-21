@@ -1,0 +1,108 @@
+﻿@page "/ViewPurchase/{PurchaseId}"
+
+@using System.Diagnostics.CodeAnalysis;
+@inject IGetPurchaseByIdUseCase GetPurchaseByIdUseCase
+
+@inject IGetDepartmentDpByIdUseCase GetDepartmentDpByIdUseCase
+@inject IGetReceiverByIdUseCase GetReceiverByIdUseCase
+@inject IGetProductsSpByPurchaseUseCase GetProductsSpByPurchaseUseCase
+
+
+@if (purchase != null && purchase.PurchaseId >0)
+{
+@*    <div>
+        <h1>Информация по покупке</h1>
+    </div>*@
+    
+    <div> <b>Пункт выдачи посылки:</b>
+        <p>@purchase?.DepartmentDeliveryParcel?.Address</p>
+        <hr />
+    </div>
+
+    <div> <b>Получатель:</b>
+        <p>@purchase?.Receiver?.Surname @purchase?.Receiver?.FirstName @purchase?.Receiver?.Surname</p>
+        <hr />
+    </div>
+
+    <div> <b>Фамилия на посылке:</b>
+        <p>@purchase?.Surname</p>
+        <hr />
+    </div>
+
+    <div> <b>Имя на посылке:</b>
+        <p>@purchase?.Name</p>
+        <hr />
+    </div>
+
+    <div> <b>Магазин:</b>
+        <p>@purchase?.Shop</p>
+        <hr />
+    </div>
+
+    <div> <b>Комментарий:</b>
+        <p>@purchase?.Description</p>
+        <hr />
+    </div>
+
+    <div> <b>??? Обьединение с другими посылками:</b>
+        <p></p>
+        <hr />
+    </div>
+}
+
+<br/>
+<ConsoleLoggerSp Owner="SbsTracks" LogerEnable="@LogerEnable">
+    <ConsoleLogger @ref="Logger" />
+</ConsoleLoggerSp>
+
+@code {
+    #region Parameters Purchase
+
+    [Parameter]
+    public string? PurchaseId { get; set; }
+
+    #endregion
+    // ---
+    #region private fields Purchase
+
+    [NotNull]
+    private ConsoleLogger? Logger { get; set; }
+    private bool LogerEnable = false;
+
+    private Purchase? purchase;
+    //private IEnumerable<ProductSp>? productSps;
+
+    #endregion
+    // ---
+    #region override methods Purchase
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        if (int.TryParse(this.PurchaseId, out int iPurchaseId))
+        {
+            if (iPurchaseId>0)
+            {
+                purchase = GetPurchaseByIdUseCase.Execute(iPurchaseId);
+
+                if (purchase != null)
+                {
+                    purchase.DepartmentDeliveryParcel = GetDepartmentDpByIdUseCase.Execute(purchase.DepartmentDeliveryParcelId);
+                    purchase.Receiver = GetReceiverByIdUseCase.Execute(purchase.ReceiverId);
+                    // purchase.ProductSps = GetDepartmentDeliveryParcelByIdUseCase.Execute(purchase.DepartmentDeliveryParcelId);
+                }
+            }
+        }
+    }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        Logger.Log($"OnAfterRender PurchaseId: {this.PurchaseId}");
+        Logger.Log($"OnAfterRender SbsTrackId: {purchase?.SbsTrackId}");
+
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
+    #endregion
+}

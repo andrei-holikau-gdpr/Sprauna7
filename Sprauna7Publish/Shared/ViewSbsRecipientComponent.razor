@@ -1,0 +1,93 @@
+﻿@using System.Diagnostics.CodeAnalysis;
+@using CoreBusiness.ShopByShop.Models;
+@using HtmlAgilityPack;
+@using UseCases.ShopByShop.UseCaseInterfaces;
+
+@inject IGetRecipientSbsByIdUseCase GetRecipientSbsByIdUseCase
+
+<h1>SbsRecipientId: @SbsRecipientId</h1>
+
+@if (recipientSbs != null)
+{
+    <table>
+        <tbody>
+            <tr>
+                <th>Id: </th>
+                <th>@ViewField(recipientSbs.Id)</th>
+            </tr>
+
+            <tr><th>Email: </th>            <th>@ViewField(recipientSbs.Email)</th></tr>
+            <tr><th>Phone: </th>            <th>@ViewField(recipientSbs.Phone)</th></tr>
+            <tr><th>FirstName: </th>        <th>@ViewField(recipientSbs.FirstName)</th></tr>
+            <tr><th>LastName: </th>         <th>@ViewField(recipientSbs.LastName)</th></tr>
+            <tr><th>MiddleName: </th>       <th>@ViewField(recipientSbs.MiddleName)</th></tr>
+            <tr><th>Birthdate: </th>        <th>@ViewField(recipientSbs.Birthdate)</th></tr>
+            <tr><th>PassportSerial: </th>   <th>@ViewField(recipientSbs.PassportSerial)</th></tr>
+            <tr><th>PassportNumber: </th>   <th>@ViewField(recipientSbs.PassportNumber)</th></tr>
+            <tr><th>PassportDate: </th>     <th>@ViewField(recipientSbs.PassportDate)</th></tr>
+            <tr><th>Type: </th>             <th>@ViewField(recipientSbs.Type)</th></tr>
+            <tr><th>PassportFounder: </th>  <th>@ViewField(recipientSbs.PassportFounder)</th></tr>
+            <tr><th>Iin: </th>              <th>@ViewField(recipientSbs.Iin)</th></tr>
+            <tr><th>PassportAddress: </th>  <th>@ViewField(recipientSbs.PassportAddress)</th></tr>
+            <tr><th>Hide: </th>             <th>@ViewField(recipientSbs.Hide)</th></tr>
+            <tr><th>CreatedAt: </th>        <th>@ViewField(recipientSbs.CreatedAt)</th></tr>
+            <tr><th>UpdatedAt: </th>        <th>@ViewField(recipientSbs.UpdatedAt)</th></tr>
+            <tr><th>Region: </th>           <th>@ViewField(recipientSbs.Region)</th></tr>
+            <tr><th>Street: </th>           <th>@ViewField(recipientSbs.Street)</th></tr>
+            <tr><th>City: </th>             <th>@ViewField(recipientSbs.City)</th></tr>
+            <tr><th>Building: </th>         <th>@ViewField(recipientSbs.Building)</th></tr>
+            <tr><th>Corpus: </th>           <th>@ViewField(recipientSbs.Corpus)</th></tr>
+            <tr><th>Apartment: </th>        <th>@ViewField(recipientSbs.Apartment)</th></tr>
+            <tr><th>Index: </th>            <th>@ViewField(recipientSbs.Index)</th></tr>
+            <tr><th>Fullname: </th>         <th>@ViewField(recipientSbs.Fullname)</th></tr>
+            <tr><th>Passport: </th>         <th>@ViewField(recipientSbs.Passport)</th></tr>
+            <tr><th>PassportHumanDate: </th><th>@ViewField(recipientSbs.PassportHumanDate)</th></tr>
+            <tr><th>PassportDateForm: </th> <th>@ViewField(recipientSbs.PassportDateForm)</th></tr>
+            <tr><th>BirthdateForm: </th>    <th>@ViewField(recipientSbs.BirthdateForm)</th></tr>
+
+        </tbody>
+    </table>
+
+    <hr />
+}
+
+<br />
+<ConsoleLoggerSp Owner="ViewSbsRecipientComponent" LogerEnable="@LogerEnable">
+    <ConsoleLogger @ref="Logger" />
+</ConsoleLoggerSp>
+
+@code {
+    #region Parameters
+
+    [Parameter]
+    public int SbsRecipientId { get; set; }
+
+    #endregion
+    // ---
+    #region private fields
+
+    [NotNull]
+    private ConsoleLogger? Logger { get; set; }
+    private bool LogerEnable = true;
+
+    private RecipientItem recipientSbs;
+
+    private string ViewField(object? field)
+    {
+        return field?.ToString() ?? "";
+    }
+
+    #endregion
+    // ---
+    #region override methods
+    protected override async Task OnParametersSetAsync()
+    {
+        recipientSbs = await GetRecipientSbsByIdUseCase.ExecuteAsync(SbsRecipientId);
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        Logger.Log($"OnAfterRender SbsRecipientId : '{this.SbsRecipientId}'");
+    }
+    #endregion
+}'

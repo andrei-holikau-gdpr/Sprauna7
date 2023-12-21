@@ -1,0 +1,121 @@
+﻿@page "/SbsRecipients"
+@using CoreBusiness.ShopByShop.Models;
+@using System.Reflection;
+@attribute [Authorize(Policy = "AdminOnly")]
+
+@inject NavigationManager NavigationManager
+@inject MessageService MessageService
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1>Получатели</h1>
+            <br />
+            <SbsRecipientTable Update="@Update"
+                               SelectRecipientSbsId="@SelectRecipientSbsId"
+                               OnClickViewCallback="@OnClickView" />
+        </div>
+    </div>
+</div>
+
+<br />
+<ConsoleLoggerSp Owner="SbsRecipients" LogerEnable="@LogerEnable">
+    <ConsoleLogger @ref="Logger" />
+</ConsoleLoggerSp>
+
+@code {
+    #region Private fields
+
+    public int? SelectRecipientSbsId;
+    public RecipientItem? SelectRecipientSbs;
+
+    public bool Update = false;
+
+    [NotNull]
+    private ConsoleLogger? Logger { get; set; }
+    private bool LogerEnable = false;
+
+    #endregion
+    // ---
+    #region Private fields / Modals
+
+    [NotNull]
+    private Modal? ModalView { get; set; }
+    [NotNull]
+    private Modal? ModalAdd { get; set; }
+    [NotNull]
+    private Modal? ModalEdit { get; set; }
+
+    private List<PropertyInfo>? PropertiesList = new();
+
+    #endregion
+    // ---
+    #region Private methods / Override methods -
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+#if DEBUG
+    LogerEnable = true;
+#endif
+    }
+
+    #endregion
+    // ---
+    #region private methods
+
+    private void ShowMessage(string message, string icon, Color color)
+    {
+        MessageService.Show(new MessageOption()
+            {
+                Content = message,
+                Icon = icon,
+                Color = color,
+                ShowDismiss = true,
+            });
+    }
+
+    #endregion
+    // ---
+    #region Private methods / OnClick CRUD
+
+    private void OnClickView(RecipientItem single)
+    {
+#if DEBUG
+        Logger.Log($"OnClickView SelectRecipientSbsId: {single.Id}");
+#endif
+
+        SelectRecipientSbsId = single.Id;
+        SelectRecipientSbs = single;
+
+        PropertiesList = typeof(Invoice).GetProperties().ToList<PropertyInfo>();
+
+        ModalView.Toggle();
+    }
+
+    private void OnClickBtnEdit(EventArgs args, int selectSbsRecipientId)
+    {
+#if DEBUG
+        Logger.Log($"OnClickEdit selectSbsRecipientId: {selectSbsRecipientId}");
+#endif
+
+        NavigationManager.NavigateTo($"/editSbsRecipient/{selectSbsRecipientId}");
+    }
+
+    private void OnClickBtnDelete(EventArgs args, int selectSbsRecipientId)
+    {
+#if DEBUG
+        Logger.Log($"OnClickBtnDelete selectSbsRecipientId: {selectSbsRecipientId}");
+#endif
+
+        SelectRecipientSbsId = 0;
+        //DeletePurchaseUseCase.Delete(SelectSbsRecipientId, currentUserId);
+        Update = true;
+        ModalView.Close();
+        // StateHasChanged();
+    }
+
+    #endregion
+    // ---
+}

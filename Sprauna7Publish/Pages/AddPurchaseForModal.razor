@@ -1,0 +1,172 @@
+﻿@*Создаем покупку*@
+
+@attribute [Authorize()]
+@page "/AddPurchaseForModal"
+
+@using Microsoft.AspNetCore.Identity;
+
+@inject NavigationManager NavigationManager
+@inject IAddPurchaseUseCase AddPurchaseUseCase
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@if (!IsModal)
+{
+    <div class="container">
+        <div class="row m-2">
+            <div class="col-sm-12 col-lg-5 p-1">
+                
+                <h1 class="h3">@ConstantSps.PURCHASE_NEW</h1>
+            </div>
+
+            <div class="col-sm-12 col-lg-7 p-1">
+                @*<button type="button" class="btn btn-link" @onclick="OnClickSetDemoData">@ConstantSps.BTN_SET_DEMO_DATA</button>*@
+            </div>
+        </div>
+    </div>
+}
+
+@if(purchase != null)
+{
+    <EditForm Model="purchase" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator></DataAnnotationsValidator>
+        <ValidationSummary></ValidationSummary>
+
+        @*display:none;*@
+        <div class="form-group response" style="">
+            <label for="CurrentUserId">CurrentUserId</label>
+            <InputText id="CurrentUserId" @bind-Value="purchase.CurrentUserId" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label for="Surname">@PurchaseOptions.Surname</label>
+            <InputText id="Surname" @bind-Value="purchase.Surname" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label for="name">@PurchaseOptions.Name</label>
+            <InputText id="name" @bind-Value="purchase.Name" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label for="Shop">@PurchaseOptions.Shop</label>
+            <InputText id="Shop" @bind-Value="purchase.Shop" class="form-control"></InputText>
+        </div>
+
+        @* AgreeWithTools *@
+        <div class="col-sm-12 col-lg-12 p-1">
+            <div class="form-check">
+                <InputCheckbox id="AgreeWithTools" @bind-Value="purchase.AgreeWithTools"
+                           class="form-check" style="float:left;"/>
+                <label for="AgreeWithTools" style="padding-left: 5px; color:@AgreeWithToolsColor">@PurchaseOptions.AgreeWithTools</label>
+            </div>
+        </div>
+
+        @* Buttons *@
+        <div class="col-sm-12 col-lg-12 p-1">
+            <button type="submit" class="btn btn-primary test1909" disabled="@SetDisabledSubmit()">
+                Сохранить
+            </button>
+            <button type="button" class="btn btn-primary" @onclick="OnCancel">Отменить</button>
+        </div>
+    </EditForm>
+}
+
+@code {
+    #region Inject
+
+    [Inject]
+    UserManager<ApplicationUser>? userManager { get; set; }
+
+    #endregion
+    // ---
+    #region public Parameters Purchase
+
+    [Parameter]
+    public bool IsModal { get; set; } = false;
+
+    [Parameter]
+    public EventCallback OnAddCallback { get; set; }
+
+    [Parameter]
+    public EventCallback OnCanselCallback { get; set; }
+
+    [Parameter]
+    public int? PurchaseId { get; set; }
+
+    #endregion
+    // ---
+    #region private fields Purchase
+
+    private Purchase purchase = new Purchase();
+
+    private string AgreeWithToolsColor = "white";
+
+    private string? currentUserId;
+
+    #endregion
+
+    #region override methods Purchase
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+#pragma warning disable CS8602 //todo: #pragma warning disable CS8602
+
+        if (user.Identity.IsAuthenticated)
+        {
+            var currentUser = await userManager.GetUserAsync(user);
+            currentUserId = userManager.GetUserId(user);
+        }
+#pragma warning restore CS8602
+    }
+
+    protected override void OnParametersSet()
+    {
+        purchase.CurrentUserId = currentUserId;
+    }
+
+    #endregion
+
+    #region private methods Purchase
+
+    private string SetDisabledSubmit() => purchase.AgreeWithTools ? "" : "disabled";
+
+    private void OnValidSubmit()
+    {
+        
+        PurchaseId = AddPurchaseUseCase.Execute(purchase);
+
+        if (!IsModal)
+        {
+            NavigationManager.NavigateTo($"/EditPurchase/{PurchaseId}");
+        }
+        else
+        {
+            OnAddCallback.InvokeAsync();
+            purchase = new Purchase();
+            //NavigationManager.NavigateTo($"/{ReceiverOptions.NameMany}");
+        }
+    }
+
+    private void OnCancel()
+    {
+        if (!IsModal)
+        {
+            NavigationManager.NavigateTo($"/{ReceiverOptions.NameMany}");
+        }
+        else
+        {
+            OnCanselCallback.InvokeAsync();
+        }
+    }
+
+    private void OnCkickSendWithoutUnit()
+    {
+        
+    }
+    #endregion
+
+}

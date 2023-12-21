@@ -1,0 +1,150 @@
+﻿DataTables with Blazor
+https://datatables.net/forums/discussion/comment/175069/#Comment_175069
+
+Подключение Яндекс.Карт к проекту Blazor Server
+https://ru.stackoverflow.com/questions/1461343/%D0%9F%D0%BE%D0%B4%D0%BA%D0%BB%D1%8E%D1%87%D0%B5%D0%BD%D0%B8%D0%B5-%D0%AF%D0%BD%D0%B4%D0%B5%D0%BA%D1%81-%D0%9A%D0%B0%D1%80%D1%82-%D0%BA-%D0%BF%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%83-blazor-server
+
+
+<HeadContent>
+https://metanit.com/sharp/blazor/2.13.php
+
+Создание и удаление
+https://yandex.ru/dev/maps/jsbox/2.1/mapbasics/
+
+Поиск организаций и геопоиск
+https://yandex.ru/dev/maps/jsbox/2.1/search_control_ppo
+
+Инструмент Определение координат.
+http://dimik.github.io/ymaps/examples/location-tool/
+
+Вызов функций JavaScript из методов .NET в ASP.NET Core Blazor
+https://learn.microsoft.com/ru-ru/aspnet/core/blazor/javascript-interoperability/call-javascript-from-dotnet?view=aspnetcore-7.0
+
+Ключи API
+https://developer.tech.yandex.ru/services/3
+
+Формат запроса
+https://yandex.ru/dev/geosearch/doc/ru/concepts/request
+
+Элемент управления «Поиск по карте»
+https://yandex.ru/dev/maps/jsapi/doc/2.1/dg/concepts/geocoding/searchControl.html
+
+CSS Loading
+https://codepen.io/xhepigerta/pen/bprWbR
+https://codepen.io/marianab/pen/XPOQaR
+
+https://loading.io/css/
+https://cssloaders.github.io/
+
+Blazor/Simple	
+https://www.youtube.com/watch?v=uP6-oxQQYbM&list=PLDpzfV5MtMjim1j4e1pdPF09wGovi0SHG&index=2
+
+JavaScript Data Grid
+https://jspreadsheet.com/
+https://js.devexpress.com/Overview/DataGrid/
+https://gridjs.io/
+https://handsontable.com/demo
+https://bryntum.com/products/grid/
+https://bryntum.com/
+https://www.ag-grid.com/
+
+https://logrocket.com/
+
+Центрирование горизонтальное и вертикальное
+https://learn.javascript.ru/css-center
+
+Add Custom Fields To User in ASP.NET Core Identity
+https://www.tektutorialshub.com/asp-net-core/add-custom-fields-to-user-in-asp-net-core-identity/
+
+How do I display and update my custom Identity fields in my ASP.NET Core application?
+https://stackoverflow.com/questions/60707589/how-do-i-display-and-update-my-custom-identity-fields-in-my-asp-net-core-applica
+
+HotReload
+https://youtrack.jetbrains.com/issue/RIDER-69647/Support-.NET6-Hot-Reload-for-Blazor-Server-Blazor-WebAssembly-apps
+
+XML для курсов валют
+https://metanit.com/sharp/tutorial/16.6.php
+
+css gradient button
+https://codepen.io/leandrosimoes/embed/VqZxaG
+https://codepen.io/mars2601/pen/MKVNMX
+
+https://codepen.io/ibrahimozturkme/pen/mOZmgG
+https://codepen.io/glasha_ch/pen/pVjpVO
+
+Внутренние тени в CSS
+https://habr.com/ru/articles/154211/
+
+Изменение CSS-градиента в зависимости от положения курсора
+https://snipp.ru/html-css/gradient-mouse
+
+Рамки блоков с градиентом
+https://snipp.ru/html-css/gradient-box-border
+
+Отключение предупреждений
+https://learn.microsoft.com/ru-ru/dotnet/fundamentals/syslib-diagnostics/syslib0014
+
+скачать favicon с сайта
+http://www.google.com/s2/favicons?domain=teweb.ru
+http://favicon.yandex.net/
+
+Тестирование UI с помощью Selenium в ASP.NET Core MVC
+https://forproger.ru/article/testirovanie-ui-s-pomoshhyu-selenium-v-aspnet-core-mvc
+
+session not created: This version of ChromeDriver only supports Chrome version 85 (SessionNotCreated)
+https://stackoverflow.com/questions/29858752/error-message-chromedriver-executable-needs-to-be-available-in-the-path/52878725#52878725favicon/teweb.ru
+
+https://chromedriver.chromium.org/downloads
+driver = webdriver.Chrome("C:/Users/michael/Downloads/chromedriver_win32/chromedriver.exe")
+
+Отключение предупреждений
+https://learn.microsoft.com/ru-ru/dotnet/fundamentals/syslib-diagnostics/syslib0014
+
+Css, hyphens Перенос слов CSS
+http://shpargalkablog.ru/2013/02/word-wrap.html
+
+Css, text-align
+https://developer.mozilla.org/en-US/docs/Web/CSS/text-align
+
+Css, CSS Loader Generator
+https://www.cssportal.com/css-loader-generator/
+
+CSS, Tooltip Generator
+https://www.cssportal.com/css-tooltip-generator/
+
+CSS, Flexbox Generator
+https://www.cssportal.com/css-flexbox-generator/
+
+CSS, Text Gradient Generator
+https://www.cssportal.com/css-text-gradient-generator/
+
+!!! CSS, 3 Loading 
+https://codepen.io/xhepigerta/pen/bprWbR
+
+!!! CSS, button
+https://uiverse.io/StealthWorm/spotty-horse-48
+
+Частичные представления в ASP.NET Core
+https://learn.microsoft.com/ru-ru/aspnet/core/mvc/views/partial?view=aspnetcore-7.0
+
+Авторизация в приложении Blazor Server
+https://www.interestprograms.ru/source-codes-blazor-identifikaciya-autentifikaciya-avtorizaciya
+
+ShopByShop RestAPI
+file:///C:/Users/Andrei/Desktop/ShopByShop%20RestAPI.html#/
+
+Подтверждение по Email в Identity
+https://metanit.com/sharp/aspnet5/16.5.php
+
+Как создать и использовать пароли приложений
+https://support.google.com/accounts/answer/185833?visit_id=638256544656024386-1328760654&p=InvalidSecondFactor&rd=1
+https://myaccount.google.com/security
+
+онлайн конвертер json в C# объект
+https://json2csharp.com/
+https://jsonformatter.org/json-to-csharp
+
+json
+https://bfotool.com/ru/json-viewer
+https://jsoneditoronline.org/#left=local.ziyova&right=local.moriba
+https://jsonviewer.stack.hu/

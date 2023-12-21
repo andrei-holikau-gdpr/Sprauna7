@@ -1,0 +1,31 @@
+﻿@page "/"
+@using System.Diagnostics.CodeAnalysis;
+@implements IDisposable
+
+<PageTitle>Index</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<SurveyPrompt Title="How is Blazor working for you?" />
+
+<Button OnClick="() => BackdropModal.Toggle()">ModalsNormalPopups</Button>
+
+<Modal @ref="BackdropModal" IsBackdrop="true" IsKeyboard="true">
+    <ModalDialog Title="ModalsIsBackdropToClose" IsDraggable="true" ShowFooter="false">
+        <BodyTemplate>
+            <div>ModalsTitlePopupWindowText</div>
+        </BodyTemplate>
+    </ModalDialog>
+</Modal>
+
+@code {
+    [NotNull]
+    private Modal? BackdropModal { get; set; }
+
+    public void Dispose()
+    {
+        BackdropModal.DisposeAsync();
+    }
+}

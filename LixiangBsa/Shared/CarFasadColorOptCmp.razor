@@ -1,0 +1,222 @@
+﻿@using Lixiang.CoreBusiness;
+
+@inject IJSRuntime JSRuntime
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h3>
+                @Title
+                <button type="button" @onclick="AddColor" class="btn btn-link">Добавить</button>
+            </h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col col-8">
+            <table id="@TableId" class="display" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>miniImage</th>
+                        <th>Images</th>
+                        <th>Description</th>
+                        <th>CRUD</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var model in CarColorOptions)
+                    {
+                        <tr @onclick="(() => EditModel(model))">
+                            <td>@model.Id</td>
+                            <td>@model.Name</td>
+                            <td>@model.Price</td>
+                            <td>
+                                @if (!string.IsNullOrWhiteSpace(model?.Thumbnail?.FileName)){
+                                    <img src="/img/@model?.Thumbnail?.FileName" width="50" alt="..."
+                                     class="img-circle" />
+                                }
+                            </td>
+                            <td>
+                                <div style="min-width:170px">
+                                    @foreach (var img in model.Images)
+                                    {
+                                        <img src="/img/@img?.FileName" width="50" alt="..."
+                                             style="float:left; margin:2px;" />
+                                    }
+                                </div>
+                            </td>
+                            <td>
+                                <div class="truncate"
+                                     data-bs-toggle="tooltip" data-bs-placement="top"
+                                     title="@model.Description">
+                                        @model.Description
+                                </div>
+                            </td>
+                            <td>
+                                <button @onclick="(() => DelColor(model))"
+                                    type="button" class="btn btn-link">
+                                    Удалить
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="col col-4">
+            @if (SelectedCarColorOption != null)
+            {
+                <div class="row mb-3">
+
+                    <div class="col-12 mb-2">
+                        <label for="optionName" class="form-label">Name (Id: @SelectedCarColorOption.Id)</label>
+                        <input type="text" class="form-control" id="optionName" @bind="SelectedCarColorOption.Name" placeholder="Name">
+                    </div>
+
+                    <div class="col-12 mb-2">
+                        <label for="optionPrice" class="form-label">Price</label>
+                        <input type="number" class="form-control" id="optionPrice" @bind="SelectedCarColorOption.Price">
+                    </div>
+
+                    <div class="col-12 mb-2">
+                        <label for="optionDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="optionDescription" rows="2" 
+                              @bind="SelectedCarColorOption.Description"></textarea>
+                    </div>
+                    @if (SelectedCarColorOption?.Thumbnail != null)
+                    {
+                        <div class="col-12 mb-2">
+                            <UploadImageCmp SelectedFileLi="
+                                new FileLi{  FileLiId = 1,
+                                             FileName = SelectedCarColorOption?.Thumbnail?.FileName, }"
+                                LoadedFilesCallback="LoadedFilesCallback"
+                                    ParentImageHtmlTag="SelectedCarColorOption.Thumbnail" />
+                            @*<img src="/img/@" width="50" alt="..."
+                    class="img-circle" style="margin-top: 20px;" />*@
+                        </div>
+                    }
+                </div>
+                <label  class="form-label">Slide Image</label>
+                @if (SelectedCarColorOption != null)
+                    {
+                    @foreach (var img in SelectedCarColorOption.Images)
+                    {
+                        @*<div class="row">
+                        <div class="col-1">
+                            <span>@img.ImageHtmlTagId</span>
+                        </div>
+                        <div class="col-9">
+                            <input type="text" class="form-control" id="optionId" @bind="img.FileName" />
+                        </div>
+
+                        <div class="col-1">
+                            <img src="/img/@img?.FileName" width="50" alt="..."
+                         class="img-rounded m-x-auto" />
+                        </div>
+                    </div>*@
+                        @if (img != null)
+                        {
+                            <div class="row">
+                                <div class="col-12">
+                                    <UploadImageCmp SelectedFileLi=" 
+                                    new FileLi{  FileLiId = img.ImageHtmlTagId,
+                                                 FileName = img.FileName, }"
+                                LoadedFilesCallback="LoadedFilesCallback" 
+                                ParentImageHtmlTag = "img"/>
+                                </div>
+                            </div>
+                        }
+                    }
+                }
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string? Title { get; set; }
+    [Parameter]
+    public List<CarColorOption> CarColorOptions { get; set; } = new();
+    [Parameter]
+    public List<ImageHtmlTag> ImageHtmlTags { get; set; } = new();
+
+    private CarColorOption? SelectedCarColorOption;
+    private string? TableId;
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        TableId = "table" + (new Random()).Next(1000000);
+    }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        JSRuntime.InvokeAsync<object>("TestDataTablesAdd", $"#{TableId}");
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
+    #region private CRUD
+    private void AddColor()
+    {
+        int maxImageId = ImageHtmlTags.Max(i => i.ImageHtmlTagId);
+        var tumb = new ImageHtmlTag(maxImageId+1, "");
+        var slide1 = new ImageHtmlTag(maxImageId + 2, "");
+        var slide2 = new ImageHtmlTag(maxImageId + 3, "");
+        var slide3 = new ImageHtmlTag(maxImageId + 4, "");
+        var slide4 = new ImageHtmlTag(maxImageId + 5, "");
+        ImageHtmlTags.AddRange(
+            new List<ImageHtmlTag>(){ tumb, slide1, slide2, slide3, slide4});
+
+        int maxId = CarColorOptions.Max(t => t.Id) + 1;
+        
+
+        CarColorOptions.Add(
+            new CarColorOption()
+                {
+                    Id = maxId,
+                    Price = 0,
+                    Description = "",
+                    Thumbnail = tumb,
+                    Images = { slide1, slide2, slide3, slide4 }
+                }
+        );
+        ShouldRender();
+    }
+    private void DelColor(CarColorOption colorOption)
+    {
+        CarColorOptions.Remove(colorOption);
+        ShouldRender();
+    }
+
+    private void EditModel(CarColorOption colorOption)
+    {
+        SelectedCarColorOption = colorOption;
+        ShouldRender();
+    }
+    #endregion
+    // ---
+    #region Private methods
+
+    private void LoadedFilesCallback(FileLi SelectedFileLi)
+    {
+        ImageHtmlTag img = null;
+        if (SelectedCarColorOption?.Thumbnail.ImageHtmlTagId == SelectedFileLi.ParentImageHtmlTag.ImageHtmlTagId)
+        {
+            img = SelectedCarColorOption?.Thumbnail;
+        }
+        else
+        {
+            img = SelectedCarColorOption?.Images
+                .Find(img => img.ImageHtmlTagId == SelectedFileLi.ParentImageHtmlTag.ImageHtmlTagId);
+        }
+        // Если нашли обьект для обновления, то обновляем
+        if (img != null)
+        {
+            img.FileName = SelectedFileLi.FileName;
+        }
+    }
+    #endregion
+}

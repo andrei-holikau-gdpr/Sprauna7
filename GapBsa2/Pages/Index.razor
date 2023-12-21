@@ -1,0 +1,111 @@
+﻿@page "/"
+@using Gap2.CoreBusiness;
+@using Gap2.Plugins.DataStore.InMemory;
+
+<PageTitle>GDPR Appliacability Project (GAP)</PageTitle>
+@if (GapResults?.ProcessSelected == null)
+{
+    <h1 Class="mt-8 px-4">GDPR Appliacability </h1>
+} else
+{
+    <h5 Class="mt-8 px-4">GDPR Appliacability </h5>
+}
+<MudContainer Class="mt-8 px-4" MaxWidth="MaxWidth.ExtraLarge">
+    <MudGrid>
+        
+        <MudItem xs="12" sm="@(GapResults?.ProcessSelected == null? 12 : 6)">
+            <MudGrid>                
+                <ProcessBlockCmp Processes="Processes" GapResults="GapResults"
+                                 UpdateCallback="UpdateCmps" />
+                @if (GapResults?.ProcessSelected != null)
+                {
+                    <JurisdictionCmp Jurisdictions="Jurisdictions" 
+                        GapResults="GapResults"
+                        UpdateCallback="UpdateCmps" />
+                    <SpecialBlockCmp Questions="Questions" GapResults="GapResults"
+                                     UpdateCallback="UpdateCmps" />
+                    <GeneralBlockCmp />
+                }                
+            </MudGrid>
+        </MudItem>
+
+        @if (GapResults?.ProcessSelected != null)
+        {
+            <MudItem xs="12" sm="6">
+                <MudPaper Elevation="2" Class="pa-4" Style="height: 100%">
+                    <ResultBlockCmp GapResults="GapResults"
+                                UpdateResult="UpdateResult" DevUiMode="DevUiMode"/>
+                </MudPaper>
+            </MudItem>
+        }
+
+@*        <MudItem xs="12" sm="12" md="12">
+            <MudPaper Elevation="2" Class="pa-4" Style="min-height: 100px;"> 
+                <MainCarouselCmp />
+            </MudPaper>
+        </MudItem>*@
+
+    </MudGrid>
+</MudContainer>
+
+<MudDivider />
+
+<MudSwitch @bind-Checked="@DevUiMode" Label="@(DevUiMode ? "Отключить режим разработчика" : "Включить режим разработчика")" />
+
+@if (DevUiMode)
+{
+    <MudContainer Class="mt-16 px-4" MaxWidth="MaxWidth.ExtraLarge">
+        <MudGrid>
+
+            <MudItem xs="12" sm="6">
+                <MudPaper Elevation="2" Class="pa-4" Style="min-height: 100px;"> 
+                    <TestBlockCmp />
+                </MudPaper>
+            </MudItem>
+
+            <MudItem xs="12" sm="6">
+                <MudPaper Elevation="2" Class="pa-4" Style="min-height: 100px;"> 
+                    <LogBlockCmp />
+                </MudPaper>
+            </MudItem>
+
+        </MudGrid>
+    </MudContainer>
+}
+
+@code{
+    private bool DevUiMode { get; set; } = false;
+
+    private List<ImageHtmlTag>? Images { get; set; }
+    private List<Process>? Processes { get; set; }
+    private List<Jurisdiction>? Jurisdictions { get; set; }
+    private List<Question>? Questions { get; set; }
+    private List<QuestionType>? QuestionTypes { get; set; }
+    private List<Answer>? Answers { get; set; }
+
+    private List<StatusAppliacability>? StatusAppliacabilities;
+    private GapResult? GapResults { get; set; }
+    public bool UpdateResult { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        TestDataGenerator testData = new();
+        Images = testData.Images;
+        Processes = testData.Processes;
+
+        Jurisdictions = testData.Jurisdictions;
+        QuestionTypes = testData.QuestionTypes;
+        Questions = testData.Questions;
+        Answers = testData.Answers;
+
+        GapResults = testData.GapResults;
+    }
+
+    private void UpdateCmps()
+    {
+        UpdateResult = !UpdateResult;
+        ShouldRender();
+    }
+}

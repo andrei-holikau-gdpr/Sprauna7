@@ -1,0 +1,10 @@
+﻿@page "/TestConfiguration"
+
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+
+<h3>TestConfiguration</h3>
+
+<h1>
+    MailSettingsSmtpServer: @Configuration["MailSettings:SmtpServer"]
+</h1>

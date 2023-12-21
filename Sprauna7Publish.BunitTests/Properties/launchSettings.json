@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Sprauna7Publish.BunitTests": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:2375;http://localhost:2376"
+    }
+  }
+}

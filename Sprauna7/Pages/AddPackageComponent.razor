@@ -1,0 +1,68 @@
+﻿@page "/addpackage"
+
+@inject NavigationManager NavigationManager
+@inject IAddPackageUseCase AddPackageUseCase
+
+<h3>AddPackageComponent</h3>
+
+@if(package != null)
+{
+    <EditForm Model="package"  OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator></DataAnnotationsValidator>
+        <ValidationSummary></ValidationSummary>
+
+        <div class="form-group">
+            <label for="name">Name</label>
+            <InputText id="name" @bind-Value="package.Name" class="form-control"></InputText>
+        </div>
+
+
+        <div class="form-group">
+            <label for="description">Описание</label>
+            <InputText id="description" @bind-Value="package.Description" class="form-control"></InputText>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+        <button type="button" class="btn btn-primary" @onclick="OnCancel">Отменить</button>
+    </EditForm>
+}
+
+@code {
+
+#region const
+
+    const string UrlAllElements = "/packages";
+
+#endregion
+
+#region private fields
+
+    private Package package;
+
+#endregion
+
+#region override methods
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        package = new Package();
+    }
+
+#endregion
+
+#region private methods
+
+    private void OnValidSubmit()
+    {
+        AddPackageUseCase.Execute(package);
+        NavigationManager.NavigateTo(UrlAllElements);
+    }
+
+    private void OnCancel()
+    {
+        NavigationManager.NavigateTo(UrlAllElements);
+    }
+
+#endregion
+}

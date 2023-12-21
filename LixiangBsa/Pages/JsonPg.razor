@@ -1,0 +1,148 @@
+﻿@page "/json"
+
+@using System.Text.Json;
+@using Lixiang.CoreBusiness;
+@using System.Text;
+@using System.Text.Encodings.Web;
+@using System.Text.Unicode;
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h3>Json files</h3>
+            <button type="button" class="btn btn-primary btn-lg btn-block" @onclick="LiJsonAsync">Load json</button>
+        </div>
+        <div class="col-12 col-lg-4">
+            <h3>Li7</h3>
+            <textarea name="message" rows="10" cols="30" class="form-control">@JsonLi</textarea>
+        </div>
+        <div class="col-12 col-lg-4">
+            <h3>Li8</h3>
+            <textarea name="message" rows="10" cols="30" class="form-control">@JsonLi</textarea>
+        </div>
+        <div class="col-12 col-lg-4">
+            <h3>Li9</h3>
+            <textarea name="message" rows="10" cols="30" class="form-control">@JsonLi</textarea>
+        </div>
+        <div class="col-12">
+            <br/>
+            <button type="button" class="btn btn-primary btn-lg btn-block" @onclick="LiJsonAsync" disabled>Save</button>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    #region private fields
+
+    private Car SelectedCar = new();
+    private double PriceCar;
+
+    private List<CarModel> CarModels { get; set; } = new();
+    private List<CarColorOption> CarFasadColorOptions { get; set; } = new();
+    private List<CarColorOption> CarInteriorColorOptions { get; set; } = new();
+    private List<CarColorOption> CarWheelDisksOptions { get; set; } = new();
+    private List<SimpleOption> OptionalEquipments { get; set; } = new();
+
+    public CarColorOption CarOptionForComponent { get; set; } = new();
+    #endregion
+    // ---
+
+    private string JsonLi { get; set; } = "Li7";
+
+    protected override Task OnParametersSetAsync()
+    {
+        LiReadJsonAsync();
+        // LiWriteJsonAsync();
+        return base.OnParametersSetAsync();
+    }
+
+    private async Task LiJsonAsync()
+    {
+        string fileName = "jsonLi7.json";
+        LiReadJsonAsync(fileName);
+        LiWriteJsonAsync(fileName);
+    }
+
+    private async Task LiReadJsonAsync(string fileName = "jsonLi7.json")
+    {
+        JsonLi = "";
+        // асинхронное чтение
+        using (StreamReader reader = new StreamReader(fileName))
+        {
+            string? line;
+            while ((line = await reader.ReadLineAsync()) != null)
+            {
+                JsonLi += line;
+            }
+        }
+
+        // чтение данных
+        /*
+        using (FileStream fs = new FileStream("jsonLi7.json", FileMode.OpenOrCreate))
+        {
+            CarColorOptionList? cars = await JsonSerializer.DeserializeAsync<CarColorOptionList>(fs);
+
+            // выделяем массив для считывания данных из файла
+            byte[] buffer = new byte[fs.Length];
+            // считываем данные
+            await fs.ReadAsync(buffer, 0, buffer.Length);
+            // декодируем байты в строку
+            JsonLi7 = Encoding.Default.GetString(buffer);
+
+            ShouldRender();
+
+            // Console.WriteLine($"Name: {person?.Name}  Age: {person?.Age}");
+        }
+        */
+
+        ShouldRender();
+    }
+    private async Task LiWriteJsonAsync(string fileName = "jsonLi7.json")
+    {
+        JsonLi = "";
+        // Очистить содержимое файла
+        // File.WriteAllText(fileName, string.Empty);
+
+        // сохранение данных
+        using (FileStream fs = new FileStream(fileName, FileMode.OpenOrCreate))
+        {
+            //Person tom = new Person("Tom", 37);
+            CarColorOptionList cars = new CarColorOptionList()
+            {
+                CarFasadColorOptions = CarFasadColorOptions,
+                CarInteriorColorOptions = CarInteriorColorOptions,
+                CarWheelDisksOptions = CarWheelDisksOptions,
+                OptionalEquipments = OptionalEquipments
+            };
+
+            var options1 = new JsonSerializerOptions
+                {
+                    Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Cyrillic),
+                    WriteIndented = true
+                };
+
+            await JsonSerializer.SerializeAsync<CarColorOptionList>(fs, cars, options1);
+            //Console.WriteLine("Data has been saved to file");
+        }        
+        ShouldRender();
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        LoadAll();        
+    }
+
+
+    private void LoadAll()
+    {
+        LoaderOptions loaderOptions = new();
+
+        CarModels = loaderOptions.CarModels;
+        CarFasadColorOptions = loaderOptions.CarFasadColorOptions;
+        CarInteriorColorOptions = loaderOptions.CarInteriorColorOptions;
+        CarWheelDisksOptions = loaderOptions.CarWheelDisksOptions;
+        OptionalEquipments = loaderOptions.OptionalEquipments;
+    }
+}

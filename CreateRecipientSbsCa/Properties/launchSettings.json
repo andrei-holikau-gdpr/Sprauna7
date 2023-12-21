@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "CreateRecipientSbsCa": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:13020;http://localhost:13028"
+    }
+  }
+}

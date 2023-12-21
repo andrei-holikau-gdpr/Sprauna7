@@ -1,0 +1,82 @@
+﻿@page "/categories"
+@inject NavigationManager NavigationManager
+
+@inject IViewCategoriesUseCase ViewCategoriesUseCase
+@inject IDeleteCategoryUseCase DeleteCategoryUseCase
+
+<h3>Categories</h3>
+
+@if (categories != null)
+{
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var item in categories)
+            {
+                <tr>
+                    <td>@item.CategoryId</td>
+                    <td>@item.Name</td>
+                    <td>@item.Description</td>
+                    <td>
+                        <button type="button" @onclick="@( () => EditCategory(item) )"
+                            class="btn btn-link">Edit</button>
+                        <button type="button" @onclick="@( () => DeleteCategory(item.CategoryId) )"
+                            class="btn btn-link">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+<br/>
+<button type="button" @onclick="OnClickAddCategory" class="btn btn-primary">Добавить</button>
+
+@code {
+    #region private fields
+
+    private List<Category> categories;
+
+    #endregion
+
+    #region override methods
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        LoadCategories();
+    }
+
+    #endregion
+    #region private methods
+
+    private void OnClickAddCategory()
+    {
+        NavigationManager.NavigateTo("/addcategory");
+    }
+
+    private void LoadCategories()
+    {
+        categories = ViewCategoriesUseCase.Execute()?.ToList();
+    }
+
+    private void EditCategory(Category category)
+    {
+        NavigationManager.NavigateTo($"/editcategory/{category.CategoryId}");
+    }
+
+    private void DeleteCategory(int categoryId)
+    {
+        DeleteCategoryUseCase.Delete(categoryId);
+        LoadCategories();
+    }
+
+    #endregion
+}

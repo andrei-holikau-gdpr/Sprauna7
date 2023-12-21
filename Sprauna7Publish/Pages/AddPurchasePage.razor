@@ -1,0 +1,437 @@
+﻿@*Создаем покупку*@
+
+@page "/addpurchase"
+@attribute [Authorize()]
+
+@using CoreBusiness.ShopByShop.Models;
+@using Microsoft.AspNetCore.Identity;
+@using System.Text.RegularExpressions;
+@using Sprauna7Publish.SpPlugins;
+@using UseCases.ShopByShop.UseCaseInterfaces;
+@using Plugins.Converters;
+
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@inject IAddPurchaseUseCase AddPurchaseUseCase
+@inject IAddPackageUseCase AddPackageUseCase
+@inject IAddTrackSbsUseCase AddTrackSbsUseCase
+@inject IEditPurchaseUseCase EditPurchaseUseCase
+
+@inject IGetDepartmentDpByIdUseCase GetDepartmentDpByIdUseCase
+@inject IGetReceiverByIdUseCase GetReceiverByIdUseCase
+@inject IGetProductSpByIdUseCase GetProductSpByIdUseCase
+
+@inject IAddProductSpUseCase AddProductSpUseCase
+
+@inject ILogger<AddPurchasePage> LoggerInFile
+
+@if (!IsModal)
+{
+    <div class="container">
+        <div class="row m-2">
+            <div class="col-sm-12 col-lg-5 p-1">
+                <h1 class="h3">@ConstantSps.PURCHASE_NEW</h1>
+            </div>
+
+            <div class="col-sm-12 col-lg-7 p-1">
+                @*<button type="button" class="btn btn-link" @onclick="OnClickSetDemoData">@ConstantSps.BTN_SET_DEMO_DATA</button>*@
+            </div>
+        </div>
+    </div>
+}
+
+@if (ErrorMessages.Count > 0)
+{
+    <ErrorMessagesComponent ErrorMessages="ErrorMessages" />
+}
+
+@if(purchase != null)
+{
+    <EditForm Model="purchase" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator></DataAnnotationsValidator>
+        <ValidationSummary></ValidationSummary>
+
+        <div class="form-group response" style="display:none;">
+            <label for="CurrentUserId">CurrentUserId</label>
+            <InputText id="CurrentUserId" @bind-Value="purchase.CurrentUserId" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label for="Surname">@PurchaseOptions.Surname</label>
+
+            @*<InputText @bind="purchase.Surname" 
+            @bind:after="OnChangeSurname">
+            </InputText>*@
+            
+            <InputText id="Surname" @bind-Value="purchase.Surname"
+                   class="form-control"></InputText>
+            <ValidationMessage For="() => purchase.Surname" />
+        </div>
+
+        <div class="form-group">
+            <label for="name">@PurchaseOptions.Name</label>
+            <InputText id="name" @bind-Value="purchase.Name" class="form-control"></InputText>
+            <ValidationMessage For="() => purchase.Name" />
+        </div>
+
+        <div class="form-group">
+            <label for="Shop">@PurchaseOptions.Shop</label>
+            <InputText id="Shop" @bind-Value="purchase.Shop" class="form-control"></InputText>
+            <ValidationMessage For="() => purchase.Shop" />
+        </div>
+        <br/>
+        @* DepartmentDeliveryParce *@
+        <div class="col-sm-12 col-lg-12 p-1">
+            <div class="form-group">
+                <b>Пункт выдачи посылки</b>
+                <br />
+                <a class="btn btn-link" data-bs-toggle="modal" data-bs-target="#pvModal">
+                    <div>
+                        @if (selectDepartmentId > 0)
+                        {
+                            <i class="bi bi-geo-alt" style="padding: 0px 10px;"></i>
+                            @GetDepartmentDpByIdUseCase.Execute(selectDepartmentId).Address
+
+                            <br />
+                        }
+                        else
+                        {
+                            <span>Выбрать</span>
+                        }
+                    </div>
+                </a>
+                @*<InputNumber id="DepartmentDeliveryParcelId" @bind-Value="purchase.DepartmentDeliveryParcelId" class="form-control"></InputNumber>*@
+            </div>
+        </div>
+        <br/>
+        @* Receiver *@
+        <div class="col-sm-12 col-lg-12 p-1">
+            <div class="form-group">
+                <b>Получатель</b><br />
+                <a class="btn btn-link" data-bs-toggle="modal" data-bs-target="#ReceiversModal">
+                    <div>                                    
+                        @if (selectReceiverId > 0)
+                        {
+                            <i class="bi bi-person" style="padding: 0px 10px;"></i>
+                            @ReceiverOptions.GetFIO( GetReceiverByIdUseCase.Execute(selectReceiverId) )
+                        } else {
+                            <span>Выбрать</span>
+                        }
+                    </div>
+                </a>
+                @*<InputNumber id="DepartmentDeliveryParcelId" @bind-Value="purchase.DepartmentDeliveryParcelId" class="form-control"></InputNumber>*@
+            </div>
+        </div>
+        @* AgreeWithTools *@
+        <div class="col-sm-12 col-lg-12 p-1">
+            <div class="form-group">
+                <InputCheckbox id="AgreeWithTools" @bind-Value="purchase.AgreeWithTools" class="form-check" style="float:left;" ></InputCheckbox>
+                <label for="AgreeWithTools" style="padding-left: 5px;">@PurchaseOptions.AgreeWithTools</label>
+            </div>
+        </div>
+
+        @*<input type="hidden" id="CurrentUserId" value="392e95bf-c5e8-42f8-a7fd-eb47b65d71f2" name="id=" CurrentUserId" />*@
+
+        @* Buttons *@
+        <div class="col-sm-12 col-lg-12 p-1">
+            @if (purchase.AgreeWithTools && selectDepartmentId > 0 && selectReceiverId > 0)
+            {
+                <button type="submit" class="btn btn-primary m-1">Сохранить</button>
+            } else {
+                <button type="submit" class="btn btn-primary m-1" disabled>Сохранить</button>
+            }
+            <button type="button" class="btn btn-link m-1" @onclick="OnCancel">Отменить</button>
+        </div>
+    </EditForm>
+}
+
+@* Модальное окно выбора пункта выдачи *@
+<div class="modal fade" id="pvModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Выбор пункта выдачи</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+
+            <div class="modal-body">
+                <SelectPvz OnSelectedCallback="OnSelectedDepartment" />
+            </div>
+        </div>
+    </div>
+</div>
+
+    @* Модальное окно выбора получателя *@
+    <div class="modal fade" id="ReceiversModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Выбор получателя</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                </div>
+
+                <div class="modal-body">
+                    <SelectReceiver OnSelectedCallback="OnSelectedReceiver" IsModal="true"/>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<ConsoleLoggerSp Owner="EditPurchaseComponent" LogerEnable="@LogerEnable">
+    <ConsoleLogger @ref="Logger" />
+</ConsoleLoggerSp>
+
+@code {
+    #region public Parameters Purchase
+
+    [Parameter]
+    public bool IsModal { get; set; } = false;
+
+    [Parameter]
+    public EventCallback OnAddCallback { get; set; }
+
+    [Parameter]
+    public EventCallback OnCanselCallback { get; set; }
+
+    [Parameter]
+    public int? PurchaseId { get; set; }
+
+    #endregion
+    // ---
+    #region private fields Purchase
+
+    [Inject]
+    UserManager<ApplicationUser>? userManager { get; set; }
+
+    [NotNull]
+    private ConsoleLogger? Logger { get; set; }
+    private bool LogerEnable = true;
+
+    private List<string> ErrorMessages = new();
+
+    // private string? userAuthenticated;
+    private string? currentUserId;
+    private int selectDepartmentId { get; set; } = 0;
+    private int selectReceiverId { get; set; } = 0;
+
+    private Purchase purchase = new Purchase();
+
+    #endregion
+
+    #region override methods Purchase
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+#pragma warning disable CS8602 //todo: #pragma warning disable CS8602
+        if (user.Identity.IsAuthenticated)
+        {
+            var currentUser = await userManager.GetUserAsync(user);
+            currentUserId = userManager.GetUserId(user);
+        }
+       @* else
+            userAuthenticated = "Пользователь НЕ аутентифицирован.";
+        *@
+
+    #pragma warning restore CS8602
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (string.IsNullOrEmpty(currentUserId))
+        {
+            var MessageForLogger = SpHelper.GetMessageForLogger(
+                "Sprauna7Publish",
+                "AddPurchasePage", "OnParametersSet()", $"", "",
+                "currentUserId == IsNullOrEmpty"
+            );
+
+            LoggerInFile.LogInformation(MessageForLogger);
+            Logger.Log(MessageForLogger);
+
+            ErrorMessages.Add( $"MessageForLogger");
+
+            NavigationManager.NavigateTo($"/Purchases/");
+        }
+        else
+        {
+            purchase.CurrentUserId = currentUserId;
+            purchase.TrackNumber = GetRandomCode(); //DateTime.Now.ToLongTimeString();
+            purchase.CreatedAt = DateTime.Now;
+        }
+
+        base.OnParametersSet();        
+    }
+
+    #endregion
+
+    #region private methods Purchase
+
+    private bool RunValidationForSbs()
+    {
+        ErrorMessages.Clear();
+
+        if (string.IsNullOrWhiteSpace(purchase.CurrentUserId))
+            ErrorMessages.Add(ErrorMessageText.UserNotDefined);
+
+        if (!Regex.IsMatch(purchase.Surname, @"^([A-Za-z]+)(\d+)?$"))
+            ErrorMessages.Add("Фамилия указана неверно. Заполните на английском без пробелов и спецсимволов.");
+
+        if (!Regex.IsMatch(purchase.Name, @"^([A-Za-z]+)(\d+)?$"))
+            ErrorMessages.Add("Имя указано неверно. Заполните на английском без пробелов и спецсимволов.");
+
+        if (purchase.DepartmentDeliveryParcelId == 0)
+            ErrorMessages.Add("Не выбран пункт выдачи посылки.");
+
+        if (purchase.ReceiverId == 0)
+            ErrorMessages.Add("Не выбран получатель.");
+
+        if (purchase.AgreeWithTools == false)
+            ErrorMessages.Add("Обязательно согласие с условиями раздела “Инструкция”.");
+
+        return ErrorMessages.Count() > 0 ? false : true;
+    }
+
+    private async Task OnValidSubmit()
+    {
+        var isValidForSbs = RunValidationForSbs();
+        if (isValidForSbs)
+        {
+            Package package = new Package() { 
+                NumberPackage = GetRandomCode() //DateTime.Now.ToString()
+            };
+            package.CurrentUserId = purchase.CurrentUserId;
+            int packageId = package.PackageId; // Todo: ForDel
+            AddPackageUseCase.Execute(package);
+
+            //purchase.Description = DateTime.Now.ToShortTimeString();
+
+            purchase.DepartmentDeliveryParcelId = selectDepartmentId;
+
+            purchase.TrackNumber = purchase.TrackNumber
+                .Replace(":", "").Replace(".", "").Replace(" ", "");
+
+
+            if (purchase.ProductSps == null 
+                || purchase.ProductSps?.Count() == 0)
+            {
+                purchase.ProductSps = new List<ProductSp>();
+
+                // purchase.ProductSps.Add(GetProductSpByIdUseCase.Execute(23));
+
+                var TestProduct = new ProductSp()
+                    {
+                        ProductTypeAndBrand = "Test ProductName",
+                        Quantity = 1,
+                        Price = 1,
+                        UrlToProduct = @"https://sprauna.by",
+                        UrlToImage = @"https://sprauna.by",
+                        CategoryId = 1,
+                        TrackNumber = SpPluginRandomizer.GetRandomCode(),
+                        CurrentUserId = currentUserId
+                    };
+                //AddProductSpUseCase.Execute(TestProduct);
+
+                purchase.ProductSps.Add(TestProduct);
+                
+            }
+            purchase.PackageId = package.PackageId;
+
+            PurchaseId = AddPurchaseUseCase.Execute(purchase);
+
+            try
+            {
+                /* Old Код перенесен в Edit
+                 
+                int recipientId = GetReceiverByIdUseCase.Execute(purchase.ReceiverId).SbsId;
+                var pvz = GetDepartmentDpByIdUseCase.Execute(purchase.DepartmentDeliveryParcelId).GipermallId.ToString(); // ToDo: Remove crutch "70130010"
+                                                                                           //Pvz = purchase.DepartmentDeliveryParcelId.ToString(),
+
+                var trackItem = TrackConverter.ConvertToTrackItem(purchase, recipientId, pvz);
+
+                int? TrackItemId = await AddTrackSbsUseCase.ExecuteAsync(trackItem);
+                if (TrackItemId != null)
+                {
+                    purchase.SbsTrackId = (int)TrackItemId;
+                    EditPurchaseUseCase.Execute(purchase);
+                    var eId = purchase.PurchaseId;
+                }
+                */
+            }
+            catch (Exception ex)
+            {
+                var MessageForLogger = SpHelper.GetMessageForLogger(
+                    "Sprauna7Publish",
+                    "AddPurchasePage", "OnValidSubmit()", "", "", 
+                    ex.Message
+                );
+
+                LoggerInFile.LogInformation(MessageForLogger);
+                Logger.Log(MessageForLogger);
+            }
+
+            if (!IsModal)
+            {
+                NavigationManager.NavigateTo($"/EditPurchase/{PurchaseId}");
+            }
+            else
+            {
+                OnAddCallback.InvokeAsync();
+                purchase = new Purchase();
+                //NavigationManager.NavigateTo($"/{ReceiverOptions.NameMany}");
+            }
+        }
+    }
+
+    private string GetRandomCode()
+    {
+        Random rnd = new Random();
+        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        char[] randomChars = new char[10];
+        for (int i = 0; i < randomChars.Length; i++)
+        {
+            randomChars[i] = chars[rnd.Next(chars.Length)];
+        }
+        return new string(randomChars);        
+    }
+
+    private void OnCancel()
+    {
+        if (!IsModal)
+        {
+            NavigationManager.NavigateTo($"/{ReceiverOptions.NameMany}");
+        }
+        else
+        {
+            OnCanselCallback.InvokeAsync();
+        }
+    }
+
+    private void OnCkickSendWithoutUnit()
+    {
+
+    }
+
+    private void OnChangeSurname()
+    {
+        purchase.Surname = "purchase.Surname";
+    }
+
+    private void OnSelectedDepartment(int selectDepartmentId)
+    {
+        this.selectDepartmentId = selectDepartmentId;
+        purchase.DepartmentDeliveryParcelId = selectDepartmentId;
+        //JS.InvokeVoidAsync("ModalBtnCloseOnClick");
+    }
+
+    void OnSelectedReceiver(int selectReceiverId)
+    {
+        this.selectReceiverId = selectReceiverId;
+        purchase.ReceiverId = selectReceiverId;
+        //JS.InvokeVoidAsync("ModalBtnCloseOnClick");
+    }
+    #endregion
+
+}

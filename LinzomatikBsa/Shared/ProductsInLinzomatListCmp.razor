@@ -1,0 +1,39 @@
+﻿@using Li.CoreBusiness;
+@using static LinzomatikBsa.Pages.Index;
+<h2>Товары (@ProductsInLinzomatList.Count)</h2>
+@if (ProductsInLinzomatList == null){
+    <p><em>Loading ...</em></p>
+}
+else
+{
+    <div class="card-deck">
+        @foreach (var item in ProductsInLinzomatList)        {
+            <div class="card">
+                @*<img class="card-img-top" src=".../100px200/" alt="Card image cap">*@
+                <div class="card-body">
+                    <h5 class="card-title">Товар @item.Name</h5>
+                    <h6 class="card-title">Линзомат @Linzomats.First(l => l.Id == item.LinzomatId).Name</h6>
+                    @*<p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+            <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>*@
+                </div>
+                <button @onclick="OnClickLinzomatByProduct" class="form-control">В каком линзомате в наличии</button>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    #region
+    [Parameter]
+    public List<Linzomat> Linzomats { get; set; } = new();
+    [Parameter]
+    public List<ProductInLinzomat> ProductsInLinzomatList { get; set; } = new();
+    #endregion
+    // ---
+    #region Private Methods
+    private void OnClickLinzomatByProduct()
+    {
+
+    }
+    #endregion
+}

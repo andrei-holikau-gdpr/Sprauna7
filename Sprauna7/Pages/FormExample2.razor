@@ -1,0 +1,66 @@
+﻿@page "/form-example-2"
+@using Microsoft.Extensions.Logging
+@using static CoreBusiness.ComponentEnums;
+@inject ILogger<FormExample2> Logger
+
+<h1>Starfleet Starship Database</h1>
+
+<h2>New Ship Entry Form</h2>
+
+<EditForm Model="@starship" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <p>
+        <label>
+            Engineering Approval:
+            <InputCheckbox @bind-Value="starship.IsValidatedDesign" />
+        </label>
+    </p>
+
+    <p>
+    <legend>Color</legend>
+        <InputRadioGroup Name="color" @bind-Value="starship.Color">
+            <InputRadio Name="color" Value="@CoreBusiness.ComponentEnums.Color.ImperialRed" />
+                Color: Imperial Red<br><br>
+            <InputRadio Name="color" Value="@CoreBusiness.ComponentEnums.Color.SpacecruiserGreen" />
+                Color: Spacecruiser Green<br><br>
+        </InputRadioGroup>
+    </p>
+
+    <p>
+    <legend>Manufacturer</legend>
+    <InputRadioGroup @bind-Value="starship.Manufacturer">
+        @foreach (var manufacturer in (Manufacturer[])Enum
+            .GetValues(typeof(Manufacturer)))
+        {
+            <label>
+                <InputRadio Value="@manufacturer" />
+                <text>&nbsp;</text>@manufacturer
+            </label>
+        }
+    </InputRadioGroup>
+    </p>
+
+    <p>
+        <legend>CombineParcels</legend>
+        <InputRadioGroup Name="combineParcels" @bind-Value="starship.CombineParcels">
+            <InputRadio Name="combineParcels" Value="@CombineParcels.SendWithUnit" />
+            CombineParcels: SendWithUnit<br><br>
+            <InputRadio Name="combineParcels" Value="@CombineParcels.SendWithoutUnit" />
+            CombineParcels: SendWithoutUnit<br><br>
+        </InputRadioGroup>
+    </p>
+
+</EditForm>
+
+@code {
+    private Starship starship = new() { };
+
+    private void HandleValidSubmit()
+    {
+        Logger.LogInformation("HandleValidSubmit called");
+
+        // Process the valid form
+    }
+}

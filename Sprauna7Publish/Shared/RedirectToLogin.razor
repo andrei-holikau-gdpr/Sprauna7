@@ -1,0 +1,9 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@inject NavigationManager navigationManager
+
+@code {
+    protected override void OnInitialized()
+    {
+        navigationManager.NavigateTo("/Identity/Account/Login");
+    }
+}

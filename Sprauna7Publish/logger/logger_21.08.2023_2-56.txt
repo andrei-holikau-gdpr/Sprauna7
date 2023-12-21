@@ -1,0 +1,57 @@
+	 SpLog, app.Run, Time:2:56:24
+Now listening on: https://localhost:7113
+Now listening on: http://localhost:5252
+Application started. Press Ctrl+C to shut down.
+Hosting environment: Development
+Content root path: D:\VisualStudioProjects\Sprauna7\Sprauna7Publish
+Executed DbCommand (72ms) [Parameters=[@__normalizedUserName_0='?' (Size = 256)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[Email], [a].[EmailConfirmed], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[ProfilePicture], [a].[SecurityStamp], [a].[TwoFactorEnabled], [a].[UserName], [a].[firstName], [a].[lastName]
+FROM [AspNetUsers] AS [a]
+WHERE [a].[NormalizedUserName] = @__normalizedUserName_0
+Executed DbCommand (34ms) [Parameters=[@__user_Id_0='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+SELECT [a].[Id], [a].[ClaimType], [a].[ClaimValue], [a].[UserId]
+FROM [AspNetUserClaims] AS [a]
+WHERE [a].[UserId] = @__user_Id_0
+Пользователь вошел в систему.
+Executed DbCommand (9ms) [Parameters=[@__p_0='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[Email], [a].[EmailConfirmed], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[ProfilePicture], [a].[SecurityStamp], [a].[TwoFactorEnabled], [a].[UserName], [a].[firstName], [a].[lastName]
+FROM [AspNetUsers] AS [a]
+WHERE [a].[Id] = @__p_0
+	 SpLog, Index.OnInitializedAsync.Run  Time:2:56:46
+Executed DbCommand (8ms) [Parameters=[@__p_0='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[Email], [a].[EmailConfirmed], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[ProfilePicture], [a].[SecurityStamp], [a].[TwoFactorEnabled], [a].[UserName], [a].[firstName], [a].[lastName]
+FROM [AspNetUsers] AS [a]
+WHERE [a].[Id] = @__p_0
+	 SpLog, Index.OnInitializedAsync.Run  Time:2:56:48
+Start processing HTTP request GET https://devprofile.shopbyshop.by/api/v1/pvz
+Sending HTTP request GET https://devprofile.shopbyshop.by/api/v1/pvz
+Received HTTP response headers after 346.6687ms - 200
+End processing HTTP request after 362.0302ms - 200
+Start processing HTTP request GET https://devprofile.shopbyshop.by/api/v1/recipient
+Sending HTTP request GET https://devprofile.shopbyshop.by/api/v1/recipient
+Received HTTP response headers after 12664.8592ms - 200
+End processing HTTP request after 12674.2195ms - 200
+Start processing HTTP request GET https://devprofile.shopbyshop.by/api/v1/track
+Sending HTTP request GET https://devprofile.shopbyshop.by/api/v1/track
+Received HTTP response headers after 2969.3822ms - 200
+End processing HTTP request after 2986.4716ms - 200
+Executed DbCommand (17ms) [Parameters=[@__p_0='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[Email], [a].[EmailConfirmed], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[ProfilePicture], [a].[SecurityStamp], [a].[TwoFactorEnabled], [a].[UserName], [a].[firstName], [a].[lastName]
+FROM [AspNetUsers] AS [a]
+WHERE [a].[Id] = @__p_0
+Start processing HTTP request GET https://devprofile.shopbyshop.by/api/v1/track
+Sending HTTP request GET https://devprofile.shopbyshop.by/api/v1/track
+Received HTTP response headers after 245.0495ms - 200
+End processing HTTP request after 256.8638ms - 200
+Executed DbCommand (13ms) [Parameters=[@__p_0='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[Email], [a].[EmailConfirmed], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[ProfilePicture], [a].[SecurityStamp], [a].[TwoFactorEnabled], [a].[UserName], [a].[firstName], [a].[lastName]
+FROM [AspNetUsers] AS [a]
+WHERE [a].[Id] = @__p_0
+Start processing HTTP request GET https://devprofile.shopbyshop.by/api/v1/track
+Sending HTTP request GET https://devprofile.shopbyshop.by/api/v1/track
+Received HTTP response headers after 163.9497ms - 200
+End processing HTTP request after 174.1319ms - 200
+Start processing HTTP request GET https://devprofile.shopbyshop.by/api/v1/track/26188
+Sending HTTP request GET https://devprofile.shopbyshop.by/api/v1/track/26188
+Received HTTP response headers after 63.4467ms - 200
+End processing HTTP request after 71.6602ms - 200

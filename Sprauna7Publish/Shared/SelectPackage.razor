@@ -1,0 +1,91 @@
+﻿@inject IViewPackagesUseCase ViewPackagesUseCase
+
+
+<h2 class="card-title h5">
+    <NavLink class="nav-link" href="packages">
+        <span class="oi oi-list-rich" aria-hidden="true"></span> Посылки (@packages?.Count)
+    </NavLink>
+</h2>
+
+@if (packages != null)
+{
+    <table class="table table-striped table-hover sp-table">
+        <tbody>
+            @foreach (var item in packages)
+            {
+                <tr @onclick="@( () => OnSelectedCallback.InvokeAsync( item.PackageId ))">
+                    <td>
+                        @item.NumberPackage
+                    </td>
+
+                    <td class="align-middle">
+                        @item.Status
+                        <div style="display:none">@(++iMiniCount)</div>
+                    </td>
+                </tr>
+
+                @*@if (MaxCountItems > 0 && iMiniCount > MaxCountItems) break;*@
+            }
+        </tbody>
+    </table>
+}
+
+
+<hr />
+@if (selectPackageId > 0)
+{
+    <i>selectPackageId: @selectPackageId</i>
+    <hr />
+}
+
+@code {
+
+    #region constants
+
+    private const string OBJECT_NAME_SINGLE = "Package";
+    //private const string OBJECT_NAME_MANY = "Package";
+
+    #endregion
+
+    #region Parameters
+
+    [Parameter]
+    public int MaxCountItems { get; set; } = 0;
+
+    [Parameter]
+    public EventCallback<int> OnSelectedCallback { get; set; }
+
+    #endregion
+
+    #region private fields
+
+    private List<Package>? packages;
+    private int selectPackageId = 0;
+    public int iMiniCount { get; set; }
+
+    #endregion
+
+    async Task OnSelected()
+    {
+        await OnSelectedCallback.InvokeAsync(selectPackageId);
+    }
+
+    #region override methods
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        LoadAll();
+    }
+
+    #endregion
+
+    #region private methods
+
+    private void LoadAll()
+    {
+        packages = ViewPackagesUseCase.Execute()?.ToList();
+    }
+
+    #endregion
+}

@@ -1,0 +1,133 @@
+﻿@using Gap2.CoreBusiness;
+
+<b>Результат</b>
+<hr/>
+@if (GapResults != null && GapResults?.ProcessSelected != null)
+{
+    <h4>Процесс: @GapResults?.ProcessSelected?.Name</h4>
+}
+
+<MudGrid>    
+    <MudItem xs="12" sm="12" md="12">
+        <MudPaper Elevation="2" Class="pa-4" Style="min-height: 100px;">
+            <h5>Applicable (@AppliacabilityJurisdictions?.Count())</h5>
+            <hr/>
+            <ul>
+            @foreach (var jurisdiction in AppliacabilityJurisdictions)
+            {
+                <li>@jurisdiction.Name</li>
+            }
+            </ul>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+<MudGrid>    
+    <MudItem xs="12" sm="12" md="12">
+        <MudPaper Elevation="2" Class="pa-4" Style="min-height: 100px;">
+            <h5>No Appliacability (@NoAppliacabilityJurisdictions?.Count())</h5>
+            <hr/>
+            <ul>
+            @foreach (var jurisdiction in NoAppliacabilityJurisdictions)
+            {
+                <li>@jurisdiction.Name</li>
+            }
+            </ul>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+<MudGrid>
+    <MudItem xs="12" sm="12" md="12">
+        <MudPaper Elevation="2" Class="pa-4" Style="min-height: 100px;">
+            <h5>No Processed (@GapResults?.Jurisdictions?.Count())</h5>
+            <hr />
+            <ul>
+                @foreach (var jurisdiction in GapResults?.Jurisdictions)
+                {
+                    @if (jurisdiction.StatusAppliacability.Name == "NotProcessed")
+                    {
+                        <li>@jurisdiction.Name</li>
+                    }
+                }
+            </ul>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+@if (DevUiMode)
+{
+    <MudGrid>
+        <MudItem xs="12" sm="12" md="12">
+            <MudPaper Elevation="2" Class="pa-4" Style="min-height: 100px;">
+                <h5>All Jurisdictions (@GapResults?.Jurisdictions?.Count())</h5>
+                <hr />
+                <ul>
+                    @foreach (var jurisdiction in GapResults?.Jurisdictions)
+                    {
+                        @if (jurisdiction.StatusAppliacability.Name == "NotProcessed")
+                        {
+                            <li>@jurisdiction.Name</li>
+                        }
+                    }
+                </ul>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+}
+
+@code {
+    #region Parameters
+    [Parameter, EditorRequired]
+    public GapResult GapResults { get; set; }
+    
+    [Parameter]
+    public bool UpdateResult { get; set; }
+    [Parameter]
+    public bool DevUiMode { get; set; } = false;
+    #endregion
+    #region private
+    private List<Jurisdiction> AppliacabilityJurisdictions { get; set; } = new();
+    private List<Jurisdiction> NoAppliacabilityJurisdictions { get; set; } = new();
+    private List<Jurisdiction> NotProcessedJurisdictions { get; set; } = new();
+    #endregion
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        AppliacabilityJurisdictions.Clear();
+        NoAppliacabilityJurisdictions.Clear();
+        NotProcessedJurisdictions.Clear();
+
+        var ApJurs = GapResults?.Jurisdictions?.Where(j =>
+                j.StatusAppliacability.Name == "Applicable");
+        if (ApJurs?.Count()>0){
+            AppliacabilityJurisdictions.AddRange(ApJurs);
+        }
+        //} else
+        //{
+        //    AppliacabilityJurisdictions.Clear();
+        //}
+
+        var NoApJurs = GapResults?.Jurisdictions?.Where(j =>
+            j.StatusAppliacability.Name == "NoApplicable");
+        if (NoApJurs?.Count() > 0)
+        {
+            NoAppliacabilityJurisdictions.AddRange(NoApJurs);
+        //}
+        //else
+        //{
+        //    NoAppliacabilityJurisdictions.Clear();
+        //}
+
+        var NoPrJurs = GapResults?.Jurisdictions?.Where(j =>
+            j.StatusAppliacability.Name == "NotProcessed");
+        if (NoPrJurs?.Count() > 0)
+        {
+            NotProcessedJurisdictions.AddRange(NoPrJurs);
+        }
+        //} else
+        //{
+        //    NotProcessedJurisdictions.Clear();
+        }
+    }
+}

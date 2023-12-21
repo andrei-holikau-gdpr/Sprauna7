@@ -1,0 +1,32 @@
+﻿@page "/TestEmail"
+@attribute [Authorize(Policy = "AdminOnly")]
+
+@using Plugins.MailSp.Models;
+@*@using Microsoft.Extensions.Configuration*@
+@*@inject IConfiguration Configuration*@
+
+@inject Plugins.MailSp.Interfaces.IMailService MailService
+
+<h1 class="h3">TestEmail</h1>
+<br/>
+
+<!--
+@*
+<ul>
+    <li>Username:   @MailService.GetUsername()</li>
+    <li>Password:   @MailService.GetPassword()</li>
+    <li>FromEmail:  @MailService.GetFromEmail()</li>
+    <li>Host:       @MailService.GetHost()</li>
+    <li>Port:       @MailService.GetPort()</li>
+</ul>
+*@
+-->
+
+<Button @onclick="OnClickTestEmail">TestEmail</Button>
+
+@code {
+    private async Task OnClickTestEmail()
+    {
+        await MailService.SendEmailAsync("kudesnik.Net@gmail.com", "Sprauna.by", "Sprauna.by");
+    }
+}

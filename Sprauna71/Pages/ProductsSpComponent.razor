@@ -1,0 +1,183 @@
+﻿@page "/productssp"
+
+@using System.Diagnostics.CodeAnalysis;
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JsRuntime
+@implements IDisposable
+
+@inject IViewProductsSpUseCase ViewProductsSpUseCase
+@inject IDeleteProductSpUseCase DeleteProductSpUseCase
+
+@inject IGetPurchaseByIdUseCase GetPurchaseByIdUseCase
+@inject IGetCategoryByIdUseCase GetCategoryByIdUseCase
+
+<h2 class="card-title h5">
+    <NavLink class="nav-link" href="productssp">
+        <span class="oi oi-list-rich" aria-hidden="true"></span> Товары (@productsSp.Count)
+    </NavLink>
+</h2>
+
+@if (productsSp != null)
+{
+    <div class="table-responsive">
+
+        <table id="example" class="display responsive nowrap" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th></th>
+                    <th>@ProductSpOptions.ProductTypeAndBrand</th>
+                    <th>@ProductSpOptions.Quantity</th>
+                    <th>@ProductSpOptions.UrlToProduct</th>
+                    <th>@ProductSpOptions.Price</th>
+                    <th>@ProductSpOptions.TrackNumber</th>
+                    <th>@ProductSpOptions.UrlToImage</th>
+                    <th>@ProductSpOptions.Purchase</th>
+                </tr>
+            </thead>
+
+        <tbody>
+            @foreach (var item in productsSp)
+            {
+                <tr>
+                    <td> @item.ProductSpId </td>
+                    <td>
+                        <button type="button" class="btn btn-link"
+                            @onclick="@( () => OnClickView(item) )">
+                            <i class="bi bi-eye"></i>
+                        </button>
+
+                        <button type="button" class="btn btn-link"
+                            @onclick="@( () => OnClickEdit(item) )" >
+                            <i class="bi bi-pencil-square"></i>
+                        </button>
+
+                        <button type="button" class="btn btn-link"
+                            @onclick="@( () => OnClickDelete(item.ProductSpId) )" >
+                            <i class="bi bi-trash3"></i>
+                        </button>
+                    </td>
+
+                    <td> @item.ProductTypeAndBrand </td>
+                    <td> @item.Quantity </td>
+                    <td> @item.UrlToProduct </td>
+                    <td> @(Math.Round(item.Price, 2)) </td>
+                    <td> @item.TrackNumber </td>
+                    <td> @item.UrlToImage </td>
+                    <td> @GetPurchaseByIdUseCase.Execute(@item.PurchaseId)?.PurchaseId </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    </div>
+}
+
+<button type="button" class="btn btn-primary" disabled>Товары добавляются в посылки</button>
+
+<Modal @ref="ModalView" IsBackdrop="true" IsKeyboard="true">
+    <ModalDialog Title="Информация о товаре" IsDraggable="true" ShowFooter="false">
+        <BodyTemplate>
+            @if (SelectProductSpId > 0)
+            {
+                <ViewProductSpComponent ProductSpId="@SelectProductSpId.ToString()" />
+            }
+        </BodyTemplate>
+    </ModalDialog>
+</Modal>
+
+<ConsoleLogger @ref="Logger" class="mt-3" />
+
+@code {
+
+    #region Public fields / Parameters
+
+    [Parameter]
+    public int MaxCountItems { get; set; } = 1;
+
+    #endregion
+    // ---
+    #region Private fields / Modal
+
+    [NotNull]
+    private Modal? ModalView { get; set; }
+    [NotNull]
+    private Modal? ModalAdd { get; set; }
+
+    #endregion
+    // ---
+    #region Private fiels
+
+    [NotNull]
+    private ConsoleLogger? Logger { get; set; }
+
+    private List<ProductSp>? productsSp;
+    private int SelectProductSpId;
+
+    #endregion
+    // ---
+    #region Public fiels
+
+    public int iMiniCount { get; set; }
+    public ProductSp? SelectProductSp;
+
+    #endregion
+    // ---
+    #region Private methods / Override methods
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        LoadAll();
+    }
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+            await JsRuntime.InvokeVoidAsync("InitialiseTable");
+    }
+
+    #endregion
+    // ---
+    #region Private methods
+
+    private void LoadAll()
+    {
+        productsSp = ViewProductsSpUseCase.Execute()?.ToList();
+    }
+    
+    private void OnClickView(ProductSp single)
+    {
+        SelectProductSp = single;
+        SelectProductSpId = single.ProductSpId;
+
+        ModalView.Toggle();
+    }
+
+    private void OnClickAdd()
+    {
+        NavigationManager.NavigateTo($"/add{ProductSpOptions.NameSingle}");
+    }
+
+    private void OnClickEdit(ProductSp single)
+    {
+        NavigationManager.NavigateTo($"/edit{ProductSpOptions.NameSingle}/{single.ProductSpId}");
+    }
+
+    private void OnClickDelete(int id)
+    {
+        DeleteProductSpUseCase.Delete(id);
+        LoadAll();
+    }
+
+    #endregion
+    // ---
+    #region Ppublic methods / Interface Implementation IDisposable
+
+    public void Dispose()
+    {
+        JsRuntime.InvokeVoidAsync("DataTablesRemove");
+    }
+
+    #endregion
+
+}

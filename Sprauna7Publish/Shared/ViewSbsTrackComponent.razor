@@ -1,0 +1,138 @@
+﻿@using System.Diagnostics.CodeAnalysis;
+@using CoreBusiness.ShopByShop.Models;
+@using HtmlAgilityPack;
+@using UseCases.ShopByShop.UseCaseInterfaces;
+
+@inject IGetTrackSbsByIdUseCase GetTrackSbsByIdUseCase
+
+<h1>SbsTrackId: @SbsTrackId</h1>
+
+@if(trackSbs != null)
+{       
+    <table>
+        <tbody>
+            <tr>
+                <th>Id: </th>
+                <th>@ViewField(trackSbs.Id)</th>
+            </tr>
+
+            <tr><th>Code: </th><th>@ViewField(trackSbs?.Code)</th></tr>
+            <tr><th>RecipientId: </th><th>@ViewField(trackSbs?.RecipientId)</th></tr> 
+            <tr><th>ConsolidationId: </th><th>@ViewField(trackSbs?.ConsolidationId)</th></tr>            
+            <tr><th>LeadId: </th><th>@ViewField(trackSbs?.LeadId)</th></tr>            
+            <tr><th>DeliveryType: </th><th>@ViewField(trackSbs?.DeliveryType)</th></tr>            
+            <tr><th>UserName: </th><th>@ViewField(trackSbs?.UserName)</th></tr>            
+            <tr><th>Surname: </th><th>@ViewField(trackSbs?.Surname)</th></tr>            
+            <tr><th>Pvz: </th><th>@ViewField(trackSbs?.Pvz)</th></tr>            
+            <tr><th>Store: </th><th>@ViewField(trackSbs?.Store)</th></tr>              
+            <tr><th>Comment: </th><th>@ViewField(trackSbs?.Comment)</th></tr>
+            <tr><th>Status: </th><th>@ViewField(trackSbs?.Status)</th></tr>
+            <tr><th>Hide: </th><th>@ViewField(trackSbs?.Hide)</th></tr>
+            <tr><th>Address: </th><th>@ViewField(trackSbs?.Address)</th></tr>
+            <tr><th>City: </th><th>@ViewField(trackSbs?.City)</th></tr>
+            <tr><th>Price: </th><th>@ViewField(trackSbs?.Price)</th></tr>
+            <tr><th>Store: </th><th>@ViewField(trackSbs?.Store)</th></tr>
+            <tr><th>Wait: </th><th>@ViewField(trackSbs?.Wait)</th></tr>
+            <tr><th>Type: </th><th>@ViewField(trackSbs?.Type)</th></tr>
+            <tr><th>CreatedAt: </th><th>@ViewField(trackSbs?.CreatedAt)</th></tr>
+            <tr><th>UpdatedAt: </th><th>@ViewField(trackSbs?.UpdatedAt)</th></tr>
+            <tr><th>ShopNumber: </th><th>@ViewField(trackSbs?.ShopNumber)</th></tr>
+            <tr><th>Apartment: </th><th>@ViewField(trackSbs?.Apartment)</th></tr>
+            <tr><th>CdekNumber: </th><th>@ViewField(trackSbs?.CdekNumber)</th></tr>
+            <tr><th>PaymentToken: </th><th>@ViewField(trackSbs?.PaymentToken)</th></tr>
+            <tr><th>CommentAmo: </th><th>@ViewField(trackSbs?.CommentAmo)</th></tr>
+            <tr><th>TrackStatus: </th><th>@ViewField(trackSbs?.TrackStatus)</th></tr>
+            <tr><th>AdditionalServices: </th><th>@ViewField(trackSbs?.AdditionalServices)</th></tr>
+            <tr><th>AdditionalServicesPrice: </th><th>@ViewField(trackSbs?.AdditionalServicesPrice)</th></tr>
+            <tr><th>Agree: </th><th>@ViewField(trackSbs?.Agree)</th></tr>
+            <tr><th>Insurence: </th><th>@ViewField(trackSbs?.Insurence)</th></tr>
+            <tr><th>Photo: </th><th>@ViewField(trackSbs?.Photo)</th></tr>
+            <tr><th>CheckSize: </th><th>@ViewField(trackSbs?.CheckSize)</th></tr>
+            <tr><th>Packing: </th><th>@ViewField(trackSbs?.Packing)</th></tr>
+            <tr><th>Invoice: </th><th>@ViewField(trackSbs?.Invoice)</th></tr>
+            <tr><th>StatusLabel: </th><th>@ViewField(trackSbs?.StatusLabel)</th></tr>
+            <tr><th>PriceReal: </th><th>@ViewField(trackSbs?.PriceReal)</th></tr>
+            <tr><th>AdditionalServicesText: </th><th>@ViewField(trackSbs?.AdditionalServicesText)</th></tr>
+            <tr><th>PvzAddress: </th><th>@ViewField(trackSbs?.PvzAddress)</th></tr>
+        </tbody>
+    </table>
+
+    <hr />
+
+    <div>
+        Products.Count() = @trackSbs?.Products?.Count()
+
+        @if (trackSbs != null && trackSbs?.Products != null && trackSbs?.Products?.Count() > 0)
+        {
+            @foreach (var product in trackSbs.Products)
+            {
+                <ul>
+                    <li>Id : @product?.Id</li>
+                    <li>TrackId : @product?.TrackId</li>
+                    <li>Name : @product?.Name</li>
+                    <li>Count : @product?.Count</li>
+                    <li>Pric : @product?.Price</li>
+                    <li>Link : @product?.Link</li>
+                    <li>Total : @product?.Total</li>
+                    <li>CodeTnved : @product?.CodeTnved</li>
+                    <li>NameTnved : @product?.NameTnved</li>
+                </ul>
+                <hr/>
+            }
+        }
+    </div>
+    <br />    
+}
+
+<br />
+<ConsoleLoggerSp Owner="ViewSbsTrackComponent" LogerEnable="@LogerEnable">
+    <ConsoleLogger @ref="Logger" />
+</ConsoleLoggerSp>
+
+@code{
+    #region Parameters
+
+    [Parameter]
+    public int SbsTrackId { get; set; }
+
+    #endregion
+
+    #region private fields
+
+    [NotNull]
+    private ConsoleLogger? Logger { get; set; }
+    private bool LogerEnable = true;
+
+    private TrackItem trackSbs;
+
+    private string ViewField(object? field)
+    {
+        //string text = nameof(field) + ": " + field.ToString();
+        //HtmlDocument htmlDoc = new HtmlDocument();
+        //htmlDoc.LoadHtml("<div></div>");
+        //HtmlNode divNode = htmlDoc.DocumentNode.SelectSingleNode("//div");
+        //divNode.InnerHtml = text;
+        //string html = htmlDoc.DocumentNode.OuterHtml;
+
+        //return html;
+
+        return field?.ToString() ?? "";
+    }
+
+    #endregion
+
+    #region override methods
+    protected override async Task OnParametersSetAsync()
+         {
+        trackSbs = await GetTrackSbsByIdUseCase.ExecuteAsync(SbsTrackId);
+
+        //return base.OnParametersSetAsync();
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        Logger.Log($"OnAfterRender SbsTrackId : '{this.SbsTrackId}'");
+    }
+
+    #endregion
+}'

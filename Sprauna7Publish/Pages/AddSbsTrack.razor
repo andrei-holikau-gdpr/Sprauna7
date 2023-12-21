@@ -1,0 +1,160 @@
+﻿@*Создаем покупку sbs*@
+
+@attribute [Authorize()]
+@page "/AddSbsTrack"
+@using CoreBusiness.ShopByShop.Models;
+@using UseCases.ShopByShop.UseCaseInterfaces;
+
+@inject NavigationManager NavigationManager
+@inject IAddTrackSbsUseCase AddTrackSbsUseCase
+
+@if (!IsModal)
+{
+    <div class="container">
+        <div class="row m-2">
+            <div class="col-sm-12 col-lg-5 p-1">
+
+                <h1 class="h3">AddSbsTrack</h1>
+            </div>
+
+            <div class="col-sm-12 col-lg-7 p-1">
+                <MessageInDeveloping />
+                @*<button type="button" class="btn btn-link" @onclick="OnClickSetDemoData">@ConstantSps.BTN_SET_DEMO_DATA</button>*@
+            </div>
+        </div>
+    </div>
+}
+
+@if (trackItem != null)
+{
+    <EditForm Model="trackItem" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator></DataAnnotationsValidator>
+        <ValidationSummary></ValidationSummary>
+
+        <div class="form-group"> <label for="Code">Code</label>
+        <InputText id="Code" @bind-Value="trackItem.Code" class="form-control"></InputText> </div>
+
+        @if (trackItem.RecipientId != null)
+        {
+            <div class="form-group">
+                <label for="RecipientId">RecipientId</label>
+                <InputNumber id="RecipientId" @bind-Value="trackItem.RecipientId" class="form-control"></InputNumber>
+            </div>
+        }
+
+        <div class="form-group">
+            <label for="UserName">UserName</label>
+            <InputText id="UserName" @bind-Value="trackItem.UserName" class="form-control"></InputText>
+        </div>
+        
+        <div class="form-group">
+            <label for="Surname">Surname</label>
+            <InputText id="Surname" @bind-Value="trackItem.Surname" class="form-control"></InputText>
+        </div>
+
+
+        <div class="form-group">
+            <label for="Pvz">Pvz</label>
+            <InputText id="Pvz" @bind-Value="trackItem.Pvz" class="form-control"></InputText>
+        </div>
+        
+        <div class="form-group">
+            <label for="v">Store</label>
+            <InputText id="Store" @bind-Value="trackItem.Store" class="form-control"></InputText>
+        </div>
+
+        @if (trackItem.Wait != null)
+        {
+            <div class="form-group">
+                <label for="Wait">Wait</label>
+                <InputNumber id="Wait" @bind-Value="trackItem.Wait" class="form-control"></InputNumber>
+            </div>
+        }
+
+        @if (trackItem.Agree != null)
+        {
+            <div class="form-group">
+                <label for="Agree">Agree</label>
+                <InputNumber id="Wait" @bind-Value="trackItem.Agree" class="form-control"></InputNumber>
+            </div>
+        }
+        
+        @* Buttons *@
+        <div class="col-sm-12 col-lg-12 p-1">
+            <button type="submit" class="btn btn-primary test1909" >
+                Сохранить
+            </button>
+            <button type="button" class="btn btn-primary" @onclick="OnCancel">Отменить</button>
+        </div>
+    </EditForm>
+}
+
+@code {
+    #region public Parameters TrackItem
+
+    [Parameter]
+    public bool IsModal { get; set; } = false;
+
+    [Parameter]
+    public EventCallback OnAddCallback { get; set; }
+
+    [Parameter]
+    public EventCallback OnCanselCallback { get; set; }
+
+    [Parameter]
+    public int? TrackItemId { get; set; }
+
+    #endregion
+    // ---
+    #region private fields Purchase
+
+    private TrackItem trackItem = new()
+    {
+        Code = DateTime.Now.ToLongTimeString().Replace(":", ""),
+        RecipientId = 2013,
+        Wait = 1,
+        Agree = 1,
+        UserName = "UserName",
+        Surname = "Surname",
+        Pvz = "70130010",
+        Store = "TestStore",
+        DeliveryType = 2
+    };
+
+    #endregion
+
+    #region private methods Purchase
+
+    private async Task OnValidSubmit()
+    {
+        TrackItemId = await AddTrackSbsUseCase.ExecuteAsync(trackItem);
+
+        if (TrackItemId != null)
+        {
+            if (!IsModal)
+            {
+                NavigationManager.NavigateTo($"/EditSbsTrack/{TrackItemId}");
+            }
+            else
+            {
+                await OnAddCallback.InvokeAsync();
+                trackItem = new TrackItem();
+                //NavigationManager.NavigateTo($"/{ReceiverOptions.NameMany}");
+            }
+        }
+    }
+
+    private void OnCancel()
+    {
+        if (!IsModal)
+        {
+            NavigationManager.NavigateTo($"/SbsTracks");
+        }
+        else
+        {
+            OnCanselCallback.InvokeAsync();
+        }
+    }
+
+    #endregion
+}ackserv

@@ -1,0 +1,20 @@
+﻿@if (ErrorMessages.Count > 0)
+{
+    <ul style="color:red;">
+        @foreach (var message in ErrorMessages)
+        {
+            <li>
+                @message
+            </li>
+        }
+    </ul>
+}
+
+@code {
+    #region Parameters
+
+    [Parameter]
+    public List<string> ErrorMessages { get; set; } = new();
+
+    #endregion
+}

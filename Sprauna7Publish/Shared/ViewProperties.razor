@@ -1,0 +1,62 @@
+﻿@using System.Reflection;
+@using System.ComponentModel.DataAnnotations;
+@using System.ComponentModel;
+
+<br/>
+
+@if (Properties != null && Properties.Count > 0)
+{
+    <ul>
+        @foreach (var item in Properties)
+        {
+            @if (GetAttributeDisplayName(item) != "Id")
+            {
+                <li>
+                    <b>@GetAttributeDisplayName(item): </b><br/>
+                    @GetValueAttribute(item)
+                    <hr/>
+                </li>
+            }
+        }
+    </ul>
+}
+
+@code {
+
+    #region Parameters
+
+    [Parameter]
+    public List<PropertyInfo> Properties { get; set; } = new();
+
+    [Parameter]
+    public object ObjectWithProperties { get; set; } = new();
+
+    #endregion
+    // ---
+    #region private Methods
+
+    private string? GetAttributeDisplayName(PropertyInfo property)
+    {
+        var dispalyName = "";
+        var atts = property.GetCustomAttributes(
+            typeof(DisplayNameAttribute), true);
+        if (atts.Length > 0)
+        {
+            dispalyName = (atts[0] as DisplayNameAttribute)?.DisplayName;
+        }
+        else
+        {
+            dispalyName = property.Name;
+        }
+
+        return dispalyName;
+    }
+
+    private string GetValueAttribute(PropertyInfo property)
+    {
+        string? value = property.GetValue(ObjectWithProperties)?.ToString();
+        return !string.IsNullOrEmpty(value) ? value : "-";
+    }
+
+    #endregion
+}

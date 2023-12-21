@@ -1,0 +1,28 @@
+﻿@media(min-width:1790px) {
+    .task-managet-container {
+        position: fixed;
+        top: 75px;
+        left: 10px;
+        background-color: white;
+        border-radius: 12px;
+        padding: 20px;
+        height: 90vh;
+        width: 20vw;
+    }
+
+    .accordion-body.task-at-work {
+        background-color: lightgreen;
+    }
+
+    .accordion-body.tasks-to-perform {
+    }
+
+    .accordion-body.task-completed {
+    }
+}
+
+@media(max-width:1790px) {
+    .task-managet-container {
+        display: none;
+    }
+}

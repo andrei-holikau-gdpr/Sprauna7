@@ -1,0 +1,75 @@
+﻿@page "/SbsPvzs"
+@using CoreBusiness.ShopByShop.Models;
+@using System.Reflection;
+@attribute [Authorize(Policy = "AdminOnly")]
+
+@inject NavigationManager NavigationManager
+@inject MessageService MessageService
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1>Pvz</h1>
+            <br/>
+            <SbsPvzTable Update=true />
+        </div>
+    </div>
+</div>
+
+<br />
+<br />
+<ConsoleLoggerSp Owner="SbsPvzs" LogerEnable="@LogerEnable">
+    <ConsoleLogger @ref="Logger" />
+</ConsoleLoggerSp>
+
+@code {
+    #region Private fields
+
+    public int? SelectPvzSbsId;
+    public PvzItem? SelectPvzSbs;
+
+    public bool Update = false;
+
+    [NotNull]
+    private ConsoleLogger? Logger { get; set; }
+    private bool LogerEnable = false;
+
+    #endregion
+    // ---
+    #region Private fields / Modals
+
+    [NotNull]
+    private Modal? ModalView { get; set; }
+
+    private List<PropertyInfo>? PropertiesList = new();
+
+    #endregion
+    // ---
+    #region Private methods / Override methods
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+#if DEBUG
+    LogerEnable = true;
+#endif
+    }
+
+    #endregion
+    // ---
+    #region private methods
+
+    private void ShowMessage(string message, string icon, Color color)
+    {
+        MessageService.Show(new MessageOption()
+            {
+                Content = message,
+                Icon = icon,
+                Color = color,
+                ShowDismiss = true,
+            });
+    }
+
+    #endregion
+}

@@ -1,0 +1,42 @@
+﻿@using Gap2.CoreBusiness;
+<MudItem xs="12">
+    <MudPaper Elevation="2" Class="pa-4" Style="min-height: 100px;">
+        <h3>Специальный блок</h3>
+    
+
+
+@foreach (var question in Questions)
+{
+    @*<MudPaper Elevation="2" Class="pa-4 question" Style="min-height: 100px;" >*@
+        <div style="min-height:60px;">
+            <span>@question.Name (QuestionsType:@question?.QuestionType?.Name)</span>
+        </div>
+        @if (question.Answers != null) {
+            <ul>
+                @foreach (var answer in question.Answers){
+                    <li>
+                        <MudCheckBox @bind-Checked="@answer.ResultBool"
+                             Label="@answer.Name" Color="Color.Primary">
+                        </MudCheckBox>
+                        Yes = @answer.YesDigitalEquivalent / No = @answer.NoDigitalEquivalent
+                    </li>
+                }
+            </ul>
+        }
+    @*</MudPaper> *@       
+    <hr />
+}
+    </MudPaper>
+</MudItem>
+
+@code {
+    #region Parameters
+    [Parameter]
+    public List<Question> Questions { get; set; }
+    [Parameter]
+    public GapResult GapResults { get; set; }
+
+    [Parameter]
+    public EventCallback UpdateCallback { get; set; }
+    #endregion
+}

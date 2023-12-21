@@ -1,0 +1,95 @@
+﻿@page "/CostOfDelivery"
+
+@using CoreBusiness;
+@using Plugins.Currencies;
+
+@inject IJSRuntime JsRuntime
+
+@inject IViewCostOfDeliveriesUseCase ViewCostOfDeliveriesUseCase
+
+
+<h3>Стоимость доставки</h3>
+<i>Курс PLN -> BYN: </i> <b>( 10 - @RoundUp(currencySell , 4) ) *Газпромбанк</b>
+<br />
+
+@if (costOfDeliveries != null)
+{
+    <div class="div-for-table">
+        <table id="example" class="display responsive nowrap" style="width:80%">
+            <thead>
+                <tr>
+                    <th> Вес, кг </th>
+                    <th> Цена, PLN </th>
+                    <th> Цена, BYN </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in costOfDeliveries)
+                {
+                    <tr>
+                        <td> @item.WeightKg </td>
+                        <td> @item.CostPln </td>
+                        <td> @RoundUp((Convert.ToDecimal(item.CostPln) * currencySell / currencyUnits), 2) </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    #region Private fiels
+
+    private List<CostOfDelivery>? costOfDeliveries;
+    private Currency currency = new Currency();
+    private decimal currencySell;
+    private int currencyUnits;
+
+    #endregion
+    //---
+    #region Private methods / Override methods
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        LoadAll();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+            await JsRuntime.InvokeVoidAsync("InitialiseTable");
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        try
+        {
+            currencySell = Convert.ToDecimal(currency.sell);
+            currencyUnits = Convert.ToInt16(currency.Units);
+        }
+        catch (Exception e)
+        {
+            //TODO: настроить хренение последнего курса
+            throw new Exception("Банковский сервис с курсами работает некорректно." + e.Message);
+        }
+    }
+
+    #endregion
+    // ---
+    #region private methods
+
+    private void LoadAll()
+    {
+        costOfDeliveries = ViewCostOfDeliveriesUseCase.Execute()?.ToList();
+    }
+
+    public static decimal RoundUp(decimal number, int digits)
+    {
+        var factor = Convert.ToDecimal(Math.Pow(10, digits));
+        return Math.Ceiling(number * factor) / factor;
+    }
+
+    #endregion
+}

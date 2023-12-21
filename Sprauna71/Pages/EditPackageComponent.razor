@@ -1,0 +1,79 @@
+﻿@page "/EditPackage/{PackageId}"
+
+@inject NavigationManager NavigationManager
+
+@inject IEditPackageUseCase EditPackageUseCase
+@inject IGetPackageByIdUseCase GetPackageByIdUseCase
+
+<h3>Edit Package </h3>
+
+@if (package != null)
+{
+    <EditForm Model="package" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator></DataAnnotationsValidator>
+        <ValidationSummary></ValidationSummary>
+
+        <div class="form-group">
+            <label for="name">Name</label>
+            <InputText id="name" @bind-Value="package.Name" class="form-control"></InputText>
+        </div>
+
+
+        <div class="form-group">
+            <label for="description">Описание</label>
+            <InputText id="description" @bind-Value="package.Description" class="form-control"></InputText>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+        <button type="button" class="btn btn-primary" @onclick="OnCancel">Отменить</button>
+    </EditForm>
+}
+
+@code {
+
+    [Parameter]
+    public string PackageId { get; set; }
+
+    private Package package;
+
+    #region override methods
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        package = new Package();
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        if (int.TryParse(this.PackageId, out int iPackageId))
+        {
+            var tempPackage = GetPackageByIdUseCase.Execute(iPackageId);
+            this.package = new Package
+                {
+                    PackageId = tempPackage.PackageId,
+                    Name = tempPackage.Name,
+                    Description = tempPackage.Description
+                };
+        }
+    }
+
+    #endregion
+
+    #region private methods
+
+    private void OnValidSubmit()
+    {
+        EditPackageUseCase.Execute(package);
+        NavigationManager.NavigateTo("/Packages");
+    }
+
+    private void OnCancel()
+    {
+        NavigationManager.NavigateTo("/Packages");
+    }
+
+    #endregion
+}

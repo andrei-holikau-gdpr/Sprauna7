@@ -1,0 +1,144 @@
+﻿@attribute [Authorize()] 
+
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Components.Authorization
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IViewReceiversUseCase ViewReceiversUseCase
+
+<HeadContent>
+    <link href="css/spprofile.css" rel="stylesheet" />
+</HeadContent>
+
+@userAuthenticated
+
+<div class="outer">
+    <div class="inner">
+        <div id="sp-profile" class="sp-profile-test">
+            
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-4 col-md-3 col-lg-2">
+                        <a href="/Identity/Account/Manage/">
+                        @if (currentUserProfilePicture != null)
+                        {
+                            <img class="photo" style="width:120px; height:120px;" src="data:image/*;base64,@(Convert.ToBase64String(@currentUserProfilePicture))">
+                        }
+                        else
+                        {
+                            <img class="photo" style="width:120px; height:120px;" src="/images/person.jpg" />
+                        }
+                        </a>
+@*                        @if (currentUserRoles != null)
+                            @foreach (var role in currentUserRoles)
+                                @($"{role} ");*@
+                    </div>
+                    <div class="col-8 col-md-5 col-lg-4">
+
+                        @{ #region Fio }
+
+                        <span class="fio">
+                            @(!string.IsNullOrWhiteSpace(currentUserFirstName)? @currentUserFirstName  : "Имя" )
+                            @(!string.IsNullOrWhiteSpace(currentUserLastName)?  @currentUserLastName   : "Фамилия" )
+                        </span>
+
+                        @{ #endregion }
+
+                        <div>
+                        @if(!string.IsNullOrWhiteSpace(currentUserPhone)){
+                            <div class="phone">
+                                <i class="bi bi-telephone"></i>
+                                @currentUserPhone
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrWhiteSpace(currentUserEmail))
+                        {
+                            <div class="email">
+                                    <i class="bi bi-envelope"></i>
+                                @currentUserEmail
+                            </div>
+                        }
+                        </div>
+                    </div>
+                    <div class="d-none d-md-block col-md-4 col-lg-3 recipient">
+                        <span class="recipient-title">
+                            Получитель
+                        </span>
+                        <span class="default-recipient">
+                            @if (receiver == null) {
+                                <i>
+                                    Добавьте получателя по умолчанию
+                                </i>
+                            } else
+                            {
+                                @($"{receiver.FirstName} {receiver.SecondName}")
+                            }             
+                        </span>
+                        <a class="add-recipient" href="#">
+                            Добавить
+                        </a>
+                    </div>
+                    <div class="d-none d-xl-block col-xl-3 edit-profile align-self-center" >
+                        <a class="" href="/Identity/Account/Manage/">Редактировать профиль</a>
+                        @*<p>/Identity/Account/Manage/PersonalData</p>*@
+                    </div>
+
+@*                    <div class="col-12 response">
+                        currentUserId: @currentUserId
+                    </div>*@
+                </div>
+            </div>           
+            
+        </div>
+    </div>
+</div>
+
+
+@code {
+    private string? userAuthenticated;
+
+    //private string? currentUserId;
+    private string? currentUserEmail;
+    private string? currentUserPhone;
+    private string? currentUserUserName;
+    private string? currentUserFirstName;
+    private string? currentUserLastName;
+    private byte[]? currentUserProfilePicture;
+
+    private bool IsShowSpProfile = true;
+
+    private Receiver? receiver;
+
+    [Inject]
+    UserManager<ApplicationUser>? userManager { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity != null && user.Identity.IsAuthenticated && userManager != null)
+    {
+            var currentUser = await userManager.GetUserAsync(user);
+            // currentUserId = currentUser.Id;
+            currentUserEmail = currentUser?.Email;
+            currentUserPhone = currentUser?.PhoneNumber;
+            currentUserUserName = currentUser?.UserName;
+            currentUserFirstName = currentUser?.firstName;
+            currentUserLastName = currentUser?.lastName;
+            currentUserProfilePicture = currentUser?.ProfilePicture;
+        }
+        else
+        {
+            userAuthenticated = "Пользователь НЕ аутентифицирован.";
+        }
+
+        receiver = ViewReceiversUseCase.Execute().FirstOrDefault(r => r.IsDefault == true);
+    }
+
+    private void OnClickShow()
+    {
+        IsShowSpProfile = !IsShowSpProfile;
+    }
+} 

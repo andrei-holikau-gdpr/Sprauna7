@@ -1,0 +1,217 @@
+﻿@page "/AdminPanel"
+
+@attribute [Authorize(Policy = "AdminOnly")]
+
+<h1 class="h3">Admin panel</h1>
+<br />
+
+<style>
+    .nmas {
+        padding-top: 20px !important;
+    }
+
+    .nav-item {
+        padding: 5px !important;
+        border-bottom: 1px solid grey;
+    }
+</style>
+<div class="" style="display: flex;">
+    <div class="" style="width:30%;">
+        <div class="admin-canvas" style="background-color: white;">
+            <ul class="navMenuAdmin" style="display: list-item; background-color: #FEFFBA;">
+
+                <li class="nav-item px-3">
+                    <NavLink class="nav-link" target="blank" href="https://www.figma.com/file/dpKlIq0yokvHuEhrqWKEA0/Sprauna?type=design&node-id=288-2727&mode=design&t=PAIFpvZsr9v7TUAj-0">
+                        <Tooltip Placement="Placement.Right" Title="Figma">
+                            <i class="bi bi-window-stack"></i>
+                            <span class="nmas">
+                                Figma
+                            </span>
+                        </Tooltip>
+                    </NavLink>
+                </li>
+
+                <li class="nav-item px-3">
+                    <NavLink class="nav-link" href="productssp">
+                        <Tooltip Placement="Placement.Right" Title="Товары">
+                            <i class="bi bi-box-seam" aria-hidden="true"></i>
+                            <span class="nmas">
+                                Товары
+                            </span>
+                        </Tooltip>
+                    </NavLink>
+                </li>
+
+
+                <li class="nav-item px-3">
+                    <NavLink class="nav-link" href="ExpressPay" id="lnkExpressPay">
+                        <Tooltip Placement="Placement.Right" Title="ExpressPay">
+                            <i class="bi bi-strava" aria-hidden="true"></i>
+                            <span class="nmas">
+                                ExpressPay
+                            </span>
+                        </Tooltip>
+                    </NavLink>
+                </li>
+
+                <li class="nav-item px-3">
+                    <NavLink class="nav-link" href="/AdminExchangeRates" id="lnkAdminExchangeRates">
+                        <Tooltip Placement="Placement.Right" Title="Курс валюты">
+                            <i class="bi bi-currency-exchange"></i>
+                            <span class="nmas">
+                                Курс валюты
+                            </span>
+                        </Tooltip>
+                    </NavLink>
+                </li>
+
+                <li class="nav-item px-3">
+                    <NavLink class="nav-link" href="AdminPvzs">
+                        <Tooltip Placement="Placement.Right" Title="Пункты выдачи посылок">
+                            <i class="bi bi-building" aria-hidden="true"></i>
+                            <span class="nmas">
+                                Pvz
+                            </span>
+                        </Tooltip>
+                    </NavLink>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+
+    <div class="" style="width:30%;">
+        <div class="admin-canvas" style="background-color: white;">
+            <ul class="navMenuAdmin" style="display: list-item; background-color: #FEFFBA;">
+
+                <li class="nav-item px-3">
+                    <NavLink class="nav-link" href="/CostOfDelivery">
+                        <Tooltip Placement="Placement.Right" Title="Стоимость доставки PLN->BYN">
+                            <i class="bi bi-truck"></i>
+                            <span class="nmas">
+                                Стоимость доставки. Таблица PLN->BYN
+                            </span>
+                        </Tooltip>
+                    </NavLink>
+                </li>
+
+                <li class="nav-item px-3">
+                    <NavLink class="nav-link" href="/AdminDiscounts">
+                        <Tooltip Placement="Placement.Right" Title="Скидки">
+                            <i class="bi bi-percent" aria-hidden="true"></i>
+                            <span class="nmas">
+                                Скидки
+                            </span>
+                        </Tooltip>
+                    </NavLink>
+                </li>
+
+                <li class="nav-item px-3">
+                    <NavLink class="nav-link" href="/UsersAdmin">
+                        <Tooltip Placement="Placement.Right" Title="Пользователи">
+                            <i class="bi bi-people"></i>
+                            <span class="nmas">
+                                Пользователи
+                            </span>
+                        </Tooltip>
+                    </NavLink>
+                </li>
+
+                <li class="nav-item px-3">
+                    <NavLink class="nav-link" href="/TestMailKit">
+                        <Tooltip Placement="Placement.Right" Title="TestMailKit">
+                            <i class="bi bi-check"></i>
+                            <span class="nmas">
+                                TestMailKit
+                            </span>
+                        </Tooltip>
+                    </NavLink>
+                </li>
+
+                <li class="nav-item px-3">
+                    <NavLink class="nav-link" href="/file-upload-1">
+                        <Tooltip Placement="Placement.Right" Title="FileUpload">
+                            <i class="bi bi-check"></i>
+                            <span class="nmas">
+                                FileUpload
+                            </span>
+                        </Tooltip>
+                    </NavLink>
+                </li>
+
+                <li class="nav-item px-3">
+                    <NavLink class="nav-link" href="/LoggerViewer">
+                        <Tooltip Placement="Placement.Right" Title="LoggerViewer">
+                            <i class="bi bi-device-ssd"></i>
+                            <span class="nmas">
+                                Logs
+                            </span>
+                        </Tooltip>
+                    </NavLink>
+                </li>
+
+                @*            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="/ToDoList">
+                <Tooltip Placement="Placement.Right" Title="ToDoList">
+                <i class="bi bi-bar-chart-steps"></i>
+                <div class="sp-navlink-text">
+                ToDoList
+                </div>
+                </Tooltip>
+                </NavLink>
+                </li>*@
+
+            </ul>
+        </div>
+    </div>
+
+    <div class="" style="width:30%;">
+        <div class="admin-canvas" style="background-color: white;">
+
+            <h2>Белка</h2>
+
+            <ul class="navMenuAdmin" style="display: list-item; background-color: #FEFFBA;">
+
+                <li class="nav-item px-3">
+                    <NavLink class="nav-lin SbsPvzsLink" href="/SbsPvzs">
+                        <Tooltip Placement="Placement.Right" Title="PVZ">
+                            <i class="bi bi-truck"></i>
+                            <span class="nmas">
+                                PVZ
+                            </span>
+                        </Tooltip>
+                    </NavLink>
+                </li>
+
+                <li class="nav-item px-3">
+                    <NavLink class="nav-link SbsRecipientsLink" href="/SbsRecipients">
+                        <Tooltip Placement="Placement.Right" Title="Получатели">
+                            <i class="bi bi-truck"></i>
+                            <span class="nmas">
+                                Получатели
+                            </span>
+                        </Tooltip>
+                    </NavLink>
+                </li>
+
+                <li class="nav-item px-3">
+                    <NavLink class="nav-link SbsTracksLink" href="/SbsTracks">
+                        <Tooltip Placement="Placement.Right" Title="Посылки">
+                            <i class="bi bi-truck"></i>
+                            <span class="nmas">
+                                Посылки
+                            </span>
+                        </Tooltip>
+                    </NavLink>
+                </li>
+
+
+
+            </ul>
+        </div>
+    </div>
+</div>
+
+@code {
+
+}

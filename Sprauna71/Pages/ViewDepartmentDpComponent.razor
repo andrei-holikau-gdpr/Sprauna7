@@ -1,0 +1,84 @@
+﻿@page "/ViewDepartment/{DepartmentId}"
+
+@using System.Diagnostics.CodeAnalysis;
+
+@inject IJSRuntime JsRuntime
+@inject IGetDepartmentDpByIdUseCase GetDepartmentByIdUseCase
+
+@*@implements IDisposable*@
+
+@if (department != null)
+{    
+    <div>
+        <b>@department.RegionId</b>
+        @($"{department.Address}")
+    </div>
+    <div>
+        <div id="map" style="width: 600px; height: 400px"></div>
+    </div>
+}
+
+<br />
+<ConsoleLogger @ref="Logger" class="mt-3" />
+
+
+@code {
+    #region Parameters Department
+
+    [Parameter]
+    public string? DepartmentId { get; set; }
+
+    #endregion
+    // ---
+    #region private fields Department
+
+    [NotNull]
+    private ConsoleLogger? Logger { get; set; }
+
+    private DepartmentDeliveryParcel? department;
+
+
+    #endregion
+    // ---
+    #region override methods Department
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        department = new DepartmentDeliveryParcel();
+
+        //JsRt = new(JsRuntime);
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        if (int.TryParse(this.DepartmentId, out int iDepartmentId))
+        {
+            department = GetDepartmentByIdUseCase.Execute(iDepartmentId);
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        Logger.Log($"OnAfterRender DepartmentId: {this.DepartmentId}");
+
+        if (firstRender)
+            await JsRuntime.InvokeVoidAsync("SyMap");
+
+        // или с возвратом:
+        // var value = await JSRuntime.InvokeAsync("name_function_javascript");
+
+        // return base.OnAfterRenderAsync(firstRender);
+    }
+
+    //protected override Task OnAfterRenderAsync(bool firstRender)
+    //{
+    //    Logger.Log($"OnAfterRender DepartmentId: {this.DepartmentId}");
+
+    //    return base.OnAfterRenderAsync(firstRender);
+    //}
+
+    #endregion
+}

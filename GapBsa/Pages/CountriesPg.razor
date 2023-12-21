@@ -1,0 +1,29 @@
+﻿@page "/Countries"
+
+@using Gap.CoreBusiness;
+
+<h3>CountriesPg</h3>
+@if(countries != null)
+{
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var country in countries)
+            {
+                <tr>
+                    <td>@country.Id</td>
+                    <td>@country.Name</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Country> countries;
+}

@@ -1,0 +1,64 @@
+﻿@using Lixiang.CoreBusiness;
+@*
+    <div class="li-model">
+    <div class="li-model-left w-75 d-inline-block">
+        li-model-left
+    </div>
+    <div class="li-model-right w-25 d-inline-block">
+        <span class="font-weight-bold">
+            li-model-right
+        </span>
+    </div>
+</div>
+*@
+
+<h3>@Title</h3>
+
+@foreach (var model in CarModels)
+{
+    <div class="@(model == SelectedCar.carModel ? "model-item current" : "model-item")" onclick="@(() => OnClickCarModel(model))">
+        <div class="model-item-name">
+            <span class="li-text-font">@model.Name</span>
+            <span class="li-text-font">@model.Price ₽</span>
+        </div>
+        <div class="model-item-desc">
+            <p class="li-text-font">@model.Description</p>
+        </div>
+    </div>
+}
+
+@code {
+    #region
+    [Parameter]
+    public string DivId { get; set; } = "";
+    [Parameter]
+    public string Title { get; set; } = "";
+    [Parameter]
+    public Car SelectedCar { get; set; } = new();
+    //[Parameter]
+    //public CarColorOption CarOptionForComponent { get; set; } = new();
+
+    [Parameter]
+    public EventCallback<CarModel> OnClickCarModelCallback { get; set; }
+
+    [Parameter]
+    public List<CarModel> CarModels { get; set; } = new();
+
+    #endregion
+
+    #region Private methods
+
+    private async Task OnClickCarModel(CarModel carModel)
+    {
+        SelectedCar.carModel = carModel;
+        await OnClickCarModelCallback.InvokeAsync(carModel);
+        // ShouldRender();
+    }
+
+    private string GetCssClassIfModelCurrent(CarModel carModel)
+    {
+        return carModel == SelectedCar.carModel ? "current" : "";
+    }
+
+    #endregion
+}

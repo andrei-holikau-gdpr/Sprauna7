@@ -1,0 +1,65 @@
+﻿1. Category
+2. Package
+3. ProductSp
+4. Purchase
+5. Receiver
+
+1. Категория
+2. Пакет
+3. ПродуктСп
+4. Покупка
+5. Приемник
+
+CategoryInMemoryRepository:		ICategory
+PackageInMemoryRepository:		IPackageRepository
+ProductSpInMemoryRepository:	IProductSpRepository
+PurchaseInMemoryRepository:		IPurchaseRepository
+ReceiverInMemoryRepository:		IReceiverRepository
+DepartmentDeliveryParcel:		IDepartmentDeliveryParcel
+Region:							IRegion
+
+AddCategory
+AddPackage
+AddProductSp
+AddPurchase
+AddReceiver
+
+AddCategoryUseCase +
+AddPackageUseCase +
+AddProductSpUseCase +
+AddPurchaseUseCase +
+AddReceiverUseCase +
+
+1. EditCategoryUseCase +
+2. EditPackageUseCase 
+3. EditProductSpUseCase 
+4. EditPurchaseUseCase 
+5. EditReceiverUseCase 
+
+
+1. GetCategoryByIdUseCase
+2. GetPackageByIdUseCase
+3. GetProductSpByIdUseCase
+4. GetPurchaseByIdUseCase
+5. GetReceiverByIdUseCase
+
+1. DeleteCategoryByIdUseCase
+2. DeletePackageByIdUseCase
+3. DeleteProductSpByIdUseCase
+4. DeletePurchaseByIdUseCase
+5. DeleteReceiverByIdUseCase
+
+1. EditCategoryComponent	@page "/editcategory/{CategoryId}"
+2. EditPackageComponent		@page "/EditPackage/{PackageId}"
+3. EditProductSpComponent	@page "/EditProductSp/{ProductSpId}"
+4. EditPurchaseComponent	@page "/EditPurchase/{PurchaseId}"
+5. EditReceiverComponent	@page "/EditReceiver/{ReceiverId}"
+
+SQL
+
++ +	ICategoryRepository
++ +	IPackageRepository
++ +	IProductSpRepository
++ +	IPurchaseRepository
++ +	IReceiverRepository
++	IDepartmentDeliveryParcelRepository

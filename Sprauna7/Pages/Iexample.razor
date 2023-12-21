@@ -1,0 +1,17 @@
+﻿@page "/Iexample"
+<h3 class="bg-secondary text-white">@SexValue</h3>
+
+<div class="form-group">
+    <label>Select sex:</label>
+    <input type="radio" name="sex" value="Male" @onchange="YourSex" />Male
+    <input type="radio" name="sex" value="Female" @onchange="YourSex" />Female
+</div>
+
+@code {
+    public string SexValue { get; set; }
+
+    private void YourSex(ChangeEventArgs e)
+    {
+        SexValue = e.Value as string;
+    }
+}

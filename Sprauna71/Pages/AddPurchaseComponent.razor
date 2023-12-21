@@ -1,0 +1,85 @@
+﻿@page "/addpurchase"
+
+@inject NavigationManager NavigationManager
+@inject IAddPurchaseUseCase AddPurchaseUseCase
+
+<h3>Добавить покупку</h3>
+
+@if(purchase != null)
+{
+    <EditForm Model="purchase" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator></DataAnnotationsValidator>
+        <ValidationSummary></ValidationSummary>
+
+        <div class="form-group">
+            <label for="Surname">@PurchaseOptions.Surname</label>
+            <InputText id="Surname" @bind-Value="purchase.Surname" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label for="name">@PurchaseOptions.Name</label>
+            <InputText id="name" @bind-Value="purchase.Name" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label for="Shop">@PurchaseOptions.Shop</label>
+            <InputText id="Shop" @bind-Value="purchase.Shop" class="form-control"></InputText>
+        </div>
+
+        @* AgreeWithTools *@
+        <div class="col-sm-12 col-lg-12 p-1">
+            <div class="form-group">
+                <InputCheckbox id="AgreeWithTools" @bind-Value="purchase.AgreeWithTools"
+                           class="form-check" style="float:left;"/>
+                <label for="AgreeWithTools" style="padding-left: 5px;">@PurchaseOptions.AgreeWithTools</label>
+            </div>
+        </div>
+
+        @* Buttons *@
+        <div class="col-sm-12 col-lg-12 p-1">
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+            <button type="button" class="btn btn-primary" @onclick="OnCancel">Отменить</button>
+        </div>
+    </EditForm>
+}
+
+@code {
+
+    #region private fields
+
+    private Purchase purchase;
+    
+
+
+    #endregion
+
+    #region override methods
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        purchase = new Purchase();
+    }
+
+    #endregion
+
+    #region private methods
+
+    private void OnValidSubmit()
+    {
+        int PurchaseId = AddPurchaseUseCase.Execute(purchase);
+        NavigationManager.NavigateTo($"/EditPurchase/{PurchaseId}");
+    }
+
+    private void OnCancel()
+    {
+        NavigationManager.NavigateTo($"/{PurchaseOptions.NameMany}");
+    }
+
+    private void OnCkickSendWithoutUnit()
+    {
+        
+    }
+    #endregion
+
+}

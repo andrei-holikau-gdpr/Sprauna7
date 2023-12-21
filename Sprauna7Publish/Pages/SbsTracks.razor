@@ -1,0 +1,182 @@
+﻿@page "/SbsTracks"
+@using CoreBusiness.ShopByShop.Models;
+@using System.Reflection;
+@attribute [Authorize(Policy = "AdminOnly")]
+
+@inject NavigationManager NavigationManager
+@inject MessageService MessageService
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1 id="sbstracks-h1" class="card-title h3">Посылки</h1>
+            <br />
+            <SbsTrackTable Update="@Update"
+                           SelectTrackSbsId="@SelectTrackSbsId" 
+                           OnClickViewCallback="@OnClickView" />
+        </div>
+    </div>
+</div>
+
+@{ #region Modals }
+
+<!-- ModalDialog Детальный просмотр -->
+<Modal @ref="ModalView" IsBackdrop="true" IsKeyboard="true">
+    <ModalDialog Title="Информация о получателе" Size="Size.Large" 
+    IsScrolling="true" IsDraggable="true" ShowFooter="false" CloseButtonText="Отмена">
+        <BodyTemplate>
+            @if (SelectTrackSbsId == null || SelectTrackSbsId < 1) 
+            {
+                <p>Посылка не выбрана</p>
+            } else {
+                <ViewSbsTrackComponent SbsTrackId="@((int)SelectTrackSbsId)" />                
+                <hr/>
+                <Button IsOutline="true"
+                    @onclick="((args) => OnClickBtnEdit(args, (int)SelectTrackSbsId))">
+                    Редактировать
+                </Button>
+                <Button IsOutline="true" Color="Color.Dark"
+                    @onclick="((args) => OnClickBtnDelete(args, (int)SelectTrackSbsId))">
+                    Удалить
+                </Button>
+            }
+        </BodyTemplate>
+    </ModalDialog>
+</Modal>
+
+<!-- ModalDialog Добавление -->
+<Modal @ref="ModalAdd" IsBackdrop="false" IsKeyboard="true">
+    <ModalDialog Title="Добавить получателя" Size="Size.Large" IsScrolling="true"
+    ShowFooter="false" ShowHeader="false">
+        <BodyTemplate>
+            <MessageInDeveloping />
+
+            @*<AddReceiverComponent IsModal="true"
+            OnAddCallback="@OnAddModalCallback"
+            OnCanselCallback="@OnAddModalCanselCallback" />*@
+        </BodyTemplate>
+    </ModalDialog>
+</Modal>
+
+<!-- ModalDialog Редактирование -->
+<Modal @ref="ModalEdit" IsBackdrop="false" IsKeyboard="true">
+    <ModalDialog Title="Редактировать получателя" Size="Size.Large" IsScrolling="true"
+    ShowFooter="false" ShowHeader="false">
+        <BodyTemplate>
+            @if (SelectTrackSbsId == null || SelectTrackSbsId < 1)
+            {
+                <p>Посылка не выбрана</p>
+            } else {
+                <MessageInDeveloping />
+                @*<EditReceiverComponent ReceiverId="@SelectSbsTrackId"
+                IsModal="true" OnEditCallback="@OnEditModalCallback"
+                OnCanselCallback="@OnEditModalCanselCallback" />*@
+            }
+        </BodyTemplate>
+    </ModalDialog>
+</Modal>
+
+@{ #endregion }
+
+
+
+<ConsoleLoggerSp Owner="SbsTracks" LogerEnable="@LogerEnable">
+    <ConsoleLogger @ref="Logger" />
+</ConsoleLoggerSp>
+
+@code{
+    #region Private fields
+
+    public int? SelectTrackSbsId;
+    public TrackItem? SelectTrackSbs;
+
+    public bool Update = false;
+
+    [NotNull]
+    private ConsoleLogger? Logger { get; set; }
+    private bool LogerEnable = false;
+
+    #endregion    
+    // ---
+    #region Private fields / Modals
+
+    [NotNull]
+    private Modal? ModalView { get; set; }
+    [NotNull]
+    private Modal? ModalAdd { get; set; }
+    [NotNull]
+    private Modal? ModalEdit { get; set; }
+
+    private List<PropertyInfo>? PropertiesList = new();
+
+    #endregion
+    // ---
+    #region Private methods / Override methods -
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+    #if DEBUG
+        LogerEnable = true;
+    #endif
+    }
+
+    #endregion
+    // ---
+    #region private methods
+
+    private void ShowMessage(string message, string icon, Color color)
+    {
+        MessageService.Show(new MessageOption()
+            {
+                Content = message,
+                Icon = icon,
+                Color = color,
+                ShowDismiss = true,
+            });
+    }
+
+    #endregion
+    // ---
+    #region Private methods / OnClick CRUD
+
+    private void OnClickView(TrackItem single)
+    {
+        #if DEBUG
+            Logger.Log($"OnClickView SelectTrackSbsId: {single.Id}");
+        #endif
+
+        SelectTrackSbsId = single.Id;
+        SelectTrackSbs = single;
+
+        PropertiesList = typeof(Invoice).GetProperties().ToList<PropertyInfo>();
+
+        ModalView.Toggle();
+    }
+
+    private void OnClickBtnEdit(EventArgs args, int selectSbsTrackId)
+    {
+        #if DEBUG
+            Logger.Log($"OnClickEdit selectSbsTrackId: {selectSbsTrackId}");
+        #endif
+
+        NavigationManager.NavigateTo($"/editSbsTrack/{selectSbsTrackId}");
+    }
+
+    private void OnClickBtnDelete(EventArgs args, int selectSbsTrackId)
+    {
+        #if DEBUG
+            Logger.Log($"OnClickBtnDelete selectSbsTrackId: {selectSbsTrackId}");
+        #endif
+
+        SelectTrackSbsId = 0;
+        //DeletePurchaseUseCase.Delete(SelectSbsTrackId, currentUserId);
+        Update = true;
+        ModalView.Close();
+        // StateHasChanged();
+    }
+
+    #endregion
+    // ---
+}

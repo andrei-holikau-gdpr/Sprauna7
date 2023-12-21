@@ -1,0 +1,72 @@
+﻿.ld-outer:before {
+    content: '';
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+}
+
+.ld-inner {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* добавим горизонтальное центрирование */
+
+.ld-outer {
+    text-align: center;
+}
+
+@media (min-width: 540px) {
+    .ld-outer {
+        height: 90vh;
+    }
+}
+
+    @media (max-width: 540px) {
+        .ld-outer {
+            width: 100%;
+            margin-top: 10px;
+        }
+    }
+
+    .ld-card {
+        background-color: white;
+        border-radius: 12px;
+        padding: 20px;
+        max-width: 500px;
+        margin-bottom: 100px;
+        box-shadow: 0 4px 20px 0 rgb(0, 54, 117, 0.25);
+    }
+
+    #login-submit {
+        background-color: #00A3FF;
+        border-radius: 12px;
+        padding: 11px, 24px, 11px, 24px;
+        width: 200px;
+        font-family: SF Pro Display;
+        font-size: 16px;
+        font-weight: 400;
+        color: white;
+    }
+
+    .inner {
+        /*    border: 0.05em solid black;*/
+        width: 50%;
+    }
+
+    .outer {
+        /*    border: 0.05em solid red;*/
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+
+.ld-card.register {
+    min-width: 500px;
+}
+
+@media(min-width:940px) {
+    .identity-account.ld-card {
+        min-width: 500px;
+    }
+}

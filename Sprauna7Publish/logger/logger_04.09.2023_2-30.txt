@@ -1,0 +1,58 @@
+Executed DbCommand (23ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT 1
+Executed DbCommand (18ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT OBJECT_ID(N'[__EFMigrationsHistory]');
+Executed DbCommand (7ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT 1
+Executed DbCommand (8ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT OBJECT_ID(N'[__EFMigrationsHistory]');
+Executed DbCommand (8ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [MigrationId], [ProductVersion]
+FROM [__EFMigrationsHistory]
+ORDER BY [MigrationId];
+Applying migration '20230903232944_CreateIdentitySchema_2'.
+Executed DbCommand (37ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+DECLARE @var0 sysname;
+SELECT @var0 = [d].[name]
+FROM [sys].[default_constraints] [d]
+INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+WHERE ([d].[parent_object_id] = OBJECT_ID(N'[ProductSps]') AND [c].[name] = N'TrackNumber');
+IF @var0 IS NOT NULL EXEC(N'ALTER TABLE [ProductSps] DROP CONSTRAINT [' + @var0 + '];');
+UPDATE [ProductSps] SET [TrackNumber] = N'' WHERE [TrackNumber] IS NULL;
+ALTER TABLE [ProductSps] ALTER COLUMN [TrackNumber] nvarchar(max) NOT NULL;
+ALTER TABLE [ProductSps] ADD DEFAULT N'' FOR [TrackNumber];
+Executed DbCommand (7ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+UPDATE [ProductSps] SET [TrackNumber] = N'3'
+WHERE [ProductSpId] = 1;
+SELECT @@ROWCOUNT;
+Executed DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+UPDATE [ProductSps] SET [TrackNumber] = N'2'
+WHERE [ProductSpId] = 2;
+SELECT @@ROWCOUNT;
+Executed DbCommand (5ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+UPDATE [ProductSps] SET [TrackNumber] = N'1'
+WHERE [ProductSpId] = 3;
+SELECT @@ROWCOUNT;
+Executed DbCommand (7ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+UPDATE [Purchases] SET [TrackNumber] = N'03.09.2023 23:29:43'
+WHERE [PurchaseId] = 1;
+SELECT @@ROWCOUNT;
+Executed DbCommand (7ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+UPDATE [Purchases] SET [TrackNumber] = N'03.09.2023 23:29:43'
+WHERE [PurchaseId] = 2;
+SELECT @@ROWCOUNT;
+Executed DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+UPDATE [Purchases] SET [TrackNumber] = N'03.09.2023 23:29:43'
+WHERE [PurchaseId] = 3;
+SELECT @@ROWCOUNT;
+Executed DbCommand (13ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+UPDATE [Receivers] SET [PassportIssueDate] = '2023-09-04T02:29:43.7965856+03:00'
+WHERE [ReceiverId] = 1;
+SELECT @@ROWCOUNT;
+Executed DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+UPDATE [Receivers] SET [PassportIssueDate] = '2023-09-04T02:29:43.7965872+03:00'
+WHERE [ReceiverId] = 2;
+SELECT @@ROWCOUNT;
+Executed DbCommand (9ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+VALUES (N'20230903232944_CreateIdentitySchema_2', N'7.0.9');

@@ -1,0 +1,19 @@
+﻿@page "/DepartmentDps"
+
+@using System.Diagnostics.CodeAnalysis;
+
+<h1>GHH</h1>
+@*<Button OnClick="() => BackdropModal.Toggle()">ModalsNormalPopups</Button>
+
+<Modal @ref="BackdropModal" IsBackdrop="true" IsKeyboard="true">
+    <ModalDialog Title="ModalsIsBackdropToClose" IsDraggable="true" ShowFooter="false">
+        <BodyTemplate>
+            <div>ModalsTitlePopupWindowText</div>
+        </BodyTemplate>
+    </ModalDialog>
+</Modal>*@
+
+@code {
+    [NotNull]
+    private Modal? BackdropModal { get; set; }
+}

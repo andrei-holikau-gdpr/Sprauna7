@@ -1,0 +1,162 @@
+﻿@attribute [Authorize(Policy = "AdminOnly")]
+
+@using Plugins.ShopByShop;
+@using CoreBusiness.ShopByShop.Models
+@using UseCases.ShopByShop.UseCaseInterfaces
+
+@inject IViewRecipientsSbsUseCase ViewRecipientsSbsUseCase
+@inject IJSRuntime JsRuntime
+
+@inject NavigationManager NavigationManager
+
+<div class="div-for-table" id="sbsRecipients">
+    @if (RecipientSbss != null && RecipientSbss.Count > 0)
+    {    
+        <table id="example" class="display nowrap">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>FirstName</th>
+                    <th>MiddleName</th>
+                    <th>LastName</th>
+                    <th>Birthdate</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in RecipientSbss)
+                {
+                    <tr>
+                        <td>@item.Id</td>
+                        <td>@item.Email</td>
+                        <td>@item.Phone</td>
+                        <td>@item.FirstName</td>
+                        <td>@item.MiddleName</td>
+                        <td>@item.LastName</td>
+                        <td>@item.Birthdate</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p class="ListPvzIsNull">Получатели не найдены</p>
+    }
+</div>
+
+<br />
+<br />
+<button type="button" @onclick="OnClickAddNewPage" class="btn btn-primary" id="btnAddPurchase">Добавить посылку</button>
+<br />
+
+<br />
+<ConsoleLoggerSp Owner="SbsRecipientTable" LogerEnable="@LogerEnable">
+    <ConsoleLogger @ref="Logger" />
+</ConsoleLoggerSp>
+
+@code {
+    #region Private fiels
+
+    [Parameter]
+    public int? SelectRecipientSbsId { get; set; }
+
+    [Parameter]
+    public List<RecipientItem> RecipientSbss { get; set; } = new();
+
+    [Parameter]
+    public bool Update { get; set; } = false;
+
+    [Parameter, NotNull]
+    public EventCallback<RecipientItem> OnClickViewCallback { get; set; }
+
+    [Parameter, NotNull]
+    public EventCallback<RecipientItem> OnClickAddCallback { get; set; }
+
+    [Parameter, NotNull]
+    public EventCallback<RecipientItem> OnClickEditCallback { get; set; }
+
+    [Parameter, NotNull]
+    public EventCallback<int> OnClickDeleteCallback { get; set; }
+
+    #endregion
+    //---
+    #region Private fields
+
+    [NotNull]
+    private ConsoleLogger? Logger { get; set; }
+    private bool LogerEnable = false;
+
+    private bool InitialiseTableСompleted = false;
+
+    #endregion
+    //---
+    #region Protected Override methods
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        LoadAll();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (Update && RecipientSbss != null && RecipientSbss.Count > 0)
+            {
+                await JsRuntime.InvokeVoidAsync("InitialiseTable");
+                InitialiseTableСompleted = true;
+                Logger.Log($"InitialiseTable()");
+            }
+        }
+
+        if (Update && RecipientSbss != null && RecipientSbss.Count > 0)
+        {
+            //await JsRuntime.InvokeVoidAsync("InitialiseTable");
+            Update = false;
+            Logger.Log($"RecipientSbss.Count = {RecipientSbss.Count}");
+        }
+
+        if (RecipientSbss == null) Logger.Log($"RecipientSbss.Count == null");
+        else if (RecipientSbss.Count == 0) Logger.Log($"RecipientSbss.Count == 0");
+    }
+
+    #endregion
+    // ---
+    #region Private methods
+
+    private async void LoadAll()
+    {
+        var templistRecipientSbss = await ViewRecipientsSbsUseCase.ExecuteAsync();
+        if (templistRecipientSbss != null)
+        {
+            RecipientSbss = (List<RecipientItem>)templistRecipientSbss;
+
+            Logger.Log($"LoadAll() RecipientSbss.Count = {RecipientSbss.Count}");
+
+            StateHasChanged();
+        }
+
+        if (!InitialiseTableСompleted && RecipientSbss != null && RecipientSbss.Count > 0)
+        {
+            await JsRuntime.InvokeVoidAsync("InitialiseTable");
+            InitialiseTableСompleted = true;
+            Logger.Log($"LoadAll() + InitialiseTable()");
+        }
+    }
+
+    private void UpdateData()
+    {
+        //JsRuntime.InvokeVoidAsync("DataTablesRemove");
+        LoadAll();
+        //JsRuntime.InvokeVoidAsync("InitialiseTable");
+    }
+
+    private void OnClickAddNewPage()
+    {
+        NavigationManager.NavigateTo($"/AddSbsRecipient");
+    }
+    #endregion
+}

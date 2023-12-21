@@ -1,0 +1,248 @@
+﻿@attribute [Authorize()]
+
+@using System
+@using System.IO
+@using Microsoft.AspNetCore.Hosting
+@using Microsoft.AspNetCore.Mvc;
+@using Microsoft.Extensions.Logging
+@using System.Security.Policy;
+@using UseCasesSp.UseCaseInterfaces;
+@using static System.Net.WebRequestMethods;
+@inject IWebHostEnvironment Environment
+@inject NavigationManager NavigationManager
+
+@inject IAddFileSpUseCase AddFileSpUseCase
+@inject IGetFileSpByIdUseCase GetFileSpByIdUseCase
+
+@inject IJSRuntime JS
+
+@inject ILogger<FileUplaodComponent> LoggerInFile
+
+@attribute [Authorize()]
+
+@if (ErrorMessages.Count > 0)
+{
+    <ErrorMessagesComponent ErrorMessages="ErrorMessages" />
+}
+
+@if (CurrentUserId == null)
+{
+    // CurrentUserId == null
+}
+else
+{
+    if (FullParameters)
+    {
+        @*<h1 class="h3">Загрузка файлов</h1>*@
+        <br />
+        <p>
+            <label>
+                Максимальный размер файла:
+                <input type="number" @bind="maxFileSize" class="form-control" />
+            </label>
+        </p>
+
+        @*
+        <p>
+            <label>
+                Максимальное количество файлов:
+                <input type="number" @bind="maxAllowedFiles" />
+            </label>
+        </p>
+        *@
+        <br />
+    }
+    <p>
+        <label>
+            <InputFile OnChange="@LoadFiles" accept=".png,.jpg,.jpeg,.gif,.pdf" class="form-control" />
+            @*multiple*@
+            @if (fileSp != null && fileSp.FileSpId > 0)
+            {
+            <button @onclick="@(() => DownloadFileFromStream(fileSp?.FileSpId ?? 0))" class="form-control my-1"> Скачать @fileSp?.FileName </button>
+            }
+        </label>
+    </p>
+
+    
+
+    @if (isLoading)
+    {
+        <p>Uploading...</p>
+    }
+    else
+    {
+        if (FullParameters)
+        {
+            <ul>
+                @foreach (var file in loadedFiles)
+                {
+                    <li>
+                        @file.Name
+                        <button @onclick="@(() => DownloadFileFromStream(fileSp.FileSpId))"> Скачать </button>
+                        <ul>
+                            <li>Last modified: @file.LastModified.ToString()</li>
+                            <li>Size (bytes): @file.Size</li>
+                            <li>Content type: @file.ContentType</li>
+                            <li>Path: @path</li>
+                        </ul>
+                    </li>
+                }
+            </ul>
+        }
+    }
+}
+
+@code {
+    #region Parameters
+
+    [Parameter]
+    public string? CurrentUserId { get; set; }
+
+    [Parameter]
+    public int? FileId { get; set; }
+
+    [Parameter]
+    public bool FullParameters { get; set; } = false;
+
+    #endregion
+    // ---
+    #region private fields
+
+    private List<string> ErrorMessages = new();
+
+    private List<IBrowserFile> loadedFiles = new();
+    private long maxFileSize = 1024 * 2000;
+    private int maxAllowedFiles = 1;
+    private bool isLoading;
+    private string AllowedContentType = "image/jpeg";
+    private string path = "";
+
+    FileSp? fileSp;
+
+    #endregion
+    // ---
+    #region protected override
+
+    protected override void OnParametersSet()
+    {
+        if (CurrentUserId == null)
+        {
+            ErrorMessages.Add("UserId in null");
+
+            if(FileId != null && FileId > 0)
+            {
+                fileSp = GetFileSpByIdUseCase.Execute((int)FileId);
+            }
+        }
+    }
+
+    #endregion
+    // ---
+    #region private Methods
+
+    private async Task LoadFiles(InputFileChangeEventArgs e)
+    {
+        isLoading = true;
+        loadedFiles.Clear();
+
+        foreach (var file in e.GetMultipleFiles(maxAllowedFiles))
+        {
+            try
+            {
+                if (maxFileSize < file.Size)
+                {
+                    var errorMessage = $"Размер файла {file.Name} превышает допустимый. MaxSize = {maxFileSize}b";
+                    ErrorMessages.Add(errorMessage);
+                    LoggerInFile.LogError("\t Sp, " + errorMessage + ", " + DateTime.Now.ToLongTimeString());
+                    break;
+                }
+                if (AllowedContentType != file.ContentType)
+                {
+                    var errorMessage = $"Тип файла {file.Name} не соответствует допустимым. {AllowedContentType}";
+                    ErrorMessages.Add(errorMessage);
+                    LoggerInFile.LogError($"\t Sp, " + errorMessage + ", " + DateTime.Now.ToLongTimeString());
+                    break;
+                }
+
+                loadedFiles.Add(file);
+
+                // ToDo: Настроить таблицу соответствия рандомных файлов и загружаемых
+                // ToDo: Проверить, что файл с таким именем не существует.
+                var trustedFileNameForFileStorage = Path.GetRandomFileName();
+                // string filePrefix = "sp_";
+                // string filePostfix = "_sp";
+                // var trustedFileNameForFileStorage = filePrefix + file.Name + filePostfix;
+
+                var _ContentRootPath = Environment.ContentRootPath;
+                var _EnvironmentName = Environment.EnvironmentName;
+
+                // ToDo: Настроить отдельные папки для разных пользователей
+
+                path = Path.Combine(_ContentRootPath, "unsafe_uploads",
+                        trustedFileNameForFileStorage);
+
+                await using FileStream fs = new(path, FileMode.Create);
+                await file.OpenReadStream(maxFileSize).CopyToAsync(fs);
+
+                fileSp = new()
+                    {
+                        FileName = file.Name,
+                        FileNameForFileStorage = trustedFileNameForFileStorage,
+                        FilePath = path,
+                        CurrentUserId = CurrentUserId,
+                        CreationDate = DateTime.Now
+                    };
+
+                fileSp.FileSpId = (int)AddFileSpUseCase.Execute(fileSp);
+
+            }
+            catch (Exception ex)
+            {
+                LoggerInFile.LogError("File: {Filename} Error: {Error}",
+                    file.Name, ex.Message);
+            }
+        }
+
+        isLoading = false;
+    }
+
+    //<button @onclick="DownloadFileFromURL">
+    //    Download File From URL
+    //</button>
+    //private async Task DownloadFileFromURL()
+    //{
+    //    var fileName = "unsafe_uploads/example.jpeg";
+    //    var fileURL = "https://localhost:5001/img/example.jpeg";
+    //    await JS.InvokeVoidAsync("triggerFileDownload", fileName, fileURL);
+    //}
+
+
+    private Stream GetFileStream(string path)
+    {
+        return System.IO.File.OpenRead(path);
+
+        // var randomBinaryData = new byte[50 * 1024];
+        // var fileStream = new MemoryStream(randomBinaryData);
+
+        // return fileStream;
+    }
+
+    private async Task DownloadFileFromStream(int fileId)
+    {
+        if (fileSp != null && fileId > 0)
+        {
+            fileSp = GetFileSpByIdUseCase.Execute(fileId);
+
+            string path = fileSp?.FilePath + fileSp?.FileNameForFileStorage; // @"D:\VisualStudioProjects\Sprauna7\Sprauna7Publish\unsafe_uploads\n4h2siez.fjv";
+            var fileStream = GetFileStream(path);
+
+            var fileName = fileSp?.FileName;
+
+            using var streamRef = new DotNetStreamReference(stream: fileStream);
+
+            await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
+        }
+    }
+
+    #endregion
+}

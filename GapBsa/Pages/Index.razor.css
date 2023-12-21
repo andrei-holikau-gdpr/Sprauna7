@@ -1,0 +1,13 @@
+﻿.process-to-consider {
+    border: solid 2px white;
+    width: 13rem;
+}
+
+    .process-to-consider:hover {
+        border: solid 2px blue;
+    }
+
+.process-to-consider-selected {
+    border: solid 2px blue;
+    width: 13rem;
+}

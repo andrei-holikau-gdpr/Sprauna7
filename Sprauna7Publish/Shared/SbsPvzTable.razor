@@ -1,0 +1,131 @@
+﻿@attribute [Authorize(Policy = "AdminOnly")]
+
+@using Plugins.ShopByShop;
+@using CoreBusiness.ShopByShop.Models
+@using UseCases.ShopByShop.UseCaseInterfaces
+
+@inject IViewPvzsSbsUseCase ViewPvzsSbsUseCase
+@inject IJSRuntime JsRuntime
+
+<div class="div-for-table" id="sbsPvzs">
+    @if (PvzSbss != null && PvzSbss.Count > 0)
+    {   
+        <table id="example" class="display nowrap">
+            <thead>
+                <tr>
+                    <th> gipermall_id </th>
+                    <th> value </th>
+                    <th> hide </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in PvzSbss)
+                {
+                    <tr>
+                        <td> @item.gipermall_id </td>
+                        <td> @item.value </td>
+                        <td> @item.hide </td>
+                    </tr>
+                }
+            </tbody>
+        </table>    
+    } 
+    else
+    {
+        <p class="ListPvzIsNull">Пункты выдачи заказов не найдены</p>
+    }
+</div>
+
+<div style="display=@(() => LogerEnable ? "block" : "none")">
+    <ConsoleLogger @ref="Logger" />
+</div>
+
+@code {
+    #region Private fiels
+
+    [Parameter]
+    public List<PvzItem>? PvzSbss { get; set; } = new();
+
+    [Parameter]
+    public bool Update { get; set; } = false;
+
+    #endregion
+    //---
+    #region Private fields
+
+    [NotNull]
+    private ConsoleLogger? Logger { get; set; }
+    private bool LogerEnable = false;
+
+    private bool InitialiseTableСompleted = false;
+
+    #endregion
+    //---
+    #region Protected Override methods
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        #if DEBUG
+            LogerEnable = true;
+        #endif
+
+        LoadAll();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (Update && PvzSbss != null && PvzSbss.Count > 0)
+            {
+                await JsRuntime.InvokeVoidAsync("InitialiseTable");
+                InitialiseTableСompleted = true;
+                Logger.Log($"InitialiseTable()");
+            }
+        }
+
+        if (Update && PvzSbss != null && PvzSbss.Count > 0)
+        {
+            // await JsRuntime.InvokeVoidAsync("InitialiseTable");
+            Update = false;
+            Logger.Log($"PvzSbss.Count = {PvzSbss.Count}");
+        }
+
+        if (PvzSbss == null) Logger.Log($"PvzSbss == null");
+        else if (PvzSbss.Count == 0) Logger.Log($"PvzSbss.Count == 0");
+    }
+
+    #endregion
+    // ---
+    #region Private methods
+
+    private async void LoadAll()
+    {
+        var templistPvzSbss = await ViewPvzsSbsUseCase.ExecuteAsync();
+        if (templistPvzSbss != null)
+        {
+            PvzSbss = (List<PvzItem>)templistPvzSbss;
+
+            Logger.Log($"LoadAll() PvzSbss.Count = {PvzSbss.Count}");
+
+            StateHasChanged();
+        }
+
+        if (!InitialiseTableСompleted && PvzSbss != null && PvzSbss.Count > 0)
+        {
+            await JsRuntime.InvokeVoidAsync("InitialiseTable");
+            InitialiseTableСompleted = true;
+            Logger.Log($"LoadAll() + InitialiseTable()");
+        }
+    }
+
+    private void UpdateData()
+    {
+        //JsRuntime.InvokeVoidAsync("DataTablesRemove");
+        LoadAll();
+        //JsRuntime.InvokeVoidAsync("InitialiseTable");
+    }
+    #endregion
+}

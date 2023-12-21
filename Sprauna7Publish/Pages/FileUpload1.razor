@@ -1,0 +1,41 @@
+﻿@page "/file-upload-1"
+@attribute [Authorize()]
+
+@using Microsoft.AspNetCore.Identity;
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<FileUplaodComponent CurrentUserId="@currentUserId" FullParameters="true"/>
+
+@code{
+    #region Inject
+
+    [Inject]
+    UserManager<ApplicationUser>? userManager { get; set; }
+
+    #endregion
+    // ---
+    #region Private fiels
+
+    private string? currentUserId; 
+
+    #endregion
+    // ---
+    #region override methods
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+#pragma warning disable CS8602 //todo: #pragma warning disable CS8602
+
+        if (user.Identity.IsAuthenticated)
+        {
+            var currentUser = await userManager.GetUserAsync(user);
+            currentUserId = userManager.GetUserId(user);
+        }
+#pragma warning restore CS8602
+    }
+
+    #endregion
+}

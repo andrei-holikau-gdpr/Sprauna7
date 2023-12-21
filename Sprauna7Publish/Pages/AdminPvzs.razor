@@ -1,0 +1,245 @@
+﻿@page "/AdminPvzs"
+@attribute [Authorize(Policy = "AdminOnly")]
+
+@using Plugins.ShopByShop
+@using System.Text.Json
+@using CoreBusiness.ShopByShop.Models
+
+@inject IJSRuntime jsRuntime
+@inject IAddPvzUseCase AddPvzUseCase
+@inject IViewDepartmentDpsUseCase ViewDepartmentDpsUseCase
+
+<style>
+    .items-text {
+        overflow: hidden;
+        position: relative;
+        height: 62px;
+    }
+
+    .items-text:after {
+        content: "";
+        text-align: right;
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        height: 1.2em;
+        background: linear-gradient(to bottom, rgba(255, 255, 255, 0), white 100%);
+        pointer-events: none;
+    }
+</style>
+
+<div class="container ">
+    <div class="row">
+
+        <div class="col-sm-12 col-lg-12 p-1">
+            <div class="form-group">
+                <h1>Администрирование ПВП</h1>
+            </div>
+        </div>
+
+        <div class="col-sm-12 col-lg-4 p-1">
+            <div class="form-group">
+                <Button @onclick="OnClickGetPvzDb" class="m-3">Загрузить пункты выдачи из базы</Button>
+            </div>
+        </div>
+        
+        <div class="col-sm-12 col-lg-4 p-1">
+            <div class="form-group">
+                <Button @onclick="OnClickGetPvzSbs" class="m-3">Загрузить Pvz из базы белки </Button>
+            </div>
+        </div>  
+        
+        <div class="col-sm-12 col-lg-4 p-1">
+            <div class="form-group">
+                <Button @onclick="OnClickClear" class="m-3">Очистить таблицу</Button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+    <NavLink class="nav-link" href="DepartmentDeliveryParcels">
+        <Tooltip Placement="Placement.Top" Title="Пункты выдачи посылок">
+            <span class="bi bi-building" aria-hidden="true"></span>
+            <div class="sp-navlink-text">
+                ПВП-Sprauna
+            </div>
+        </Tooltip>
+    </NavLink>
+<br />
+<br />
+
+@if (Loader)
+{
+    <div @onclick="OnClickLoader">
+        <LoaderMini></LoaderMini>
+    </div>
+}
+else
+{    
+    <TablePvz pvzs="@pvzs" Update="@Update" />
+    <br/>
+    <Button @onclick="OnClickSavePvzToDbAsync">Сохранить в БД </Button> @(SavedCompleted ? "Сохранение успешно завершено" : "")
+}
+
+<div class="response">
+@if (!string.IsNullOrEmpty(@jsonResponse))
+{
+    <hr/>
+    <div class="items">
+        <div class="items-row">
+            <h3>Ответ от белки (jsonResponse):</h3>
+            <div class="items-text">
+                @jsonResponse
+            </div>
+        </div>
+    </div>
+}
+</div>
+
+
+<div class="ToDoList">
+    <hr />
+    <ul>
+        <li>
+           Настроить сохранение ПВП в БД *
+        </li>
+    </ul>
+</div>
+
+
+<div class="TaskCompleted">
+    <hr/>
+    <ul>
+        <li>
+            Разобраться почему работает только со второго нажатия
+        </li>
+    </ul>
+</div>
+
+@code {
+
+    #region Private fiels
+
+    public bool Loader = false;
+    public bool Update = false;
+    //private int? DisplayLoader = null;
+
+    private List<PvzItem> pvzs = new();
+
+    private string UrlPvz = @"https://devprofile.shopbyshop.by/api/v1/pvz";
+    private string accessToken = "1|27DetjHTbItGQJZoJUTfSZnnBo9DTmlWxBBQHvh5";
+    private string jsonResponse = "";
+
+    public bool SavedCompleted = false;
+
+    #endregion
+    //---
+    #region Private methods / Override methods
+
+    #endregion
+    // ---
+    #region private methods
+
+    private void OnClickLoader()
+    {
+        //DisplayLoader = 1;
+        StateHasChanged();
+    }
+
+    private async void OnClickGetPvzSbs()
+    {
+        await jsRuntime.InvokeVoidAsync("DataTablesRemove");
+        Loader = true;
+
+        pvzs =  await GetPvzSbs();
+        Update = true;
+        Loader = false;
+
+        StateHasChanged();
+    }
+
+    public void OnClickGetPvzDb()
+    {
+        IEnumerable<DepartmentDeliveryParcel> departments = ViewDepartmentDpsUseCase.Execute();
+        foreach (var item in departments)
+        {
+            pvzs.Add(new() {
+                    gipermall_id = item.GipermallId,
+                    value = item.Address,
+                    hide = item.Hide
+            });
+        }
+        Update = true;
+    }
+
+    public async Task<List<PvzItem>> GetPvzSbs()
+    {
+        await jsRuntime.InvokeVoidAsync("DataTablesRemove");
+        PvzsJson pvzsJson = new();
+
+        using (var client = new HttpClient())
+        {
+            //client.DefaultRequestHeaders.Add("Authorization", "Bearer " + accessToken);
+
+            if (!string.IsNullOrWhiteSpace(accessToken))
+            {
+                client.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+
+                jsonResponse = await client.GetStringAsync(UrlPvz);
+                // Parse JSON response.
+                // https://metanit.com/sharp/tutorial/6.5.php
+
+                if (!string.IsNullOrWhiteSpace(jsonResponse))
+                {
+#pragma warning disable CS8600
+                    //todo: #pragma warning disable CS8600
+
+                    pvzsJson = JsonSerializer.Deserialize<PvzsJson>(jsonResponse);
+                    //pvzs = restoredPerson?.data?.pvz;
+#pragma warning restore CS8600
+                }
+            }
+        }
+        if (pvzsJson == null
+            || pvzsJson.data == null
+            || pvzsJson.data.pvz == null)
+        {
+            return new List<PvzItem>();
+        }
+
+        return pvzsJson.data.pvz;
+    }
+
+    private async void OnClickSavePvzToDbAsync()
+    {
+        await jsRuntime.InvokeVoidAsync("DataTablesRemove");
+        foreach(var item in pvzs)
+        {
+            var department = new DepartmentDeliveryParcel()
+                {
+                    Address = item.value,
+                    AddressForMap = item.value,
+                    GipermallId = item.gipermall_id,
+                    Hide = item.hide
+                };
+            AddPvzUseCase.Execute(department);
+        }
+
+        SavedCompleted = true;
+        // await jsRuntime.InvokeVoidAsync("InitialiseTable");
+        Update = false;        
+        //await jsRuntime.InvokeVoidAsync("jsAlert", "Данная функция находится в разработке");
+    }
+
+    private async void OnClickClear(){
+        await jsRuntime.InvokeVoidAsync("DataTablesRemove");
+        pvzs.Clear();
+        Update = false; 
+        StateHasChanged();
+    }
+
+    #endregion
+}

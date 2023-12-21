@@ -1,0 +1,173 @@
+﻿@page "/"
+
+@using Microsoft.AspNetCore.Components.Web
+@inject IJSRuntime jsRuntime
+@*@using Microsoft.JSInterop*@
+@inject NavigationManager NavigationManager
+
+
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.Extensions.Logging;
+@inject ILogger<Index> LoggerInFile
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@attribute [AllowAnonymous]
+
+
+
+@if (!DisplayLoader.HasValue)
+{
+    @*<button class="btn btn-primary" @onclick="OnClickLoader">OnClickLoader</button>*@
+    <div @onclick="OnClickLoader">
+        <LoaderMini></LoaderMini>
+    </div>
+}
+else
+{
+    <PageTitle>Index</PageTitle>
+
+
+    <AuthorizeView>
+        
+        <Authorized>
+            <PurchasesComponent></PurchasesComponent>
+        </Authorized>
+        <NotAuthorized>
+            <div id="SpNotAuthorized">
+                <LoaderBig></LoaderBig>
+            </div>
+        </NotAuthorized>
+    </AuthorizeView>
+
+
+    @*<PackagesComponent/>*@
+
+    DisplayLoader = 1;
+} 
+
+<ConsoleLoggerSp Owner="IndexPage" LogerEnable="@LogerEnable">
+    <ConsoleLogger @ref="Logger" />
+</ConsoleLoggerSp>
+
+@code {
+
+    #region Private Fields
+
+    [NotNull]
+    private ConsoleLogger? Logger { get; set; }
+    private bool LogerEnable = true;
+
+    private bool load = false;
+
+    // private string? userAuthenticated;
+
+    private int? DisplayLoader = null;
+
+    private static string LeftString => "Tooltip on left";
+    private static string RightString => "Tooltip on right";
+
+    #endregion
+    // --
+    #region Parameters
+
+    [CascadingParameter] 
+    protected Task<AuthenticationState>? AuthStat { get; set; }
+
+    #endregion
+    // ---
+    #region Private Methods
+    private async Task Alert()
+    {
+        await jsRuntime.InvokeVoidAsync("jsAlert", "Alert");
+        await jsRuntime.InvokeVoidAsync("jsCheckSpNotAuthorized", "SpNotAuthorized");
+    }
+    #endregion
+    // ---
+    #region Protected Override Methods
+
+    protected async override Task OnInitializedAsync()
+    {
+        base.OnInitialized();
+
+        LoggerInFile.LogInformation($"\t SpLog, Index.OnInitializedAsync.Run  Time:{DateTime.Now.ToLongTimeString()}");
+
+        load = true;
+
+        //if (AuthStat != null)
+        //{
+        //    var user = (AuthStat)?.User; //await AuthStat).User;
+        //    if (user != null)
+        //    {
+        //        if (user.Identity != null)
+        //        {
+        //            if (!user.Identity.IsAuthenticated)
+        //            {
+        //                NavigationManager.NavigateTo($"Identity/Account/Login?");
+        //            }
+        //            else
+        //            {
+        //                // NavigationManager.NavigateTo($"/purchases");
+        //            }
+        //        }
+        //        else
+        //        {
+        //            throw new Exception("user.Identity == null");
+        //        }
+        //    } else
+        //    {
+        //        throw new Exception("user == null");
+        //    }
+        //} else
+        //{
+        //    throw new Exception("AuthStat == null");
+        //}
+
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+#pragma warning disable CS8602
+        //todo: #pragma warning disable CS8602
+
+        if (!user.Identity.IsAuthenticated)
+        {
+            NavigationManager.NavigateTo($"/Identity/Account/Login?");
+        } else
+        {
+            // NavigationManager.NavigateTo($"/TestConfiguration");
+            // NavigationManager.NavigateTo($"/TestMailKit");
+            // NavigationManager.NavigateTo($"/file-upload-1");
+        }
+
+#pragma warning restore CS8602
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender) OnClickDisableLoader();
+        
+        if (load) load = false;
+
+        base.OnAfterRender(firstRender);
+    }
+
+    #endregion
+    // ---
+    #region Private Methods / Events
+
+    private void OnClickLoader()
+    {
+        DisplayLoader = 1;
+        StateHasChanged();
+    }
+
+    private void OnClickDisableLoader()
+    {
+        if (DisplayLoader == null)
+        {
+            DisplayLoader = 1;
+            StateHasChanged();
+        }
+    }
+
+    #endregion
+}

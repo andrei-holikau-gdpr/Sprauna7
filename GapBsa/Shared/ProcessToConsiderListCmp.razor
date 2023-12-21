@@ -1,0 +1,55 @@
+﻿@using Gap.CoreBusiness;
+
+@*ProcessToConsiderListCmp*@
+
+@if (ProcessToConsiderList?.Count() == 0)
+{
+    <b>Процессы не найдены</b>
+} else {
+    <div class="container">
+        <div class="row row-cols-auto">
+            @foreach (var process in ProcessToConsiderList)
+            {
+                <div class="col p-1">
+                    @if (process == SelecetedProcessToConsider)
+                    {
+                        <ProcessToConsiderCmp 
+                            ProcessToConsiderParameter="process"
+                            OnClickProcessToConsiderCallback="OnClickProcessToConsider" 
+                            Seleceted="true" />                    
+                    } else {
+                        <ProcessToConsiderCmp 
+                            ProcessToConsiderParameter="process"
+                            OnClickProcessToConsiderCallback="OnClickProcessToConsider" />
+                    }
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    #region Parameters and EventCallbacks
+    [Parameter]
+    public List<ProcessToConsider> ProcessToConsiderList { get; set; } = new();
+
+    [Parameter]
+    public EventCallback<ProcessToConsider> OnClickProcessToConsiderCallback { get; set; }
+    #endregion
+    // ---
+    #region private Fields
+
+    private ProcessToConsider? SelecetedProcessToConsider = null;
+
+    #endregion
+    // ---
+    #region Private methods
+
+    private void OnClickProcessToConsider(ProcessToConsider processToConsider)
+    {
+        SelecetedProcessToConsider = processToConsider;
+        ShouldRender();
+    }
+
+    #endregion
+}

@@ -1,0 +1,194 @@
+﻿@using Lixiang.CoreBusiness;
+@using System.Text.Json;
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-9 hidden-xs-down">
+            <MainCarousel CarOptionForComponent="CarOptionForComponent" />
+        </div>
+
+        <div class="col-lg-3 col-sm-12">
+            <div class="li-col-2 li-option-left">
+
+                @*<div class="header-col-right-price"></div>*@
+
+                
+                <CarModelSelect Title="Модель" 
+                                CarModels="CarModels" 
+                                OnClickCarModelCallback="OnClickCarModel" />
+
+                <CarColorOptionsCmp Title="Цвет экстерьера" DivId="Fasad" SelectedCar="SelectedCar" 
+                                    CarColorOptions="CarFasadColorOptions"
+                                    CarOptionForComponent="SelectedCar.carFasad"
+                                    OnClickCarFasadCallback="OnClickCarFasad" />
+
+                <CarColorOptionsCmp Title="Цвет интерьера" DivId="Interior" SelectedCar="SelectedCar" 
+                                    CarColorOptions="CarInteriorColorOptions"
+                                    CarOptionForComponent="SelectedCar.carInterior"
+                                    OnClickCarFasadCallback="OnClickCarInterior" />
+
+                <CarColorOptionsCmp Title="Колёсные диски" DivId="WheelDisks" SelectedCar="SelectedCar" 
+                                    CarColorOptions="CarWheelDisksOptions"
+                                    CarOptionForComponent="SelectedCar.carWheelDisk"
+                                    OnClickCarFasadCallback="OnClickCarWheelDisks" />
+                <br/>
+
+                <OptionalEquipmentCmp Title="Дополнительное оборудование"
+                                      OptionalEquipments="OptionalEquipments"
+                                      OnClickCarModelCallback="OnClickAddSimpleOption" 
+                                      SelectedCar="SelectedCar" />
+                
+                
+                <hr/>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="floatingInput" >
+                    <label for="floatingInput">Телефон (+7 920 ... ... ...)</label>
+                </div>
+
+                <div class="footer-price">
+                    <FooterPrice PriceCar="PriceCar" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ConfiguratorComCss />
+
+@code {
+    #region Parameters
+    [Parameter]
+    public string FileName { get; set; } = "jsonLi7.json";
+    #endregion
+    // ---
+    #region private fields
+
+    private Car SelectedCar = new();
+    private double PriceCar;
+
+    public List<CarModel> CarModels { get; set; } = new();
+    public List<CarColorOption> CarFasadColorOptions { get; set; } = new();
+    public List<CarColorOption> CarInteriorColorOptions { get; set; } = new();
+    public List<CarColorOption> CarWheelDisksOptions { get; set; } = new();
+    public List<SimpleOption> OptionalEquipments { get; set; } = new();
+
+    public CarColorOption CarOptionForComponent { get; set; } = new();
+    #endregion
+    // ---
+    #region public methods
+
+    public void OnClickCarModel(CarModel carModel)
+    {
+        SelectedCar.carModel = carModel;
+        // CarOptionForComponent = carFasad; // ---
+        PriceCar = SelectedCar.GetFullPrice();
+        StateHasChanged();
+    }
+
+    public void OnClickCarFasad(CarColorOption carFasad)
+    {
+        SelectedCar.carFasad = carFasad;
+        CarOptionForComponent = carFasad; // ---
+        PriceCar = SelectedCar.GetFullPrice();
+        StateHasChanged();
+    }
+
+    public void OnClickCarInterior(CarColorOption carInterior)
+    {
+        SelectedCar.carInterior = carInterior;
+        CarOptionForComponent = carInterior; // ---
+        PriceCar = SelectedCar.GetFullPrice();
+        StateHasChanged();
+    }
+
+    public void OnClickCarWheelDisks(CarColorOption carWheelDisk)
+    {
+        SelectedCar.carWheelDisk = carWheelDisk;
+        CarOptionForComponent = carWheelDisk; // ---
+        PriceCar = SelectedCar.GetFullPrice();
+        StateHasChanged();
+    }
+
+    public void OnClickAddSimpleOption(SimpleOption simpleOption)
+    {
+        if (SelectedCar.SimpleOptions.Count == 0)
+        {
+            SelectedCar.SimpleOptions.Add(simpleOption);
+        }
+        else
+        {
+            SelectedCar.SimpleOptions.Clear();
+        }
+        PriceCar = SelectedCar.GetFullPrice();
+        StateHasChanged();
+    }
+
+    #endregion
+    //---
+    #region Protected Override methods
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        LoadAll();       
+    }
+
+    #endregion
+    // ---
+    #region private methods
+    private void LoadAll()
+    {
+        OnClickLoadDataFromJsonAsync();
+
+        //LoaderOptions loaderOptions = new();
+
+        //CarModels = loaderOptions.LoadCarModels();
+        //CarFasadColorOptions = loaderOptions.LoadCarFasads();
+        //CarInteriorColorOptions = loaderOptions.LoadCarInteriors();
+        //CarWheelDisksOptions = loaderOptions.LoadCarWheelDisks();
+
+        // LiShouldRender();
+    }
+
+    private void OnClickLoadDataFromJsonAsync()
+    {
+        CarModels = new();
+        CarFasadColorOptions = new();
+        CarInteriorColorOptions = new();
+        CarWheelDisksOptions = new();
+        OptionalEquipments = new();
+
+        LoadDataFromJsonAsync();
+        // ShouldRender();        
+    }
+
+    private async Task LoadDataFromJsonAsync()
+    {
+        using (FileStream fs = new FileStream(FileName, FileMode.OpenOrCreate))
+        {
+            CarColorOptionList? carJson = await JsonSerializer.DeserializeAsync<CarColorOptionList>(fs);
+            //CarColorOptionList carJson = new();
+
+            CarModels = carJson.CarModels;
+            CarFasadColorOptions = carJson.CarFasadColorOptions;
+            CarInteriorColorOptions = carJson.CarInteriorColorOptions;
+            CarWheelDisksOptions = carJson.CarWheelDisksOptions;
+            OptionalEquipments = carJson.OptionalEquipments;
+        }
+
+        LiShouldRender();
+    }
+
+    private void LiShouldRender()
+    {
+        SelectedCar.carFasad = CarFasadColorOptions.First<CarColorOption>();
+        SelectedCar.carInterior = CarInteriorColorOptions.First<CarColorOption>();
+        SelectedCar.carWheelDisk = CarWheelDisksOptions.First<CarColorOption>();
+
+        CarOptionForComponent = SelectedCar.carFasad;
+
+        // ShouldRender();
+        StateHasChanged();
+    }
+    #endregion
+}

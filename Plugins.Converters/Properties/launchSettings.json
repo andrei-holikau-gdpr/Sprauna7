@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Plugins.Converters": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:13025;http://localhost:13026"
+    }
+  }
+}

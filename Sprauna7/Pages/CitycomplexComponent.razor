@@ -1,0 +1,435 @@
+﻿@page "/citycomplex"
+
+
+<div class="cc-body" >
+    <div class="container ">
+        <div class="row">
+            
+            @* Выбор услуг *@
+            <div class="col-sm-12 col-lg-3 p-1 cc-bg-white">
+                <div class="card">
+                    1. Выбор услуг
+                </div>
+            </div>
+
+            @* Адрес и контактные данные *@
+            <div class="col-sm-12 col-lg-3 p-1 cc-bg-white">
+                <div class="card">
+                    2.Адрес и контактные данные
+                </div>
+            </div>
+
+            @* Выбор способа оплаты *@
+            <div class="col-sm-12 col-lg-3 p-1 cc-bg-white">
+                <div class="card">
+                    3. Выбор способа оплаты
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="container ">
+        <div class="row">
+
+            <div class="col-sm-12 col-lg-9 p-1">
+
+                <div class="container ">
+                    <div class="row">
+
+                        <div class="col-sm-12 col-lg-12 p-1">
+                            <h1 class="cc-h1">Выберите вид уборки</h1>
+                        </div>
+
+                        <div class="col-sm-12 col-lg-4 p-1"
+                             @onclick=@(() => OnClickTypeService(@TYPE_SERVICE_Maintenance_cleaning))>
+                            <div class="card cc-card cc-center">
+                                <img src="/img/1.svg" />
+                                <p>@TYPE_SERVICE_Maintenance_cleaning</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-lg-4 p-1"
+                             @onclick=@(() => OnClickTypeService(@TYPE_SERVICE_Spring_cleaning))>
+                            <div class="card cc-card cc-center">
+                                <img src="/img/2.svg" />
+                                <p>@TYPE_SERVICE_Spring_cleaning</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-lg-4 p-1"
+                             @onclick=@(() => OnClickTypeService(@TYPE_SERVICE_Cleaning_after_renovation))>
+                            <div class="card cc-card cc-center">
+                                <img src="/img/3.svg" />
+                                <p>@TYPE_SERVICE_Cleaning_after_renovation</p>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-12 col-lg-4 p-1"
+                             @onclick=@(() => OnClickLocation(LOCATION_Flat_apartment))>
+                            <div class="card cc-card cc-center">
+                                <p>@LOCATION_Flat
+                                    <img src="/img/4.svg" class="cc-padding-10" />
+                                </p>              
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-lg-4 p-1"
+                             @onclick=@(() => OnClickLocation(LOCATION_Office_cleaning))>
+                            <div class="card cc-card cc-center">
+
+                                <p>@LOCATION_Office 
+                                    <img src="/img/5.svg" class="cc-padding-10" />
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-lg-4 p-1"
+                             @onclick=@(() => OnClickLocation(LOCATION_Private_house_cleaning))>
+                            <div class="card cc-card cc-center">
+                                <p>@LOCATION_Private_hause
+                                    <img src="/img/6.svg" class="cc-padding-10" />
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-12 col-lg-4 p-1" >
+                            <div class="card cc-card cc-center">
+                                <p>
+                                    <img src="/img/minus.svg" class="cc-minus" @onclick=@(() => OnClickDecreaseRoom()) />
+                                        @service.Room комната
+                                    <img src="/img/plus.svg" class="cc-plus" @onclick=@(() => OnClickIncreaseRoom()) />
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-lg-4 p-1" >
+                            <div class="card cc-card cc-center">
+                                <p>
+                                    <img src="/img/minus.svg" class="cc-minus" @onclick=@(() => OnClickDecreaseBathroom()) />
+                                        @service.Bathroom санузел
+                                    <img src="/img/plus.svg" class="cc-plus" @onclick=@(() => OnClickIncreaseBathroom()) />
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-12 col-lg-12 p-1">
+                            <h2>Выберите дату и время уборки</h2>
+                        </div>
+
+
+                        <div class="col-sm-12 col-lg-12 p-1">
+                            <hr/>
+                        </div>
+
+
+                        <div class="col-sm-12 col-lg-12 p-1">
+                            <h2>Дополнительные услуги</h2>
+                        </div>
+
+                        @foreach (var item in ExtraServices){
+                            <div class="col-sm-12 col-lg-3 p-1 ExtraServices" >
+                                <div class="card cc-center @item.CssForCard">
+                                    <img class="icon" src="/img/@item.Icon" />
+                                    <p class="count-es">
+                                        <img src="/img/minus.svg" class="cc-minus" @onclick=@(() => OnClickExtraServiceDecrease(item)) />
+                                        @item.CountES.ToString()
+                                        <img src="/img/plus.svg" class="cc-plus" @onclick=@(() => OnClickExtraServiceIncrease(item)) />
+                                    </p>
+                                    <p class="cc-h-48 cc-m-0 cc-text-center">@item.Title</p>
+                                    <p class="cc-m-0 cc-text-center">@String.Format("{0:0.00}", item.Price) BYN</p>
+                                </div>
+                            </div>
+                        }
+
+                        <div class="col-sm-12 col-lg-12 p-1">
+                            <h2>Мойка окон</h2>
+                        </div>
+
+                        @foreach (var item in WindowWashing)
+                        {
+                            <div class="col-sm-12 col-lg-3 p-1"
+                             @onclick=@(() => OnClickExtraService(item))>
+                                <div class="card cc-card @item.CssForCard">
+                                    <img src="/img/@item.Icon" />
+                                    <p class="cc-h-48 cc-text-center">@item.Title</p>
+                                    <p class="cc-h-48 cc-text-center">@String.Format("{0:0.00}", item.Price) BYN</p>
+                                </div>
+                            </div>
+                        }
+
+                    </div> @*row*@
+                </div> @*container*@
+
+            </div>
+
+            <div class="col-sm-12 col-lg-3 p-1 cc-results">
+                <div class="card cc-card">
+                    <h2 class="cc-h2">@service.Location </h2>
+
+                    <ul>
+                        <li>@service.TypeService</li>
+                    </ul>
+                    <hr />
+                    <div>
+                        <span class="cc-date">10 мая</span> <span class="cc-time">9:00</span>
+                        <p> Примерное время работы 2 часа </p>
+                    </div>
+                    <hr />
+                    <b> К оплате</b>
+                    <span class="cc-price">@service.Price BYN</span>
+
+                    <button class="cc-button">Заказать</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+
+@code {
+
+    private class ExtraService
+    {
+        private int countES = 0;
+
+        public string Title { get; set; } = "";
+        public double Price { get; set; } = 0;
+        public string Icon { get; set; } = "";
+        public int CountES { 
+            get
+            {
+                return countES;
+            }
+            set
+            {
+                if (value>=0 && value<100)
+                    countES = value;
+            }
+        }
+
+        public string CssForCard {
+            get
+            {
+                if ( CountES > 0 )
+                    return "cc-card-enable";
+                else 
+                    return "cc-card";
+            } 
+        }
+    }
+
+    private class CityComplexService
+    {
+        public string TypeService { get; set; } = "";
+        public string Location { get; set; } = "Уборка";
+
+        public int Room { get; set; } = 1;
+        public int Bathroom { get; set; } = 1;
+
+        //public ExtraService ExtraService { get; set; }
+        //    = new ExtraService()
+        //        {
+        //            Title = "",
+        //            Price = 0
+        //        };
+
+        public double Price { get; set; } = 0;
+
+        public List<ExtraService> ExtraServices = new() { };
+    }
+
+    #region
+
+    private const string LOCATION_Flat = "Квартира";
+    private const string LOCATION_Office = "Офис";
+    private const string LOCATION_Private_hause = "Частный дом";
+
+    private const string LOCATION_Flat_apartment = "Уборка квартиры";
+    private const string LOCATION_Office_cleaning = "Уборка офиса";
+    private const string LOCATION_Private_house_cleaning = "Уборка частного дома";
+
+    private const string TYPE_SERVICE_Maintenance_cleaning = "Поддерживающая уборка";
+    private const string TYPE_SERVICE_Spring_cleaning = "Генеральная уборка";
+    private const string TYPE_SERVICE_Cleaning_after_renovation = "Уборка после ремонта";
+
+    private List<ExtraService> ExtraServices = new()
+    {
+        new ExtraService() { Title ="Мытье окон (постворочно)", Price = 10, Icon="ex1.svg"},
+            new ExtraService() { Title ="Мойка кухонного гарнитура внутри", Price = 40, Icon="ex2.svg"},
+            new ExtraService() { Title ="Мойка холодильника", Price = 30, Icon="ex3.svg"},
+            new ExtraService() { Title ="Мойка духовки, гриля", Price = 30, Icon="ex4.svg"},
+
+            new ExtraService() { Title ="Мойка микроволновки", Price = 17, Icon="ex5.svg"},
+            new ExtraService() { Title ="Мойка чайника", Price = 5, Icon="ex6.svg"},
+            new ExtraService() { Title ="Мойка посуды", Price = 25, Icon="ex7.svg"},
+            new ExtraService() { Title ="Очистка вытяжки", Price = 20, Icon="ex8.svg"},
+
+            new ExtraService() { Title ="Уборка гардероба", Price = 30, Icon="ex9.svg"},
+            new ExtraService() { Title ="Стирка белья", Price = 15, Icon="ex10.svg"},
+        new ExtraService() { Title ="Мойка балконной двери", Price = 10, Icon="ex11.svg"},
+            new ExtraService() { Title ="Уборка на балконе", Price = 65, Icon="ex12.svg"},
+
+        new ExtraService() { Title ="Мойка доп.санузла", Price = 10, Icon="ex13.svg"},
+            new ExtraService() { Title ="Вынос мусора", Price = 100, Icon="ex14.svg"},
+            new ExtraService() { Title ="Вывоз мусора", Price = 10, Icon="ex15.svg"},
+        new ExtraService() { Title ="Уборка территории", Price = 10, Icon="ex16.svg"},
+
+        new ExtraService() { Title ="Забрать и привезти ключ", Price = 10, Icon="ex17.svg"}
+    };
+
+    private List<ExtraService> WindowWashing = new ()
+    {
+            new ExtraService() { Title ="Одностворчатое", Price = 13, Icon="ex1.svg"},
+            new ExtraService() { Title ="2-х створчатое", Price = 24, Icon="ex1.svg"},
+            new ExtraService() { Title ="3-х створчатое", Price = 36, Icon="ex1.svg"},
+        new ExtraService() { Title ="4-х створчатое", Price = 48, Icon="ex1.svg"},
+
+        new ExtraService() { Title ="Одностворчатое с фрамугой", Price = 10, Icon="ex1.svg"},
+        new ExtraService() { Title ="2-х створчатое с фрамугой", Price = 10, Icon="ex1.svg"},
+        new ExtraService() { Title ="3-х створчатое с фрамугой", Price = 10, Icon="ex1.svg"},
+        new ExtraService() { Title ="Дверь с фрамугой", Price = 10, Icon="ex1.svg"},
+
+            new ExtraService() { Title ="Дверь со створкой", Price = 27, Icon="ex1.svg"},
+        new ExtraService() { Title ="Дверь с двумя створками", Price = 10, Icon="ex1.svg"},
+            new ExtraService() { Title ="Панорамное окно", Price = 10, Icon="ex1.svg"},
+        new ExtraService() { Title ="Панорамное окно SOLO", Price = 10, Icon="ex1.svg"}
+    };
+
+    #endregion
+
+    private CityComplexService service;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        service = new CityComplexService();
+
+        foreach(var item in ExtraServices)
+        {
+            service.ExtraServices.Add(item);
+        }
+    }
+
+    private void OnClickTypeService(string typeService)
+    {
+        service.TypeService = typeService;
+        CalculateTheCost();
+    }
+
+    private void OnClickLocation(string location)
+    {
+        service.Location = location;
+        CalculateTheCost();
+    }
+
+    private void OnClickExtraService(ExtraService extraService)
+    {
+        //extraService.Enable = !extraService.Enable;
+        //if (extraService.Enable)
+        //{
+        //    service.ExtraServices.Add(extraService);
+        //}
+        //else
+        //{
+        //    service.ExtraServices.Remove(extraService);
+        //}
+
+        CalculateTheCost();
+    }
+
+    private void OnClickIncreaseRoom()
+    {
+        if (service.Room < 3)
+            service.Room += 1;
+        CalculateTheCost();
+    }
+
+    private void OnClickDecreaseRoom()
+    {
+        if (service.Room > 1)
+            service.Room -= 1;
+        CalculateTheCost();
+    }
+
+    private void OnClickIncreaseBathroom()
+    {
+        if (service.Bathroom < 3)
+            service.Bathroom += 1;
+        CalculateTheCost();
+    }
+
+    private void OnClickDecreaseBathroom()
+    {
+        if (service.Bathroom > 1)
+            service.Bathroom -= 1;
+        CalculateTheCost();
+    }
+
+    private void CalculateTheCost()
+    {
+        switch (service.Location)
+        {
+            case LOCATION_Flat_apartment:
+                {
+                    switch (service.TypeService)
+                    {
+                        case TYPE_SERVICE_Maintenance_cleaning:
+                            {
+                                switch (service.Room)
+                                {
+                                    case 1: service.Price = 70; break;
+                                    case 2: service.Price = 85; break;
+                                    case 3: service.Price = 115; break;
+                                    default: service.Price = 0; break;
+                                }                               
+                                break;
+                            }
+                        case TYPE_SERVICE_Spring_cleaning:
+                            {
+                                switch (service.Room)
+                                {
+                                    case 1: service.Price = 190; break;
+                                    case 2: service.Price = 230; break;
+                                    case 3: service.Price = 290; break;
+                                    default: service.Price = 0; break;
+                                }
+                                break;
+                            }
+                        case TYPE_SERVICE_Cleaning_after_renovation:
+                            {
+                                switch (service.Room)
+                                {
+                                    case 1: service.Price = 270; break;
+                                    case 2: service.Price = 310; break;
+                                    case 3: service.Price = 350; break;
+                                    default: service.Price = 0; break;
+                                }
+                                break;
+                            }
+                    }
+                    break;
+                }
+            case LOCATION_Office_cleaning:          { service.Price = 0; break; }
+            case LOCATION_Private_house_cleaning:   { service.Price = 0; break; }
+            default:                                { service.Price = 0; break; }
+        }
+
+        foreach (var item in service.ExtraServices)
+        {
+            service.Price += item.Price * item.CountES;
+        }        
+    }
+
+    private void OnClickExtraServiceDecrease(ExtraService extraService)
+    {
+        service.ExtraServices.Find(e => e.Title == extraService.Title).CountES--;
+
+        CalculateTheCost();
+    }
+
+    private void OnClickExtraServiceIncrease(ExtraService extraService)
+    {
+        service.ExtraServices.Find(e => e.Title == extraService.Title).CountES++;
+
+        CalculateTheCost();
+    }
+}

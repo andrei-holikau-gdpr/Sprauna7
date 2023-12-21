@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="jsonLi7.json" />
+    <Content Remove="jsonLi8.json" />
+    <Content Remove="jsonLi9.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="jsonLi7.json" />
+    <None Include="jsonLi8.json" />
+    <None Include="jsonLi9.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Lixiang.CoreBusiness\Lixiang.CoreBusiness.csproj" />
+  </ItemGroup>
+
+</Project>

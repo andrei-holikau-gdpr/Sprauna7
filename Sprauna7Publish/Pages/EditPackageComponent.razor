@@ -1,0 +1,209 @@
+﻿@page "/EditPackage/{PackageId}"
+@using Plugins.Converters;
+@using Plugins.Currencies;
+@using Plugins.ExpressPay;
+@using UseCasesSp.UseCaseInterfaces;
+
+@inject NavigationManager NavigationManager
+
+@inject IEditPackageUseCase EditPackageUseCase
+@inject IGetPackageByIdUseCase GetPackageByIdUseCase
+@inject IViewPurchasesUseCase ViewPurchasesUseCase
+@inject IGetPurchasesByPackegeIdUseCase GetPurchasesByPackegeIdUseCase
+@inject IViewCostOfDeliveriesUseCase ViewCostOfDeliveriesUseCase
+
+<h3>Edit Package </h3>
+
+@if (package != null)
+{
+    <EditForm Model="package" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator></DataAnnotationsValidator>
+        <ValidationSummary></ValidationSummary>
+
+        <div class="col-sm-12 col-lg-5 p-1" style="display:none;">
+            <div class="form-group">
+                <label for="PackageId">PackageId</label>
+                <InputNumber id="PackageId" @bind-Value="package.PackageId" class="form-control"></InputNumber>
+            </div>
+        </div>
+
+        <div class="form-group response" style="display:none;">
+            <label for="CurrentUserId">CurrentUserId</label>
+            <InputText id="CurrentUserId" @bind-Value="package.CurrentUserId" class="form-control"></InputText>
+        </div>
+
+        <div class="col-sm-12 col-lg-5 p-1">
+            <div class="form-group">
+                <label for="Weight">Weight</label>
+                <InputNumber id="Weight" @bind-Value:format="F2"
+                    @bind-Value="package.Weight" class="form-control"></InputNumber>
+            </div>
+        </div>
+
+        <div class="col-sm-12 col-lg-3 p-1">
+            <div class="form-group">
+                <label for="Statuse">Статус</label>
+                <InputSelect id="Status" @bind-Value="package.Status" class="form-select">
+                    @foreach (var item in Enum.GetValues(typeof(StatusesPackage)))
+                    {
+                        if (item.ToString() == package.Status.ToString()){
+                            <option value="@item" selected>@item</option>
+                        } else {
+                            <option value="@item">@item</option>
+                        }
+                    }
+                </InputSelect>
+
+                <ValidationMessage For="@(() => package.Status)" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Описание</label>
+            <InputText id="description" @bind-Value="package.Description" class="form-control"></InputText>
+        </div>
+        <div class="col-sm-12 col-lg-12 p-1">
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+            <button type="button" class="btn btn-primary" @onclick="OnCancel">Отменить</button>
+        </div>
+    </EditForm>
+}
+
+@code {
+
+    [Parameter]
+    public string? PackageId { get; set; }
+
+    private Package package = new Package();
+
+    #region override methods
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        if (int.TryParse(this.PackageId, out int iPackageId))
+        {
+            var tempPackage = GetPackageByIdUseCase.Execute(iPackageId);
+            if (tempPackage != null){
+
+                var allCost = ViewCostOfDeliveriesUseCase.Execute().ToList();
+
+                var oneCost = GetClosestCost(allCost, tempPackage.Weight);
+
+                decimal currencySell;
+                int currencyUnits;
+
+                Currency currency = new Currency();
+
+                try
+                {
+                    currencySell = Convert.ToDecimal(currency.sell);
+                    currencyUnits = Convert.ToInt16(currency.Units);
+                }
+                catch (Exception e)
+                {
+                    //TODO: настроить хренение последнего курса
+                    throw new Exception("Банковский сервис с курсами работает некорректно." + e.Message);
+                }
+
+                var price = Convert.ToDouble(RoundUp((Convert.ToDecimal(oneCost.CostPln) * currencySell / currencyUnits), 2));
+                // var price = 34.5; // ToDo: Удалить заглушку
+
+                this.package = new Package
+                    {
+                        PackageId = tempPackage.PackageId,
+                        NumberPackage = tempPackage.NumberPackage,
+                        Description = tempPackage.Description,
+                        CurrentUserId = tempPackage.CurrentUserId,
+                        Status = tempPackage.Status,
+                        Weight = tempPackage.Weight,
+                        PriceBYN = price
+                    };
+            }
+        }
+    }
+
+    #endregion
+
+    #region private methods
+
+    public static CostOfDelivery GetClosestCost(List<CostOfDelivery> costs, double weight)
+    {
+        // return costs.OrderBy(c => Math.Abs(c.WeightKg - weight)).First();
+        CostOfDelivery bestCost = null;
+        double minDifference = double.MaxValue;
+        foreach (var cost in costs)
+        {
+            double difference = Math.Abs(cost.WeightKg - weight);
+            if (difference < minDifference)
+            {
+                minDifference = difference;
+                bestCost = cost;
+            }
+        }
+        return bestCost;
+    }
+
+    public static decimal RoundUp(decimal number, int digits)
+    {
+        var factor = Convert.ToDecimal(Math.Pow(10, digits));
+        return Math.Ceiling(number * factor) / factor;
+    }
+
+    private void OnValidSubmit()
+    {
+        string InvoiceUrl = "";
+        int InvoiceId = 0;
+        if (package.Status == StatusesPackage.CostCalculation)
+        {
+            // ToDo: Удалить заглушку.
+            package.PriceBYN = 34.5; // 34.5 - минимальная стоимость
+            if (package.PriceBYN > 0)
+            {
+                var purchases = GetPurchasesByPackegeIdUseCase.Execute(package.PackageId);
+                if (purchases.Count() > 0)
+                {
+                    var purchaseFirst = purchases.FirstOrDefault();
+                    if (purchaseFirst == null) throw new Exception("Error 05091616: Ошибка в связанных данных. ");
+                    var receiver = purchaseFirst.Receiver;
+                    var newInvoice = InvoiceConverter.ToInvoiceDataForCreate(
+                                        receiver, 
+                                        package.PriceBYN.ToString(), 
+                                        package.NumberPackage.ToString());
+
+                    ExpressPayServices expressPayServices = new ExpressPayServices();
+                    var newInvoiceInEp = expressPayServices.AddInvoice(newInvoice);
+
+                    InvoiceUrl = newInvoiceInEp?.InvoiceUrl?.ToString() ?? "";
+                    InvoiceId = newInvoiceInEp?.InvoiceNo ?? 0;
+
+                    package.Invoice = new Invoice()
+                        {
+                            InvoiceNo = newInvoiceInEp?.InvoiceNo?.ToString(),
+                            Url = newInvoiceInEp?.InvoiceUrl,
+                            Status = StatusesInvoice.AwaitingPayment
+                        };
+
+                    EditPackageUseCase.Execute(package);
+
+                    // string list = expressPayServices.GetListInvoices();
+
+                    //url = expressPayServices.GetDetailsInvoice("123458");
+                }
+            }
+        }
+        //NavigationManager.NavigateTo(InvoiceUrl, true);
+
+        EditPackageUseCase.Execute(package);
+        
+        NavigationManager.NavigateTo("/Packages");
+    }
+
+    private void OnCancel()
+    {
+        NavigationManager.NavigateTo("/Packages");
+    }
+
+    #endregion
+}

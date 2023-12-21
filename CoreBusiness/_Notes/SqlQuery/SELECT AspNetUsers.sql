@@ -1,0 +1,1 @@
+﻿Select email, firstName, lastName From AspNetUsers

@@ -1,0 +1,84 @@
+﻿@inherits LayoutComponentBase
+
+@inject IJSRuntime jsRuntime
+
+
+<PageTitle>Panel.Sprauna.by</PageTitle>
+
+
+<AuthorizeView>
+    <Authorized>
+
+        <NavMenuAdmin />
+
+        @if (SpProfileEnable)
+        {
+            <SpProfile></SpProfile>
+        }   
+        
+        <NavMenuSecond />
+
+        <div class="outer">             
+
+            <div class="" style="@InnerSize">
+                @*inner*@
+                <div class="page">
+
+                    <div class="sidebar">
+                        <NavMenu />
+                    </div>
+
+                    <main>
+                        <article class="content px-4">
+                            @Body
+                        </article>
+                    </main>
+                </div>
+
+            </div>
+        </div>
+
+        <div style="position:fixed; top:0px; right: 0px;">
+            <button class="btn btn-link" @onclick="OnClickBtnResize">
+                <i class="bi bi-arrows-angle-expand"></i>
+            </button>
+        </div>
+
+
+    </Authorized>
+    <NotAuthorized>
+        <LoginDisplay></LoginDisplay>
+    </NotAuthorized>
+</AuthorizeView>
+
+
+@code{
+
+    string InnerMinSize = "width:1100px;";
+    string InnerMaxSize = "width:100%;";
+
+    string InnerSize = "min-width:1100px;";
+
+    bool SpProfileEnable = true;
+
+
+    private void OnClickBtnResize()
+    {
+        if (InnerSize == InnerMinSize)
+        {
+            SpProfileEnable = false;
+            InnerSize = InnerMaxSize;
+        }        
+        else
+        {
+            SpProfileEnable = true;
+            InnerSize = InnerMinSize;
+        }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+            jsRuntime.InvokeVoidAsync("GradientMouse");
+    }
+}

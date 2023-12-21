@@ -1,0 +1,32 @@
+	 SpLog, app.Run,, Time:20:49:20
+Now listening on: https://localhost:7113
+Now listening on: http://localhost:5252
+Application started. Press Ctrl+C to shut down.
+Hosting environment: Development
+Content root path: D:\VisualStudioProjects\Sprauna7\Sprauna7Publish
+	 SpLog, Index.OnInitializedAsync.Run  Time:20:49:25
+Executed DbCommand (75ms) [Parameters=[@__p_0='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[Email], [a].[EmailConfirmed], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[ProfilePicture], [a].[SecurityStamp], [a].[TwoFactorEnabled], [a].[UserName], [a].[firstName], [a].[lastName]
+FROM [AspNetUsers] AS [a]
+WHERE [a].[Id] = @__p_0
+	 SpLog, Index.OnInitializedAsync.Run  Time:20:49:39
+Executed DbCommand (20ms) [Parameters=[@__p_0='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[Email], [a].[EmailConfirmed], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[ProfilePicture], [a].[SecurityStamp], [a].[TwoFactorEnabled], [a].[UserName], [a].[firstName], [a].[lastName]
+FROM [AspNetUsers] AS [a]
+WHERE [a].[Id] = @__p_0
+Start processing HTTP request GET https://devprofile.shopbyshop.by/api/v1/track/26234
+Sending HTTP request GET https://devprofile.shopbyshop.by/api/v1/track/26234
+Start processing HTTP request POST https://devprofile.shopbyshop.by/api/v1/track/26234
+Sending HTTP request POST https://devprofile.shopbyshop.by/api/v1/track/26234
+Received HTTP response headers after 1227.8593ms - 200
+End processing HTTP request after 1253.6735ms - 200
+Received HTTP response headers after 286.0455ms - 200
+End processing HTTP request after 292.3111ms - 200
+Start processing HTTP request GET https://devprofile.shopbyshop.by/api/v1/track/26235
+Sending HTTP request GET https://devprofile.shopbyshop.by/api/v1/track/26235
+Start processing HTTP request POST https://devprofile.shopbyshop.by/api/v1/track/26235
+Sending HTTP request POST https://devprofile.shopbyshop.by/api/v1/track/26235
+Received HTTP response headers after 943.4187ms - 200
+End processing HTTP request after 953.6212ms - 200
+Received HTTP response headers after 1227.2552ms - 200
+End processing HTTP request after 1236.8329ms - 200

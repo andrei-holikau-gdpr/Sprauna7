@@ -1,0 +1,28 @@
+﻿@page "/addProductSpTest"
+
+@inject IAddProductSpUseCase AddProductSpUseCase
+
+<button @onclick="Run">addProductSpTest</button>
+
+@code {
+    private void Run()
+    {
+        var TestProduct = new ProductSp()
+            {
+                CurrentUserId = "392e95bf-c5e8-42f8-a7fd-eb47b65d71f2",
+
+                ProductTypeAndBrand = "Test ProductName",
+                Quantity = 1,
+                Price = 1,
+                UrlToProduct = @"https://sprauna.by",
+                UrlToImage = @"https://sprauna.by",
+                CategoryId = 1,
+                Description = "",
+                PurchaseNewId = 27,
+                TrackNumber = "123",
+                SbsId = 123
+                
+            };
+        AddProductSpUseCase.Execute(TestProduct);
+    }
+}

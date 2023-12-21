@@ -1,0 +1,206 @@
+﻿@*Создаем покупку sbs*@
+
+@attribute [Authorize()]
+@page "/EditSbsTrack/{TrackItemId}"
+@using CoreBusiness.ShopByShop.Models;
+@using UseCases.ShopByShop.UseCaseInterfaces;
+
+@inject NavigationManager NavigationManager
+@inject IAddTrackSbsUseCase AddTrackSbsUseCase
+
+@if (!IsModal)
+{
+    <div class="container">
+        <div class="row m-2">
+            <div class="col-sm-12 col-lg-5 p-1">
+
+                <h1 class="h3">AddSbsTrack</h1>
+            </div>
+
+            <div class="col-sm-12 col-lg-7 p-1">
+                <MessageInDeveloping />
+                @*<button type="button" class="btn btn-link" @onclick="OnClickSetDemoData">@ConstantSps.BTN_SET_DEMO_DATA</button>*@
+            </div>
+        </div>
+    </div>
+}
+
+@if (trackItem != null)
+{
+    <EditForm Model="trackItem" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator></DataAnnotationsValidator>
+        <ValidationSummary></ValidationSummary>
+
+        <div class="form-group">
+            <label for="Code">Code</label>
+            <InputText id="Code" @bind-Value="trackItem.Code" class="form-control"></InputText>
+        </div>
+
+        @if (trackItem.RecipientId != null)
+        {
+            <div class="form-group">
+                <label for="RecipientId">RecipientId</label>
+                <InputNumber id="RecipientId" @bind-Value="trackItem.RecipientId" class="form-control"></InputNumber>
+            </div>
+        }
+
+        <div class="form-group">
+            <label for="UserName">UserName</label>
+            <InputText id="UserName" @bind-Value="trackItem.UserName" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label for="Surname">Surname</label>
+            <InputText id="Surname" @bind-Value="trackItem.Surname" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label for="Pvz">Pvz</label>
+            <InputText id="Pvz" @bind-Value="trackItem.Pvz" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label for="Store">Store</label>
+            <InputText id="Store" @bind-Value="trackItem.Store" class="form-control"></InputText>
+        </div>
+
+        @if (trackItem.Wait != null)
+        {
+            <div class="form-group">
+                <label for="Wait">Wait</label>
+                <InputNumber id="Wait" @bind-Value="trackItem.Wait" class="form-control"></InputNumber>
+            </div>
+        }
+
+        @if (trackItem.Agree != null)
+        {
+            <div class="form-group">
+                <label for="Agree">Agree</label>
+                <InputNumber id="Wait" @bind-Value="trackItem.Agree" class="form-control"></InputNumber>
+            </div>
+        }
+
+        @* Buttons *@
+        <div class="col-sm-12 col-lg-12 p-1">
+            <button type="submit" class="btn btn-primary test1909">
+                Сохранить
+            </button>
+            <button type="button" class="btn btn-primary" @onclick="OnCancel">Отменить</button>
+        </div>
+    </EditForm>
+}
+
+@code {
+    #region public Parameters TrackItem
+
+    [Parameter]
+    public bool IsModal { get; set; } = false;
+
+    [Parameter]
+    public EventCallback OnAddCallback { get; set; }
+
+    [Parameter]
+    public EventCallback OnCanselCallback { get; set; }
+
+    [Parameter]
+    public string? TrackItemId { get; set; }
+
+    #endregion
+    // ---
+    #region override methods
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        if (int.TryParse(this.TrackItemId, out int iTrackItemId))
+        {
+        //     var tempCategory = GetTrackSbsByIdUseCase.Execute(iCategoryId);
+            this.trackItem = new TrackItem
+                {
+        //            Id = tempCategory.Id,
+        //            Code = tempCategory.Code,
+        //            RecipientId = tempCategory.RecipientId,
+        //            ConsolidationId = tempCategory.ConsolidationId,
+        //            LeadId = tempCategory.LeadId,
+        //            DeliveryType = tempCategory.DeliveryType,
+        //            Status = tempCategory.Status,
+        //            Hide = tempCategory.Hide,
+        //            UserName = tempCategory.UserName,
+        //            Surname = tempCategory.Surname,
+        //            Pvz = tempCategory.Pvz,
+        //            Address = tempCategory.Address,
+        //            City = tempCategory.City,
+        //            Comment = tempCategory.Comment,
+        //            Price = tempCategory.Price,
+        //            Store = tempCategory.Store,
+        //            Wait = tempCategory.Wait,
+        //            Weight = tempCategory.Weight,
+        //            Type = tempCategory.Type,
+        //            CreatedAt = tempCategory.CreatedAt,
+        //            UpdatedAt = tempCategory.UpdatedAt,
+        //            ShopNumber = tempCategory.ShopNumber,
+        //            Apartment = tempCategory.Apartment,
+        //            CdekNumber = tempCategory.CdekNumber,
+        //            PaymentToken = tempCategory.PaymentToken,
+        //            CommentAmo = tempCategory.CommentAmo,
+        //            TrackStatus = tempCategory.TrackStatus,
+        //            AdditionalServices = tempCategory.AdditionalServices,
+        //            AdditionalServicesPrice = tempCategory.AdditionalServicesPrice,
+        //            Agree = tempCategory.Agree,
+        //            Insurence = tempCategory.Insurence,
+        //            Photo = tempCategory.Photo,
+        //            CheckSize = tempCategory.CheckSize,
+        //            Packing = tempCategory.Packing,
+        //            Invoice = tempCategory.Invoice,
+        //            StatusLabel = tempCategory.StatusLabel,
+        //            PriceReal = tempCategory.PriceReal,
+        //            AdditionalServicesText = tempCategory.AdditionalServicesText,
+        //            PvzAddress = tempCategory.PvzAddress,
+        //            File = tempCategory.File,
+        //            Products = tempCategory.Products
+                };
+        }
+    }
+
+    #endregion
+    // ---
+    #region private fields 
+
+    private TrackItem trackItem = new TrackItem();
+
+    #endregion
+
+    #region private methods 
+
+    private async Task OnValidSubmit()
+    {
+        //TrackItemId = await AddTrackSbsUseCase.ExecuteAsync(trackItem);
+
+        if (!IsModal)
+        {
+            NavigationManager.NavigateTo($"/EditSbsTrack/{TrackItemId}");
+        }
+        else
+        {
+            await OnAddCallback.InvokeAsync();
+            trackItem = new TrackItem();
+            //NavigationManager.NavigateTo($"/{ReceiverOptions.NameMany}");
+        }
+
+    }
+
+    private void OnCancel()
+    {
+        if (!IsModal)
+        {
+            NavigationManager.NavigateTo($"/SbsTracks");
+        }
+        else
+        {
+            OnCanselCallback.InvokeAsync();
+        }
+    }
+
+    #endregion
+}

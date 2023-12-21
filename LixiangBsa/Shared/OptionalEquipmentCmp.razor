@@ -1,0 +1,146 @@
+﻿@using Lixiang.CoreBusiness;
+
+<span class="h5">@Title</span>
+<br/>
+<style>
+    .card-body{
+        padding:0px; 
+        border:solid 1px grey;
+        border-radius: 0 0 10px 10px;
+        cursor:pointer;
+    }
+
+    .card-body.current{
+        border-color: #057568;
+    }
+</style>
+
+@foreach(var optionalEquipment in OptionalEquipments){
+    <div class="card" style="border:none;">
+        <div class="@(SelectedCar.SimpleOptions.Count > 0 ? "card-body current" : "card-body")">
+            <div onclick="@(() => OnClickAddSimpleOption(optionalEquipment))">
+            <img src="/img/@optionalEquipment.Thumbnail.FileName" width="100%" />
+            <div style="padding:10px;">
+                <span class="h6">@optionalEquipment.Name</span>
+                    <div style="float:right">
+                @if (SelectedCar.SimpleOptions.Exists(s=>s == optionalEquipment))
+                {   
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill" viewBox="0 0 16 16">
+                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
+                            </svg>
+                } 
+                else
+                {
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-circle" viewBox="0 0 16 16">
+                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+                        </svg>
+                }
+                    </div>
+                <br />
+                @if (@optionalEquipment.Price>0){
+                    <div class="price">+ @optionalEquipment.Price ₽</div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="text">
+        @optionalEquipment.Description
+    </div>
+</div>
+}
+
+<style>
+    .text-12_20 {
+        font-size: 12px;
+        line-height: 20px;
+        float: right;
+    }
+
+    .lxcheckbox {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+        display: flex;
+        flex-wrap: nowrap;
+    }
+
+    .lxcheckbox-toggle {
+        cursor: pointer;
+        display: flex;
+    }
+
+    .lxcheckbox-icon-custom {
+        margin-right: 0;
+    }
+
+    .lxcheckbox-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 20px;
+        height: 20px;
+        margin-right: 12px;
+        border: 1.5px solid rgba(0,0,0,.2);
+        border-radius: 50%;
+    }
+
+    .lxcheckbox-icon-checked {
+        background-color: #191919;
+    }
+
+    .lxicon-icon_20_duigou::before {
+        content: "\e6e1";
+    }
+
+    .lxcheckbox-icon i {
+        color: #fff;
+    }
+
+    .lxicon {
+        font-family: lxiconfont !important;
+        font-size: 16px;
+        font-style: normal;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    .circle {
+        width: 200px;
+        height: 200px;
+        border: 1px solid black;
+        border-radius: 50%;
+        margin: auto;
+    }
+
+    .circle-fill {
+        width: 200px;
+        height: 200px;
+        background-color: green;
+        border-radius: 50%;
+        margin: auto;
+    }
+</style>
+
+@code {
+    #region Parameters
+    [Parameter]
+    public string Title { get; set; } = "";
+    [Parameter]
+    public List<SimpleOption> OptionalEquipments { get; set; } = new();
+
+    [Parameter]
+    public Car SelectedCar { get; set; } = new();
+
+    [Parameter]
+    public EventCallback<SimpleOption> OnClickCarModelCallback { get; set; }
+    #endregion
+    // ---
+    #region Private methods
+
+    private async Task OnClickAddSimpleOption(SimpleOption simpleOption)
+    {        
+        await OnClickCarModelCallback.InvokeAsync(simpleOption);
+        ShouldRender();
+    }
+    #endregion
+}

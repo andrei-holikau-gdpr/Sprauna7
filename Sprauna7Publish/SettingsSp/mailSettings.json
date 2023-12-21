@@ -1,0 +1,10 @@
+{
+  "MailSettings": {
+    "SmtpServer": "smtp.gmail.com",
+    "SmtpPort": 587,
+    "SmtpUsername": "sprauna@gmail.com",
+    "SmtpPassword": "",
+    "SenderEmail": "sprauna@gmail.com",
+    "SenderName": "Администрация сайта Sprauna.by"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Plugins.MailSp": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:2369;http://localhost:2370"
+    }
+  }
+}

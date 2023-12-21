@@ -1,0 +1,104 @@
+﻿@inject NavigationManager NavigationManager
+
+@inject IViewDepartmentDeliveryParcelsUseCase ViewDepartmentDeliveryParcelsUseCase
+@inject IViewRegionsUseCase ViewRegionsUseCase
+
+<h2 class="card-title h5">
+    <NavLink class="nav-link" href="packages">
+        <span class="oi oi-list-rich" aria-hidden="true"></span>
+        Пункты выдачи посылок (@departments.Count)
+    </NavLink>
+</h2>
+
+@if (departments != null)
+{
+    <table class="table table-striped table-hover sp-table">
+        <tbody>
+            @foreach (var item in departments)
+            {
+                <tr @onclick="@( () => OnSelectedCallback.InvokeAsync( item.DepartmentDeliveryParcelId ))">
+                    <td>
+                        @item.DepartmentDeliveryParcelId
+                    </td>
+
+                    <td class="align-middle">
+                        @item.Address
+                        <div style="display:none">@(++iMiniCount)</div>
+                    </td>
+                </tr>
+
+                @*@if (MaxCountItems > 0 && iMiniCount > 1) break;*@
+            }
+        </tbody>
+    </table>
+}
+
+<hr />
+@if (selectDepartmentId > 0)
+{
+    <i>selectDepartmentId: @selectDepartmentId</i>
+    <hr />
+}
+
+@code {
+
+    #region Parameters
+
+    [Parameter]
+    public int selectDepartmentId { get; set; } = 0;
+
+    [Parameter]
+    public int MaxCountItems { get; set; } = 1;
+
+    [Parameter]
+    public EventCallback<int> OnSelectedCallback { get; set; }
+
+    #endregion
+
+    #region const
+
+    private const string OBJECT_NAME_SINGLE = "DepartmentDeliveryParcel";
+    //private const string OBJECT_NAME_MANY = "Package";
+
+    #endregion
+
+    #region public fields
+
+
+
+    #endregion
+
+    #region private fields
+
+    private List<DepartmentDeliveryParcel> departments;
+    private List<Region> regions;
+
+    private int iMiniCount { get; set; }
+
+    #endregion
+
+    async Task OnSelect()
+    {
+        await OnSelectedCallback.InvokeAsync(selectDepartmentId);
+    }
+
+    #region override methods
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        LoadAll();
+    }
+
+    #endregion
+
+    #region private methods
+
+    private void LoadAll()
+    {
+        departments = ViewDepartmentDeliveryParcelsUseCase.Execute()?.ToList();
+        regions = ViewRegionsUseCase.Execute()?.ToList();
+    }
+
+    #endregion
+}

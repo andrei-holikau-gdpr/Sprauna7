@@ -1,0 +1,361 @@
+﻿@attribute [Authorize()]
+@page "/receivers"
+
+@using System.Diagnostics.CodeAnalysis;
+@using Microsoft.AspNetCore.Identity;
+@using UseCases.ShopByShop.UseCaseInterfaces;
+
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JsRuntime
+@inject MessageService MessageService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@inject IViewReceiversUseCase ViewReceiversUseCase
+@inject IDeleteReceiverUseCase DeleteReceiverUseCase
+@inject IDeleteRecipientSbsUseCase DeleteRecipientSbsUseCase
+
+@inject ILogger<ReceiversComponent> LoggerInFile
+
+@implements IDisposable
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1 id="purchases-h1" class="card-title h3">Получатели</h1>
+            <br/>
+
+            @if(Loader) {
+                <div @onclick="OnClickLoader">
+                    <LoaderMini /> 
+                </div>
+            }
+            else
+            {
+                <TableReceiversComponent Update="@Update"
+                    CurrentUserId="@currentUserId"
+                    SelectReceiverId="@SelectReceiverId"
+                    OnClickAddCallback="@OnClickAdd" 
+                    OnClickViewCallback="@OnClickView"
+                    OnClickEditCallback="@OnClickEdit" 
+                    OnClickDeleteCallback="@OnClickDelete"/>
+    
+                <br/>
+                <button type="button" @onclick="OnClickAdd" class="btn btn-primary">
+                    Добавить</button>
+            }
+        </div>
+    </div>
+</div>
+
+@{ #region Modals }
+
+<!-- ModalDialog Детальный просмотр -->
+<Modal @ref="ModalView" IsBackdrop="true" IsKeyboard="true">
+    <ModalDialog Title="Информация о получателе" Size="Size.Large"
+                 IsScrolling="true" ShowCloseButton="false"
+                 IsDraggable="true" ShowFooter="true">
+        <BodyTemplate>
+            @if (SelectReceiverId > 0) {
+                <ViewtReceiver ReceiverId="@SelectReceiverId.ToString()" />
+            }
+        </BodyTemplate>
+        <FooterTemplate>
+            <Button @onclick="OnCanselViewModal" IsOutline="true" Color="Color.Secondary" style="float:left">Закрыть</Button>
+            <Button @onclick="((args) => OnClickBtnEdit(args, SelectReceiverId))" IsOutline="true">Редактировать</Button>
+            <Button @onclick="((args) => OnClickBtnDelete(args, SelectReceiver))" IsOutline="true" Color="Color.Dark">Удалить</Button>
+            @*Color="BootstrapBlazor.Components.Button.ButtonColor.Primary"*@
+        </FooterTemplate>
+    </ModalDialog>
+</Modal>
+
+<!-- ModalDialog Добавление -->
+<Modal @ref="ModalAdd" IsBackdrop="false" IsKeyboard="true">
+    <ModalDialog Title="Добавить получателя" Size="Size.Large" IsScrolling="true" 
+    ShowFooter="false" ShowHeader="false">
+        <BodyTemplate>
+            <AddReceiverComponent IsModal="true" 
+            OnAddCallback="@OnAddModalCallback" 
+            OnCanselCallback="@OnAddModalCanselCallback" />
+        </BodyTemplate>
+    </ModalDialog>
+</Modal>
+
+<!-- ModalDialog Редактирование -->
+<Modal @ref="ModalEdit" IsBackdrop="false" IsKeyboard="true">
+    <ModalDialog Title="Редактировать получателя" Size="Size.Large" IsScrolling="true" 
+    ShowFooter="false" ShowHeader="false">
+        <BodyTemplate>
+            @if (SelectReceiverId > 0) {
+                <EditReceiverComponent ReceiverId="@SelectReceiverId.ToString()" 
+                IsModal="true" OnEditCallback="@OnEditModalCallback" 
+                OnCanselCallback="@OnEditModalCanselCallback" />
+            }
+        </BodyTemplate>
+    </ModalDialog>
+</Modal>
+
+@{ #endregion }
+
+<ConsoleLoggerSp Owner="ReceiversComponent" LogerEnable="@LogerEnable">
+    <ConsoleLogger @ref="Logger" />
+</ConsoleLoggerSp>
+
+
+
+@code {
+    #region Public fields / Parameters
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationStateTask { get; set; }
+
+    [Inject]
+    UserManager<ApplicationUser>? userManager { get; set; }
+
+    #endregion
+
+    #region Private fields
+
+    private string? currentUserId;
+    private int? DisplayLoader = null;
+
+    [NotNull]
+    private ConsoleLogger? Logger { get; set; }
+    private bool LogerEnable = false;
+
+    public Receiver? SelectReceiver;
+    public int SelectReceiverId;
+
+    public bool Update = false;
+    public bool Loader = false;
+
+    #endregion
+    // ---
+    #region Private fields / Modals
+
+    [NotNull]
+    private Modal? ModalView { get; set; }
+    [NotNull]
+    private Modal? ModalAdd { get; set; }
+    [NotNull]
+    private Modal? ModalEdit { get; set; }
+
+    #endregion
+    // ---
+    #region Private methods / Override methods -
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        #if DEBUG
+    LogerEnable = true;
+        #endif
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+#pragma warning disable CS8602 //todo: #pragma warning disable CS8602
+
+        if (user.Identity.IsAuthenticated)
+        {
+            var currentUser = await userManager.GetUserAsync(user);
+            currentUserId = userManager.GetUserId(user);
+        }
+#pragma warning restore CS8602
+    }
+
+    #endregion
+    // ---
+    #region private methods
+
+    private void ShowMessage(string message, string icon, Color color)
+    {
+        MessageService.Show(new MessageOption()
+            {
+                Content = message,
+                Icon = icon,
+                Color = color,
+                ShowDismiss = true,
+            });
+    }
+
+    #endregion
+    // ---
+    #region Private methods / OnClick CRUD
+
+    private void OnClickView(Receiver single)
+    {
+        #if DEBUG
+    Logger.Log($"OnClickView singleId: {single.ReceiverId}");
+        #endif
+
+        SelectReceiver = single;
+        SelectReceiverId = single.ReceiverId;
+        ModalView.Toggle();
+    }
+
+    private void OnClickAdd()
+    {
+        #if DEBUG
+    Logger.Log("OnClickAdd()");
+        #endif
+
+        Loader = true;
+        JsRuntime.InvokeVoidAsync("DataTablesRemove");
+        ModalAdd.Toggle();
+        //Update = true;
+
+        // JsRuntime.InvokeVoidAsync("InitialiseTable");
+        //Loader = false;
+
+        // JsRuntime.InvokeVoidAsync("jsReloadPage");
+
+        // NavigationManager.NavigateTo($"/receivers");
+        //NavigationManager.NavigateTo($"/add{ReceiverOptions.NameSingle}");
+    }
+
+    private void OnCanselViewModal()
+    {
+        ModalView?.Close();
+    }
+
+    private async void OnAddModalCanselCallback()
+    {
+        ModalAdd?.Close();
+
+        await JsRuntime.InvokeVoidAsync("InitialiseTable");
+        Loader = false;
+
+        ShowMessage(ConstantSps.RECIPIENT_NOT_ADDED, ConstantSps.MESSAGE_ICON_INFO, Color.Info);
+    }
+
+    private void OnAddModalCallback()
+    {
+        ShowMessage(ConstantSps.RECIPIENT_ADDED, ConstantSps.MESSAGE_ICON_SUCCESS, Color.Success);
+
+        // Loader = true;
+        // JsRuntime.InvokeVoidAsync("DataTablesRemove");
+        Update = true;
+        JsRuntime.InvokeVoidAsync("InitialiseTable");
+        Loader = false;
+        ModalAdd.Close();
+
+        // JsRuntime.InvokeVoidAsync("jsReloadPage");
+
+        //Update = true;
+    }
+
+    private void OnClickEditLog(string methodName, int ReceiverId)
+    {
+        #if DEBUG
+    Logger.Log($"OnClickEdit ReceiverId: {ReceiverId}");
+        #endif
+    }
+
+    private void OnClickEdit(Receiver single)
+    {
+        SelectReceiverId = single.ReceiverId;
+
+        OnClickEditLog("OnClickEdit", single.ReceiverId);
+
+        //Loader = true;
+        //JsRuntime.InvokeVoidAsync("DataTablesRemove");
+        ModalEdit.Toggle();
+
+        //NavigationManager.NavigateTo($"/edit{ReceiverOptions.NameSingle}/{single.ReceiverId}");
+    }
+
+    protected void OnClickBtnEdit(EventArgs args, int ReceiverId)
+    {
+        OnClickEditLog("OnClickBtnEdit", ReceiverId);
+
+        ModalView.Close();
+        ModalEdit.Toggle();
+        // NavigationManager.NavigateTo($"/edit{ReceiverOptions.NameSingle}/{ReceiverId}");
+        // JsRuntime.InvokeVoidAsync("scrollToTop");
+    }
+
+    private void OnEditModalCanselCallback()
+    {
+        ShowMessage(ConstantSps.RECIPIENT_NOT_EDITED, ConstantSps.MESSAGE_ICON_INFO, Color.Info);
+        ModalEdit.Close();
+        Loader = false;
+    }
+
+    private void OnEditModalCallback()
+    {
+        ShowMessage(ConstantSps.RECIPIENT_EDITED, ConstantSps.MESSAGE_ICON_SUCCESS, Color.Success);
+        ModalEdit.Close();
+    }
+
+    private void OnClickDeleteLog(string methodName, int id)
+    {
+        #if DEBUG
+            Logger.Log($"OnClickDelete singleId: {id}");
+        #endif
+    }
+
+    private void OnClickDelete(Receiver receiver)
+    {
+        OnClickDeleteLog("OnClickDelete", receiver.ReceiverId);
+
+        if (receiver.CurrentUserId == currentUserId)
+        {
+            SelectReceiverId = 0;
+            DeleteReceiverUseCase.Delete(receiver.ReceiverId);
+
+            DeleteRecipientSbsUseCase.ExecuteAsync(receiver.SbsId);
+            Update = true;
+            ShowMessage(ConstantSps.RECIPIENT_DELETED, ConstantSps.MESSAGE_ICON_DELETE, Color.Danger);
+        } else
+        {
+            Logger.Log($"Данный товар не принадлежит данному пользователю. ");
+            // ToDo: Записать попытку в Log file
+            LoggerInFile.LogInformation(
+                $"\t SpLog, ReceiversComponent, OnClickDelete(), "
+                +$"ReceiverId = {receiver.ReceiverId}, , "
+                +$"Date: {DateTime.Now.ToLongDateString()}, "
+                +$"Time: {DateTime.Now.ToLongTimeString()} ");
+        }
+    }
+
+    protected void OnClickBtnDelete(EventArgs args, Receiver receiver)
+    {
+        OnClickDelete(receiver);
+        ModalView.Close();
+        // StateHasChanged();
+    }
+
+    #endregion
+    // ---
+    #region Ppublic methods / Interface Implementation IDisposable
+
+    public void Dispose()
+    {        
+        JsRuntime.InvokeVoidAsync("DataTablesRemove");
+    }
+
+    #endregion
+    // ---
+    #region Private Methods / Events
+
+    private void OnClickLoader()
+    {
+        DisplayLoader = 1;
+        StateHasChanged();
+    }
+
+    private void OnClickDisableLoader()
+    {
+        if (DisplayLoader == null)
+        {
+            DisplayLoader = 1;
+            StateHasChanged();
+        }
+    }
+
+    #endregion
+}

@@ -1,0 +1,304 @@
+﻿@inject IJSRuntime JsRuntime
+@inject IViewPurchasesUseCase ViewPurchasesUseCase
+
+@inject IGetDepartmentDpByIdUseCase GetDepartmentDpByIdUseCase
+@inject IGetReceiverByIdUseCase GetReceiverByIdUseCase
+
+@if (purchases != null && purchases.Count > 0)
+{
+<div class="purchases div-for-table">
+    <table id="example" class="display nowrap">
+        <thead>
+            <tr>
+                <th>Id</th>
+                @*<th></th>*@
+                @*<th></th>
+            </tr>
+            </thead>*@
+                <th>ФИО</th>
+                <th>Магазин</th>
+                <th>ПВ</th>
+                <th>Получатель</th>
+                <th>@PurchaseOptions.TrackNumber</th>
+                <th>Товары</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in purchases)
+            {
+                <tr @onclick="@( () => OnClickView(item) )">
+                    <td class="align-middle">
+                        <div class="overflow-auto">
+                            @item.PurchaseId
+                            @*@onclick="@( () => selectPurchaseId=item.PurchaseId )">*@
+                        </div>
+                    </td>
+                    <!-- Old
+                    @*<td>
+                        <Tooltip Placement="Placement.Top" Title="Посмотреть подробнее">
+                        <button type="button" class="btn btn-link"
+                        @onclick="@( () => OnClickView(item) )">
+                        <i class="bi bi-eye"></i>
+                        </button>
+                        </Tooltip>
+
+                        <Tooltip Placement="Placement.Top" Title="Редактировать">
+                        <button type="button" class="btn btn-link"
+                        @onclick="@( () => OnClickEdit(item) )">
+                        <i class="bi bi-pencil-square"></i>
+                        </button>
+                        </Tooltip>
+
+                        <Tooltip Placement="Placement.Top" Title="Удалить">
+                        <button type="button" class="btn btn-link"
+                        @onclick="@( () => OnClickDelete(item.PurchaseId) )">
+                        <i class="bi bi-trash3"></i>
+                        </button>
+                        </Tooltip>
+                    </td>*@
+                    -->
+
+                    <td> <TextOverflowWithTooltip Text="@($"{item.Name} {item.Surname}")" /> </td>
+                    <td> <TextOverflowWithTooltip Text="@item.Shop" /> </td>
+                    <td> <TextOverflowWithTooltip Text="@GetDepartmentDpAddress(item.DepartmentDeliveryParcelId)" /> </td>
+                    <td> <TextOverflowWithTooltip Text="@GetReceiverFio(item.ReceiverId)" /> </td>
+                    <td> <TextOverflowWithTooltip Text="@item.TrackNumber" /> </td>
+                    <td>
+                        @if (item.ProductSps != null)
+                        {
+                            <ul>
+                                @foreach (var prod in item.ProductSps)
+                                {
+                                    <li>
+                                        @prod.ProductTypeAndBrand; 
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    </td>
+                </tr>
+                @* @if (MiniView && iMiniCount > MaxCountItems) break;*@
+            }
+        </tbody>
+    <!--
+    @*<tfoot>
+        <tr>
+        <th>Id</th>
+        <th>ФИО</th>
+        <th>Магазин</th>
+        <th>ПВ</th>
+        <th>Получатель</th>
+        <th>@PurchaseOptions.TrackNumber</th>
+
+        <th></th>
+        </tr>
+        </tfoot>*@
+    -->
+    </table>
+ </div>
+    }
+else
+{
+    <p style="color:#000838; ">
+        Читайте <a href="https://sprauna.by" target="_blank">нашу инструкцию</a>, как сделать свой первый заказ из европейких магазинов.
+        Здесь появятся покупки, которые вы заказали на один из <a href="https://sprauna.by" target="_blank">ваших адресов в Польше</a>.
+    </p>
+    <p style="color:#929292; ">
+        Совет: Перед оформлением каждого заказа настоятельно рекомендуем ознакамливаться со всеми разделами вкладки “Инструкции”, потому что адрес и условия доставки могут быть изменены в любой момент.
+    </p>
+    <div style="display:none;">
+    @JsRuntime.InvokeVoidAsync("DataTablesRemove");
+    </div>
+    <br/>        
+    <a href="https://sprauna.by" target="_blank">Где покупать в ЕС?</a>
+    <br />
+    <a href="https://sprauna.by" target="_blank">Что нельзя пересылать в РБ?</a>
+}
+
+<br />
+<ConsoleLoggerSp Owner="TablePurchasesComponent" LogerEnable="@LogerEnable">
+    <ConsoleLogger @ref="Logger" />
+</ConsoleLoggerSp>
+
+@code{
+    #region public Parameters Purchase
+
+    [Parameter]
+    public int SelectPurchaseId { get; set; }
+
+    [Parameter]
+    public string? CurrentUserId { get; set; }
+
+    #pragma warning disable BL0007
+    //todo: #pragma warning disable BL0007
+
+    [Parameter]
+    public bool Update
+    {
+        get { return update; }
+        set {
+            update = value;
+            if (update == true) UpdateData();
+            update = false;
+        }
+    }
+
+    #pragma warning restore BL0007
+
+    [Parameter, NotNull]
+    public EventCallback<Purchase> OnClickViewCallback { get; set; }
+
+    [Parameter, NotNull]
+    public EventCallback<Purchase> OnClickAddCallback { get; set; }
+
+    [Parameter, NotNull]
+    public EventCallback<Purchase> OnClickEditCallback { get; set; }
+
+    [Parameter, NotNull]
+    public EventCallback<int> OnClickDeleteCallback { get; set; }
+
+    [Parameter, NotNull]
+    public EventCallback OnUpdateCallback { get; set; }
+
+    #endregion
+
+    #region Private fiels / Purchase
+
+    public bool update;
+
+    [NotNull]
+    private ConsoleLogger? Logger { get; set; }
+    private bool LogerEnable = true;
+
+    private List<Purchase>? purchases;
+
+    private Purchase? SelectPurchase { get; set; }
+
+    #endregion
+    //---
+    #region Protected Override methods / Purchase
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        LoadAll();
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+
+        Logger.Log("TablePurchasesComponent -> OnAfterRender");
+
+        if (firstRender && purchases != null && purchases.Count > 0)
+        {
+            try
+            {
+                JsRuntime.InvokeVoidAsync("InitialiseTable");
+            }
+            catch (Exception e)
+            {
+                Logger.Log(e.Message);
+            }
+        }
+
+        if (purchases == null)
+        {
+            Logger.Log((purchases == null) ? "purchases == null" : "");
+        }
+        else
+        {
+            Logger.Log((purchases?.Count > 0)
+                ? "purchases.Count = " + purchases.Count.ToString()
+                : "purchases.Count = 0");
+        }
+    }
+
+    //protected override async Task OnAfterRenderAsync(bool firstRender)
+    //{
+    //    Logger.Log("TablePurchasesComponent -> OnAfterRenderAsync");
+
+    //    if (firstRender && purchases != null && purchases.Count>0 )
+    //    {
+    //        try{
+    //            await JsRuntime.InvokeVoidAsync("InitialiseTable");
+    //        } 
+    //        catch(Exception e)
+    //        {
+    //            Logger.Log(e.Message);
+    //        }
+    //    }
+
+    //    if(purchases == null)
+    //    {
+    //        Logger.Log((purchases == null) ? "purchases == null" : "");
+    //    }
+    //    else
+    //    {
+    //        Logger.Log((purchases?.Count > 0) 
+    //            ? "purchases.Count = " + purchases.Count.ToString() 
+    //            : "purchases.Count = 0");
+    //    }
+    //}
+
+    #endregion
+    // ---
+    #region Private methods
+
+    private void LoadAll()
+    {
+        purchases = ViewPurchasesUseCase.Execute(CurrentUserId)?.ToList();        
+    }
+
+    private void UpdateData()
+    {
+        //JsRuntime.InvokeVoidAsync("DataTablesRemove");
+        LoadAll();
+        //JsRuntime.InvokeVoidAsync("InitialiseTable");
+    }
+
+    private void OnClickView(Purchase purchase)
+    {
+        SelectPurchaseId = purchase.PurchaseId;
+        OnClickViewCallback.InvokeAsync(purchase);
+    }
+
+    private void OnClickEdit(Purchase purchase)
+    {
+        OnClickEditCallback.InvokeAsync(purchase);
+    }
+
+    private void OnClickDelete(int PurchaseId)
+    {
+        OnClickDeleteCallback.InvokeAsync(PurchaseId);
+    }
+        private string GetDepartmentDpAddress(int departmentId)
+    {
+        string address = "";
+        if (departmentId > 0)
+        {
+            var department = GetDepartmentDpByIdUseCase.Execute(departmentId);
+            if (department != null)
+            {
+                address = department.Address;
+            }
+        }
+        return address;
+    }
+
+    private string GetReceiverFio(int receiverId)
+    {
+        string fio = "";
+        if (receiverId > 0)
+        {
+            var receiver = GetReceiverByIdUseCase.Execute(receiverId);
+            if (receiver != null)
+            {
+                fio = ReceiverOptions.GetFIO(receiver);
+            }
+        }
+        return fio;
+    }
+
+    #endregion
+}

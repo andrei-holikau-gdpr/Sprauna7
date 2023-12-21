@@ -1,0 +1,25 @@
+	 SpLog, app.Run,, Time:19:57:06
+Now listening on: https://localhost:7113
+Now listening on: http://localhost:5252
+Application started. Press Ctrl+C to shut down.
+Hosting environment: Development
+Content root path: D:\VisualStudioProjects\Sprauna7\Sprauna7Publish
+Executed DbCommand (67ms) [Parameters=[@__p_0='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[Email], [a].[EmailConfirmed], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[ProfilePicture], [a].[SecurityStamp], [a].[TwoFactorEnabled], [a].[UserName], [a].[firstName], [a].[lastName]
+FROM [AspNetUsers] AS [a]
+WHERE [a].[Id] = @__p_0
+Executed DbCommand (16ms) [Parameters=[@__user_Id_0='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+SELECT [a].[Id], [a].[ClaimType], [a].[ClaimValue], [a].[UserId]
+FROM [AspNetUserClaims] AS [a]
+WHERE [a].[UserId] = @__user_Id_0
+	 SpLog, Index.OnInitializedAsync.Run  Time:19:57:13
+	 SpLog, Index.OnInitializedAsync.Run  Time:19:57:27
+Executed DbCommand (27ms) [Parameters=[@__p_0='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[Email], [a].[EmailConfirmed], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[ProfilePicture], [a].[SecurityStamp], [a].[TwoFactorEnabled], [a].[UserName], [a].[firstName], [a].[lastName]
+FROM [AspNetUsers] AS [a]
+WHERE [a].[Id] = @__p_0
+Start processing HTTP request GET https://devprofile.shopbyshop.by/api/v1/recipient/6116
+Sending HTTP request GET https://devprofile.shopbyshop.by/api/v1/recipient/6116
+Received HTTP response headers after 108.3045ms - 200
+End processing HTTP request after 151.7688ms - 200
+	 SpLog,Date: 30 августа 2023 г., Time: 19:59:00, Sprauna7Publish, AddPurchasePage, OnValidSubmit(), , Exception: Error:2108039. SbsTrack No Created. .{"message":"The given data was invalid.","errors":{"invoice":["\u0437\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u0435 \u0438\u043d\u0432\u043e\u0439\u0441"],"recipient_id":["Recipient not found"]}}

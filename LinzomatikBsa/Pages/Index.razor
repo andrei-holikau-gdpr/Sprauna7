@@ -1,0 +1,206 @@
+﻿@page "/"
+@using Li.CoreBusiness;
+
+<PageTitle>Index</PageTitle>
+<h1>linzomatik.by</h1><hr/>
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm">
+
+            <div class="form-group form-check">
+                <label for="CitiesSelect">Города</label>
+                <select id="CitiesSelect" class="form-control custom-select" @onchange="OnValueCityChanged" title="Citie is required ">
+                    <option value="0" selected>Все города</option>
+                    @foreach (var item in Cities)
+                    {
+                        <option value="@item.Id"> @item.Name</option>
+                    }
+                </select><br />
+                <button @onclick="OnClickFilterCityCallback" class="form-control">Применить</button>
+            </div>
+
+        </div>
+        <div class="col-sm">
+
+            <div class="form-group form-check">
+                <label for="ProductsSelect">Товары</label>
+                <select id="ProductsSelect" class="form-control custom-select" @onchange="OnValueProductChanged" title="Product is required ">
+                    <option value="0" selected>Все товары</option>
+                    @foreach (var item in ProductTypes)
+                    {
+                        <option value="@item.Id"> @item.Name</option>
+                    }
+                </select><br />
+                <button @onclick="OnClickFilterProductCallback" class="form-control">Применить</button>
+            </div>
+
+        </div>
+        <div class="col-sm">
+        </div>
+        <div class="col-sm ">
+            
+        </div>
+    </div>
+</div>
+<br />
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm">
+            <LinzomatList LinzomatListParameter="LinzomatList" CitiesParameter="Cities" />
+        </div>
+        <div class="col-sm">
+            <ProductsInLinzomatListCmp Linzomats="Linzomats" ProductsInLinzomatList="ProductsInLinzomatList" />
+        </div>
+        <div class="col-sm">
+            <h2>Log</h2>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card{
+        margin-bottom:10px;
+    }
+</style>
+
+
+@code{
+    #region private fields
+
+    private List<City> Cities = new();
+    private List<Linzomat> Linzomats = new();
+    private List<ProductType> ProductTypes = new();    
+    private List<ProductInLinzomat> ProductsInLinzomat = new();
+
+    private List<Linzomat> LinzomatList = new();
+    private List<ProductInLinzomat> ProductsInLinzomatList = new();
+
+    private int CitySelectedId = 0;
+    private int LinzomatSelectedId = 0;
+    private int ProductSelectedId = 0;
+
+    #endregion
+    //---
+    #region Protected Override methods 
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        LoadAll();
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+    }
+
+    #endregion
+    // ---
+    #region Private methods
+
+    private void OnValueCityChanged(ChangeEventArgs e)
+    {
+        if (e.Value != null)
+        {
+            CitySelectedId = Convert.ToInt32(e.Value);
+        }
+    }
+    private void OnValueLinzomatChanged(ChangeEventArgs e)
+    {
+        if (e.Value != null)
+        {
+            LinzomatSelectedId = Convert.ToInt32(e.Value);
+        }
+    }
+    private void OnValueProductChanged(ChangeEventArgs e)
+    {
+        if (e.Value != null)
+        {
+            ProductSelectedId = Convert.ToInt32(e.Value);
+        }
+    }
+
+    private void OnClickFilterCityCallback()
+    {
+        if (CitySelectedId > 0)
+        {
+            LinzomatList = Linzomats.Where(l => l.CityId == CitySelectedId).ToList();
+        } 
+        else
+        {
+            LinzomatList = Linzomats;
+        }
+        ProductsInLinzomatList = new();
+        foreach (var item in LinzomatList)
+        {
+            var tempProducts = ProductsInLinzomat.Where(p => p.LinzomatId == item.Id).ToList();
+            ProductsInLinzomatList.AddRange(tempProducts);
+        }
+    }
+
+    private void OnClickFilterProductCallback()
+    {
+        ProductsInLinzomatList = new();
+        foreach (var item in LinzomatList)
+        {
+            var tempProducts = ProductsInLinzomat.Where(p => p.LinzomatId == item.Id).ToList();
+            ProductsInLinzomatList.AddRange(tempProducts);
+        }
+
+        if (CitySelectedId > 0)
+        {
+            LinzomatList = Linzomats.Where(l => l.CityId == CitySelectedId).ToList();
+        }
+        else
+        {
+            LinzomatList = Linzomats;
+        }
+    }
+
+    private void LoadAll()
+    {
+        Cities.AddRange(new List<City> {
+            new City(){ Id = 1, Name = "Минск"},
+            new City(){ Id = 2, Name = "Гомель"},
+            new City(){ Id = 3, Name = "Витебск"}
+        });
+
+        Linzomats.AddRange(new List<Linzomat> {
+            new Linzomat(){ Id = 1, Name = "г.Минск, ул.Рудобельская,3 ", CityId = 1},
+            new Linzomat(){ Id = 2, Name = "г.Минск, ул Притыцкого 17А-3", CityId = 1},
+            new Linzomat(){ Id = 3, Name = "г.Минск, ул Макаенка 11-1000", CityId = 1},
+            new Linzomat(){ Id = 4, Name = "Гомель, пр.Речицкий 5в", CityId = 2},
+            new Linzomat(){ Id = 5, Name = "Гомель, Гагарина 65", CityId = 2},
+            new Linzomat(){ Id = 6, Name = "Витебск, Чкалова 35", CityId = 3}
+        });
+
+        LinzomatList = Linzomats;
+
+        ProductTypes.AddRange(new List<ProductType> {
+            new ProductType(){ Id = 1, Name = "AO Hydraglyde - 1.50"},
+            new ProductType(){ Id = 2, Name = "PV2 -1.5"},
+            new ProductType(){ Id = 3, Name = "optima -1.5"},
+        });
+
+        ProductsInLinzomat.AddRange(new List<ProductInLinzomat> {
+            new ProductInLinzomat(){ Id = 1, Name = "AO Hydraglyde - 1.50", LinzomatId = 1, ProductTypeId = 1},
+            new ProductInLinzomat(){ Id = 2, Name = "AO Hydraglyde - 1.50", LinzomatId = 4, ProductTypeId = 1},
+            new ProductInLinzomat(){ Id = 3, Name = "PV2 -1.50", LinzomatId = 4, ProductTypeId = 2},
+            new ProductInLinzomat(){ Id = 4, Name = "AO Hydraglyde - 1.50", LinzomatId = 6, ProductTypeId = 1},
+            new ProductInLinzomat(){ Id = 5, Name = "PV2 -1.50", LinzomatId = 6, ProductTypeId = 2},
+            new ProductInLinzomat(){ Id = 6, Name = "optima -1.5", LinzomatId = 6, ProductTypeId = 3},
+            new ProductInLinzomat(){ Id = 1, Name = "AO Hydraglyde - 1.50", LinzomatId = 2, ProductTypeId = 1}
+        });
+
+        var prodGroupByType = ProductsInLinzomat.GroupBy(p => p.ProductTypeId);
+
+        foreach (var type in prodGroupByType)
+        {
+            ProductsInLinzomatList.Add(type.First());
+        }
+    }
+
+    #endregion
+}

@@ -1,0 +1,5 @@
+﻿_Notes_GitChanges
+
+Git Changes
+---
+Added EF core

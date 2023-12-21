@@ -1,0 +1,136 @@
+﻿@page "/QuizGdprPg/"
+
+<h3>Quiz Gdpr </h3>
+@using System.Collections.Generic
+@*@using YourNamespace*@
+
+<h3>Question List</h3>
+
+@if (questions != null && questions.Count > 0)
+{
+    <ul>
+        @foreach (var question in questions)
+        {
+            <li>
+                @question.QuestionText (@question.QuestionType?.QuestionTypeName)
+                @if (question.Answers != null && question.Answers.Count > 0)
+                {
+                    <ul>
+                        @foreach (var answer in question.Answers)
+                        {
+                            <li>@answer.AnswerText</li>
+                        }
+                    </ul>
+                }
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p>No questions found.</p>
+}
+
+@code {
+    // Usage:
+    TestDataGenerator testDataGenerator;
+    List<Question> questions;
+    List<Answer> answers;
+    List<QuestionType> questionTypes;
+    List<Country> countries;
+
+    protected override void OnInitialized()
+    {
+        TestDataGenerator testDataGenerator = new TestDataGenerator();
+         questions = testDataGenerator.GenerateQuestions();
+         answers = testDataGenerator.GenerateAnswers();
+         questionTypes = testDataGenerator.GenerateQuestionTypes();
+         countries = testDataGenerator.GenerateCountries();
+    }
+
+    public class Question
+    {
+        public int Id { get; set; }
+        public string QuestionText { get; set; }
+        public int QuestionTypeId { get; set; }
+        public QuestionType QuestionType { get; set; }
+        public List<Answer> Answers { get; set; }
+        public List<Country> Countries { get; set; }
+        public int Order { get; set; }
+    }
+
+    public class Answer
+    {
+        public int Id { get; set; }
+        public string AnswerText { get; set; }
+        public int AnswerWeight { get; set; }
+        public int QuestionId { get; set; }
+        public int Order { get; set; }
+    }
+
+    public class QuestionType
+    {
+        public int Id { get; set; }
+        public string QuestionTypeName { get; set; }
+        public List<Question> Questions { get; set; }
+        public int Order { get; set; }
+    }
+
+    public class Country
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public List<Question> Questions { get; set; }
+        public int Order { get; set; }
+    }
+
+    public class TestDataGenerator
+    {
+        public List<Question> GenerateQuestions()
+        {
+            return new List<Question>
+            {
+                new Question { Id = 1, QuestionText = "Question 1", QuestionTypeId = 1, Order = 1 },
+                new Question { Id = 2, QuestionText = "Question 2", QuestionTypeId = 1, Order = 2 },
+                new Question { Id = 3, QuestionText = "Question 3", QuestionTypeId = 2, Order = 3 },
+                new Question { Id = 4, QuestionText = "Question 4", QuestionTypeId = 2, Order = 4 }
+            };
+        }
+
+        public List<Answer> GenerateAnswers()
+        {
+            return new List<Answer>
+            {
+                new Answer { Id = 1, AnswerText = "Answer 1", AnswerWeight = 1, QuestionId = 1, Order = 1 },
+                new Answer { Id = 2, AnswerText = "Answer 2", AnswerWeight = 2, QuestionId = 1, Order = 2 },
+                new Answer { Id = 3, AnswerText = "Answer 3", AnswerWeight = 1, QuestionId = 2, Order = 3 },
+                new Answer { Id = 4, AnswerText = "Answer 4", AnswerWeight = 2, QuestionId = 2, Order = 4 }
+            };
+        }
+
+        public List<QuestionType> GenerateQuestionTypes()
+        {
+            return new List<QuestionType>
+            {
+                new QuestionType { Id = 1, QuestionTypeName = "Type 1", Order = 1 },
+                new QuestionType { Id = 2, QuestionTypeName = "Type 2", Order = 2 },
+                new QuestionType { Id = 3, QuestionTypeName = "Type 3", Order = 3 },
+                new QuestionType { Id = 4, QuestionTypeName = "Type 4", Order = 4 }
+            };
+        }
+
+        public List<Country> GenerateCountries()
+        {
+            return new List<Country>
+            {
+                new Country { Id = 1, Name = "Country 1", Order = 1 },
+                new Country { Id = 2, Name = "Country 2", Order = 2 },
+                new Country { Id = 3, Name = "Country 3", Order = 3 },
+                new Country { Id = 4, Name = "Country 4", Order = 4 }
+            };
+        }
+    }
+
+
+
+}

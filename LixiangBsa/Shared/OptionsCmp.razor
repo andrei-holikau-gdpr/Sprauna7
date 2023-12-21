@@ -1,0 +1,334 @@
+﻿@using Lixiang.CoreBusiness;
+@using System.Text.Json;
+@using System.Text.Encodings.Web;
+@using System.Text.Unicode;
+
+
+
+<button type="button" class="btn btn-primary btn-sm my-3"
+        @onclick="OnClickLoadDataFromJsonAsync">
+    Load Options
+</button>
+
+<button type="button" class="btn btn-link btn-sm m-3"
+        @onclick="OnClickLoadDefaultOptions">
+    Load Default Options
+</button>
+@if(jsonLoaded){
+
+<button type="button" class="btn btn-primary btn-sm m-3"
+        @onclick="OnClickWriteJsonAsync">
+    Save in file xxx.json
+</button>
+
+<div class="accordion" id="accordionExample">
+    <div class="accordion-item">
+        <h2 class="accordion-header" id="headingOne">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                Модель
+            </button>
+        </h2>
+        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+            <div class="accordion-body">
+                <CarModelsOptCmp Title="Модель"
+                    CarModels="CarModels"
+                    ImageHtmlTags="ImageHtmlTags" />
+            </div>
+        </div>
+    </div>
+
+    <div class="accordion-item">
+        <h2 class="accordion-header" id="headingTwo">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                Цвет экстерьера
+            </button>
+        </h2>
+        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+            <div class="accordion-body">
+                <CarFasadColorOptCmp Title="Цвет экстерьера"
+                    CarColorOptions="CarFasadColorOptions"
+                    ImageHtmlTags="ImageHtmlTags" />
+            </div>
+        </div>
+    </div>
+
+    <div class="accordion-item">
+        <h2 class="accordion-header" id="headingThree">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                Цвет интерьера
+            </button>
+        </h2>
+        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
+            <div class="accordion-body">
+                    <CarFasadColorOptCmp Title="Цвет интерьера"
+                        CarColorOptions="CarInteriorColorOptions"
+                        ImageHtmlTags="ImageHtmlTags" />
+            </div>
+        </div>
+    </div>
+
+    <div class="accordion-item">
+            <h2 class="accordion-header" id="headingWheelDisks">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseWheelDisks" aria-expanded="false" aria-controls="collapseWheelDisks">
+                    Колёсные диски
+            </button>
+        </h2>
+            <div id="collapseWheelDisks" class="accordion-collapse collapse" aria-labelledby="headingWheelDisks" data-bs-parent="#accordionExample">
+            <div class="accordion-body">
+                    <CarFasadColorOptCmp Title="Колёсные диски"
+                        CarColorOptions="CarWheelDisksOptions"
+                        ImageHtmlTags="ImageHtmlTags" />
+            </div>
+        </div>
+    </div>
+
+    <div class="accordion-item">
+        <h2 class="accordion-header" id="headingFour">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                Дополнительное оборудование
+            </button>
+        </h2>
+        <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#accordionExample">
+            <div class="accordion-body">
+                    @*<CarModelsOptCmp Title="Дополнительное оборудование"
+                                 CarModels="OptionalEquipments"
+                                 ImageHtmlTags="ImageHtmlTags" />*@
+                    <OptionalEquipmentOptCmp Title="Дополнительное оборудование"
+                        OptionalEquipments="OptionalEquipments"
+                        ImageHtmlTags="ImageHtmlTags" />
+            </div>
+        </div>
+    </div>
+</div>
+}
+<div class="accordion" id="accordionJson">
+
+    <div class="accordion-item">
+        <h2 class="accordion-header" id="headingFour">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseJsonLi" aria-expanded="false" aria-controls="collapseJsonLi">
+                JsonLi
+            </button>
+        </h2>
+        <div id="collapseJsonLi" class="accordion-collapse collapse" aria-labelledby="headingJsonLi" data-bs-parent="#accordionJson">
+            <div class="accordion-body">
+
+                <button type="button" class="btn btn-link btn-sm"
+                        @onclick="OnClickLoadEmptyOptions">
+                    Load Empty Options
+                </button>
+
+                <button type="button" class="btn btn-link btn-sm"
+                        @onclick="LiReadJsonLi7Async">
+                    Read json file
+                </button>
+
+
+
+                <button type="button" class="btn btn-link btn-sm"
+                        @onclick="OnClickClearTextAreaJson">
+                    Очистить TextArea json
+                </button>
+
+                <button type="button" class="btn btn-link btn-sm"
+                        @onclick="OnClickClearJsonFile">
+                    Очистить json file
+                </button>
+
+                <textarea class="form-control my-1" id="JsonLi" rows="2" disabled readonly>
+                    @JsonLi
+                                </textarea>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+@code {
+    #region Parameters
+    [Parameter]
+    public string NameModel { get; set; } = "Li7";
+    #endregion
+
+    #region Private fields
+    private bool jsonLoaded = false;
+    private List<CarModel> CarModels { get; set; } = new();
+    private List<CarColorOption> CarFasadColorOptions { get; set; } = new();
+    private List<CarColorOption> CarInteriorColorOptions { get; set; } = new();
+    private List<CarColorOption> CarWheelDisksOptions { get; set; } = new();
+    private List<SimpleOption> OptionalEquipments { get; set; } = new();
+    
+    private List<ImageHtmlTag> ImageHtmlTags { get; set; } = new();
+
+    private string JsonLi { get; set; } = "";
+
+    private string FileName { get; set; } = "jsonLi7.json";
+
+
+    #endregion
+    // ---
+    #region Protected Override methods
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        // LoadAll();
+        FileName = "json" + NameModel + ".json";
+    }
+    #endregion
+    // ---
+    #region private methods
+
+
+    private void LoadAll()
+    {
+        LoadDefaultOptions();
+    }
+    private void OnClickLoadEmptyOptions()
+    {
+        LoadEmptyOptions();
+        JsonLi = "";
+        ShouldRender();
+    }
+    private void OnClickLoadDefaultOptions()
+    {
+        LoadDefaultOptions();
+        JsonLi = "";
+        jsonLoaded = true;
+        ShouldRender();
+    }
+
+    private void LoadEmptyOptions()
+    {
+        CarModels = new();
+        CarFasadColorOptions = new();
+        CarInteriorColorOptions = new();
+        CarWheelDisksOptions = new();
+        OptionalEquipments = new();
+    }
+
+    private void LoadDefaultOptions()
+    {
+        LoaderOptions loaderOptions = new();
+
+        CarModels = loaderOptions.CarModels;
+        CarFasadColorOptions = loaderOptions.CarFasadColorOptions;
+        CarInteriorColorOptions = loaderOptions.CarInteriorColorOptions;
+        CarWheelDisksOptions = loaderOptions.CarWheelDisksOptions;
+        OptionalEquipments = loaderOptions.OptionalEquipments;
+        ImageHtmlTags = loaderOptions.ImageHtmlTags;
+    }
+
+    private async Task LiReadJsonLi7Async()
+    {
+        await LiReadJsonAsync();
+    }
+    private async Task OnClickWriteJsonAsync()
+    {
+        await ClearJsonFile();
+        await LiWriteJsonAsync();
+        await LiReadJsonAsync();
+    }
+    private async Task OnClickLoadDataFromJsonAsync()
+    {
+        await LiReadJsonAsync();
+        await LoadDataFromJsonAsync();
+        jsonLoaded = true;
+        ShouldRender();
+    }
+    private void OnClickClearTextAreaJson()
+    {
+        JsonLi = "";
+        ShouldRender();
+    }
+    private void OnClickClearJsonFile()
+    {
+        ClearJsonFile();
+        JsonLi = "Файл очищен";
+        OnClickLoadEmptyOptions();
+        ShouldRender();
+    }
+
+    private async Task LiReadJsonAsync()
+    {
+        JsonLi = "";
+        // асинхронное чтение
+        using (StreamReader reader = new StreamReader(FileName))
+        {
+            string? line;
+            while ((line = await reader.ReadLineAsync()) != null)
+            {
+                JsonLi += line;
+            }
+        }
+
+        if (JsonLi.Length == 0)
+        {
+            JsonLi = "Пустой файл.";
+        }
+
+        ShouldRender();
+    }
+
+    private async Task LoadDataFromJsonAsync()
+    {
+        using (FileStream fs = new FileStream(FileName, FileMode.OpenOrCreate))
+        {
+            CarColorOptionList? carJson 
+                = await JsonSerializer.DeserializeAsync<CarColorOptionList>(fs);
+            //CarColorOptionList carJson = new();
+
+            CarModels = carJson.CarModels;
+            CarFasadColorOptions = carJson.CarFasadColorOptions;
+            CarInteriorColorOptions = carJson.CarInteriorColorOptions;
+            CarWheelDisksOptions = carJson.CarWheelDisksOptions;
+            OptionalEquipments = carJson.OptionalEquipments;
+            ImageHtmlTags = carJson.ImageHtmlTags;
+        }
+
+        StateHasChanged();
+        ShouldRender();
+    }
+
+    private async Task ClearJsonFile()
+    {
+        // Очистить содержимое файла
+        File.WriteAllText(FileName, string.Empty);
+    }
+
+    private async Task LiWriteJsonAsync()
+    {
+        JsonLi = "";
+        // Очистить содержимое файла
+        // File.WriteAllText(fileName, string.Empty);
+
+        CarColorOptionList cars = new CarColorOptionList()
+            {
+                CarModels = CarModels,
+                CarFasadColorOptions = CarFasadColorOptions,
+                CarInteriorColorOptions = CarInteriorColorOptions,
+                CarWheelDisksOptions = CarWheelDisksOptions,
+                OptionalEquipments = OptionalEquipments,
+                ImageHtmlTags = ImageHtmlTags
+            };
+
+        // сохранение данных
+        using (FileStream fs = new FileStream(FileName, FileMode.OpenOrCreate))
+        {
+            //Person tom = new Person("Tom", 37);
+            var options1 = new JsonSerializerOptions
+                {
+                    Encoder = JavaScriptEncoder.Create(
+                            UnicodeRanges.BasicLatin, UnicodeRanges.Cyrillic),
+                    WriteIndented = true
+                };
+
+            await JsonSerializer
+                .SerializeAsync<CarColorOptionList>(fs, cars, options1);
+            //Console.WriteLine("Data has been saved to file");
+        }
+        ShouldRender();
+    }
+
+    #endregion
+}

@@ -1,0 +1,275 @@
+﻿@page "/addreceiver"
+
+@inject IJSRuntime JS
+
+@inject NavigationManager NavigationManager
+@inject IAddReceiverUseCase AddReceiverUseCase
+
+<div class="container">
+    <div class="row m-2">
+        <div class="col-sm-12 col-lg-5 p-1">
+            <h1 class="h3">Новый получатель</h1>
+        </div>
+
+        <div class="col-sm-12 col-lg-7 p-1">
+            <button type="button" class="btn btn-link" @onclick="OnClickSetDemoData">Заполнить тестовыми данными</button>
+        </div>
+    </div>
+</div>
+
+
+@if(receiver != null)
+{
+    <EditForm Model="receiver" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator></DataAnnotationsValidator>
+        <ValidationSummary></ValidationSummary>
+
+        <div class="card p-3">
+            <div class="container ">
+                <div class="row">
+                    <div class="col-sm-12 col-lg-12 p-1">
+                        <p>
+                            Получатель это тот, на кого оформляется таможенная декларация. Данная информация необходима для подсчета таможенного лимита, который составляет 1000 евро и 31 кг.
+                        </p>
+                        <a href="https://sprauna.by/">Как считается лимит?</a>
+                        <br/>
+                    </div>
+                    <div class="col-sm-12 col-lg-12 p-1">
+                        <h3>Паспортные данные и ИНН</h3>
+                    </div>
+                    <div class="col-sm-12 col-lg-3 p-1">
+                        <div class="form-floating">
+                            <InputText id="floatingNationality" @bind-Value="receiver.Nationality"
+                                   class="form-control" placeholder=" "></InputText>
+                            <label for="floatingNationality">@ReceiverOptions.Nationality</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-3 p-1">
+                        <div class="form-floating">
+                            <InputText id="floatingPassportSeries" @bind-Value="receiver.PassportSeries" 
+                                class="form-control" placeholder=" "></InputText>
+                            <label for="floatingPassportSeries">@ReceiverOptions.PassportSeries</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-3 p-1">
+                        <div class="form-floating">
+                            <InputText id="floatingPassportID" @bind-Value="receiver.PassportID" 
+                                class="form-control" placeholder=" "></InputText>
+                            <label for="floatingPassportID">@ReceiverOptions.PassportID</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-3 p-1">
+                        <div class="form-floating">
+                            <InputDate id="floatingPassportIssueDate" @bind-Value="receiver.PassportIssueDate" 
+                                class="form-control" placeholder=" " ></InputDate>
+                            <label for="floatingPassportIssueDate">@ReceiverOptions.PassportIssueDate</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-6 p-1">
+                        <div class="form-floating">
+                            <InputText id="floatingPassportIssuedBy" @bind-Value="receiver.PassportIssuedBy"
+                                   class="form-control" placeholder=" "></InputText>
+                            <label for="floatingPassportIssuedBy">@ReceiverOptions.PassportIssuedBy</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-6 p-1">
+
+                    </div>
+                    <div class="col-sm-12 col-lg-3 p-1">
+                        <div class="form-floating">
+                            <InputText id="floatingSecondName" @bind-Value="receiver.SecondName"
+                                   class="form-control" placeholder="Иванов"></InputText>
+                            <label for="floatingSecondName">@ReceiverOptions.SecondName</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-3 p-1">
+                        <div class="form-floating">
+                            <InputText id="floatingFirstName" @bind-Value="receiver.FirstName"
+                                   class="form-control" placeholder="Иван"></InputText>
+                            <label for="floatingFirstName">@ReceiverOptions.FirstName</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-3 p-1">
+                        <div class="form-floating">
+                            <InputText id="floatingSurname" @bind-Value="receiver.Surname"
+                                   class="form-control" placeholder="Иванович"></InputText>
+                            <label for="floatingSurname">@ReceiverOptions.Surname</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-3 p-1">
+
+                    </div>
+                    <div class="col-sm-12 col-lg-12 p-1">
+                        <br />
+                        <h3>Адрес регистрации</h3>
+                    </div>
+                    <div class="col-sm-12 col-lg-3 p-1">
+                        <div class="form-group">
+                            <label for="Country">@ReceiverOptions.Country</label>
+                            <InputSelect id="Country" @bind-Value="receiver.Country" class="form-select">
+                                @foreach (var country in ReceiverOptions.countries)
+                                {
+                                    <option value="@country">@country</option>
+                                }
+                            </InputSelect>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-3 p-1">
+                        <div class="form-group">
+                            <label for="Region">@ReceiverOptions.Region</label>
+                            <InputSelect id="Region" @bind-Value="receiver.Region" class="form-select">
+                                @foreach (var region in ReceiverOptions.regions)
+                                {
+                                    <option value="@region">@region</option>
+                                }
+                            </InputSelect>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-3 p-1">
+                        <div class="form-group">
+                            <label for="City">@ReceiverOptions.City</label>
+                            <InputText id="City" @bind-Value="receiver.City" class="form-control"></InputText>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-12 p-1"></div>
+                    <div class="col-sm-12 col-lg-3 p-1">
+                        <div class="form-group">
+                            <label for="Street">@ReceiverOptions.Street</label>
+                            <InputText id="Street" @bind-Value="receiver.Street"
+                                   class="form-control" placeholder="Ул. Червякова"></InputText>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-2 p-1">
+                        <div class="form-group">
+                            <label for="House">@ReceiverOptions.House</label>
+                            <InputNumber id="House" @bind-Value="receiver.House"
+                                class="form-control" Min=1></InputNumber>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-2 p-1">
+                        <div class="form-group">
+                            <label for="HouseBuildingNumber">@ReceiverOptions.HouseBuildingNumber</label>
+                            <InputText id="HouseBuildingNumber" @bind-Value="receiver.HouseBuildingNumber" 
+                                class="form-control"></InputText>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-2 p-1">
+                        <div class="form-group">
+                            <label for="Flat">@ReceiverOptions.Flat</label>
+                            <InputNumber id="Flat" @bind-Value="receiver.Flat"
+                                     class="form-control" Min=1></InputNumber>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-5 p-1">
+                        <div class="form-group">
+                            <label for="Index">@ReceiverOptions.Index</label>
+                            <InputText id="Index" @bind-Value="receiver.Index" class="form-control"></InputText>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-7 p-1" style="height:100%; vertical-align:middle;">
+                        <br /><a href="https://google.com">Узнать свой индекс</a>
+                    </div>
+                    <div class="col-sm-12 col-lg-6 p-1">
+                        <div class="form-group">
+                            <label for="ContactNumber">@ReceiverOptions.ContactNumber</label>
+                            <InputText id="ContactNumber" @bind-Value="receiver.ContactNumber"
+                                   class="form-control" placeholder="+375 (29) 999-99-99"></InputText>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-6 p-1"></div>
+                    <div class="col-sm-12 col-lg-6 p-1">
+                        <div class="form-group">
+                            <label for="PassportScan">@ReceiverOptions.PassportScan</label>
+                            <InputText id="PassportScan" @bind-Value="receiver.PassportScan" class="form-control"></InputText>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-3 p-1"></div>
+                    <div class="col-sm-12 col-lg-6 p-1">
+                        Пункт выдачи
+                    </div>
+                    <div class="col-sm-12 col-lg-6 p-1"></div>
+                    <div class="col-sm-12 col-lg-6 p-1">
+                        <div class="form-group">
+                            <label for="description">Описание</label>
+                            <InputText id="description" @bind-Value="receiver.Description" class="form-control"></InputText>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-12 p-1"></div>
+                    <div class="col-sm-12 col-lg-12 p-1">
+                        <button type="submit" class="btn btn-primary">Сохранить и выйти</button>
+                        <button type="button" class="btn btn-primary" @onclick="OnCancel">Отменить</button>
+                    </div>
+                </div>
+            </div>  
+        </div>
+
+
+    </EditForm>
+}
+
+@code {
+
+    #region private fields
+
+    private Receiver receiver;
+    
+
+    #endregion
+
+    #region override methods
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        receiver = new Receiver();
+
+        receiver.PassportIssueDate = DateTime.Now;
+        receiver.House = 1;
+        receiver.Flat = 1;
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        JS.InvokeVoidAsync("setMask");
+    }
+
+    #endregion
+
+    #region private methods
+
+    private void OnValidSubmit()
+    {
+        AddReceiverUseCase.Execute(receiver);
+        NavigationManager.NavigateTo($"/{ReceiverOptions.NameMany}");
+    }
+
+    private void OnCancel()
+    {
+        NavigationManager.NavigateTo($"/{ReceiverOptions.NameMany}");
+    }
+
+    private void OnClickSetDemoData()
+    {
+        receiver.Nationality = "Гражданство 111";
+        receiver.PassportSeries = "Серия паспорта 111";
+        receiver.PassportID = "Номер паспорта 111";
+        receiver.PassportIssueDate = DateTime.Now;
+        receiver.PassportIssuedBy = "Кем выдан 111";
+        receiver.SecondName = "Фамилия 111";
+        receiver.FirstName = "Имя 111";
+        receiver.Surname = "Отчество 111";
+        receiver.Country = "Беларусь";
+        receiver.Region = "Минская область";
+        receiver.City = "Город 111";
+        receiver.Street = "Улица 111";
+        receiver.House = 111;
+        receiver.HouseBuildingNumber = "Корпус 111";
+        receiver.Flat = 111;
+        receiver.Index = "Индекс 111";
+        receiver.ContactNumber = "+375 29 123 12 12";
+        receiver.PassportScan = "Скан паспорта 111";
+    }
+
+#endregion
+
+}

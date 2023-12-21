@@ -1,0 +1,96 @@
+﻿@using Lixiang.CoreBusiness;
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h3>Цвет интерьера</h3>
+            <button type="button" @onclick="AddColor" class="btn btn-link">Добавить</button>
+        </div>
+    </div>
+
+    @foreach (var model in CarColorOptions)
+    {
+        <div class="row mb-3">
+            <div class="col-1">
+                <label for="optionId" class="form-label">Id: @model.Id</label>
+                <button @onclick="(() => DelColor(model))"
+                    type="button" class="btn btn-outline-danger">
+                    Удалить
+                </button>
+            </div>
+
+            <div class="col-3">
+                <label for="optionName" class="form-label">Name</label>
+                <input type="text" class="form-control" id="optionName" @bind="model.Name" disabled>
+            </div>
+
+            <div class="col-1">
+                <label for="optionPrice" class="form-label">Price</label>
+                <input type="number" class="form-control" id="optionPrice" @bind="model.Price">
+            </div>
+
+            <div class="col-3">
+                <label for="optionDescription" class="form-label">Description</label>
+                <textarea class="form-control" id="optionDescription" rows="1" disabled>@model?.Description</textarea>
+            </div>
+
+        </div>
+        <div class="row">
+
+            <div class="col-4">
+                <label for="formFile" class="form-label">Mimi Image</label>
+                <br />
+                <a href="/OptionsPg/#">Загрузить картирнку</a>
+                @*<input class="form-control" type="file" id="formFile" accept="image/*" >*@
+            </div>
+
+            <div class="col-1">
+                <img src="/img/@model.Thumbnail" width="50" alt="..."
+                 class="img-circle" style="margin-top: 20px;" />
+            </div>
+
+            <div class="col-3">
+                <label for="formFile" class="form-label">Slide Image</label>
+                <br/>
+                <a href="/OptionsPg/#">Загрузить картирнку</a>
+                @*<input class="form-control" type="file" id="formFile" accept="image/*">*@
+            </div>
+
+            <div class="col-1">
+                <img src="/img/@model?.Images.First()?.FileName" width="100" alt="..."
+                 class="img-rounded m-x-auto" />
+            </div>
+
+            <div class="col-12">
+                <hr />
+            </div>
+        </div>
+    }
+    
+</div>
+
+@code {
+    [Parameter]
+    public List<CarColorOption> CarColorOptions { get; set; } = new();
+
+    #region private CRUD
+    private void AddColor()
+    {
+        int maxId = CarColorOptions.Max(t => t.Id) + 1;
+        CarColorOptions.Add(
+            new CarColorOption()
+                {
+                    Id = maxId,
+                    Price = 0,
+                    Description =""
+                }
+        );
+        ShouldRender();
+    }
+    private void DelColor(CarColorOption colorOption)
+    {
+        CarColorOptions.Remove(colorOption);
+        ShouldRender();
+    }
+    #endregion
+}

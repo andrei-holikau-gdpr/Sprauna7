@@ -1,0 +1,69 @@
+﻿@inject NavigationManager NavigationManager
+
+@inject IViewReceiversUseCase ViewReceiversUseCase
+@inject IDeleteReceiverUseCase DeleteReceiverUseCase
+
+<h2 class="card-title h5">
+    <NavLink class="nav-link" href="receivers">
+        <span class="oi oi-list-rich" aria-hidden="true"></span> Получатели (@receivers?.Count)
+    </NavLink>
+</h2>
+
+
+@if (receivers != null)
+{
+    <table class="table table-striped table-hover sp-table">
+        <tbody>
+            @foreach (var item in receivers)
+            {
+                <tr @onclick="@( () => OnSelectedCallback.InvokeAsync( item.ReceiverId ))">
+                    <td class="align-middle">
+                        <div class="overflow-auto">
+                            @item.ReceiverId
+
+                            @*@onclick="@(() => selectReceiverId = item.ReceiverId)"*@
+                        </div>
+                    </td>
+
+                    <td class="align-middle">
+                        @($"{item.SecondName} {item.SecondName}")
+                        <div style="display:none">@(++iMiniCount)</div>
+                    </td>                   
+                </tr>
+                @*@if ( MaxCountItems > 0 && iMiniCount > 1) break;*@
+            }
+        </tbody>
+    </table>
+}
+
+@code 
+{
+    #region Parameters
+
+    [Parameter]
+    public int MaxCountItems { get; set; } = 2;
+
+    [Parameter]
+    public EventCallback<int> OnSelectedCallback { get; set; }
+
+    #endregion
+
+    public int iMiniCount { get; set; }
+
+    private List<Receiver>? receivers;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        LoadAll();
+    }
+
+    #region private methods
+
+    private void LoadAll()
+    {
+        receivers = ViewReceiversUseCase.Execute()?.ToList();
+    }
+
+    #endregion
+}

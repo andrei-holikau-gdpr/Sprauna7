@@ -1,0 +1,86 @@
+﻿@using Gap2.CoreBusiness;
+
+<style>
+    .process {
+        border: solid 1px white;
+        min-height: 100px;
+        cursor:pointer;
+    }
+    .process.gap-selected, .process:hover {
+        border: solid 1px blue;
+        background-color: #f1f6ff;
+    }
+    .process .name{
+        min-height: 80px;
+    }
+</style>   
+
+    @foreach (var process in Processes)
+    {
+        @if (GapResults?.ProcessSelected == process)
+        {
+            <MudItem xs="12" sm="6" md="4">
+            <MudPaper Elevation="2" Class="pa-0 process gap-selected">
+                <div @onclick="@OnClickProcessSelectedClean" >
+                    <div class="pa-4">
+                        <span>@process.Name</span>                       
+                    </div>
+                </div>
+                </MudPaper>
+            </MudItem>
+        } 
+        else
+        {
+            <MudItem xs="12" sm="6" md="4">
+                <MudPaper Elevation="2" Class="pa-0 process">
+                    <div @onclick="@(() => OnClickProcess(process))">
+                    
+                        @if (GapResults?.ProcessSelected == null)
+                        {
+                            <div class="pa-4">
+                                <h5>@process.Name</h5>
+                            </div>
+                            <img src="images/@process?.Image?.FileName" alt="@process?.Image?.Alt" width="100%" />
+                            
+                        } 
+                        else
+                        {
+                            <div class="pa-4">
+                                <span>@process.Name</span>
+                            </div>
+                        }
+
+                    </div>
+                </MudPaper>
+            </MudItem>
+        }
+    }
+
+@code {
+    #region Parameters
+    [Parameter]
+    public List<Process> Processes { get; set; }
+    [Parameter]
+    public GapResult GapResults { get; set; }
+
+    [Parameter]
+    public EventCallback UpdateCallback { get; set; }
+    #endregion
+    #region
+    private void OnClickProcess(Process process)
+    {
+        GapResults.ProcessSelected = process;
+        UpdateCallback.InvokeAsync();
+    }
+    private void OnClickProcessSelectedClean()
+    {
+        GapResults.ProcessSelected = null;
+        UpdateCallback.InvokeAsync();
+    }
+
+    private string GetClass(Process process) 
+        => (process == GapResults?.ProcessSelected) 
+            ? "process-selected" 
+            : "process";
+    #endregion
+}

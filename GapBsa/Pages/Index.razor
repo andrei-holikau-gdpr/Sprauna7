@@ -1,0 +1,177 @@
+﻿@page "/"
+@using Gap.CoreBusiness;
+
+<PageTitle>GDPR Applicability Project</PageTitle>
+
+<ProcessToConsiderListCmp 
+    ProcessToConsiderList = "ProcessToConsiderList"
+    OnClickProcessToConsiderCallback="OnClickProcessToConsider" />
+<br/>
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm">
+            <OprosCmp ProcessToConsider="ProcessToConsiderSeleceted" />
+        </div>
+        <div class="col-sm">
+            <ReasultOprosaCmp />
+        </div>
+    </div>
+</div>
+
+<SurveyPrompt Title="How is Blazor working for you?" />
+
+<style>
+    .process-to-consider {
+        border: solid 2px #E4E5E7;
+        width: 13rem;
+    }
+
+    .process-to-consider:hover {
+        border: solid 2px #D2DBFF;
+    }
+
+    .process-to-consider-selected {
+        border: solid 2px blue;
+        width:  13rem;
+    }
+</style>
+
+@code {
+
+    #region private Fields and EventCallback
+
+    private List<ProcessToConsider> ProcessToConsiderList = new();
+    private ProcessToConsider? ProcessToConsiderSeleceted = null;
+
+    private List<SubProcess> SubProcessList = new();
+    private List<Country> CountryList = new();
+    private List<Otvet> OtvetList = new();
+
+
+    private List<Vopros> VoprosList = new(); 
+
+    #endregion
+    #region override 
+
+    protected override void OnInitialized()
+    {
+        var ptc1 = new ProcessToConsider()
+            {
+                Id = 1,
+                Name = "Мобильное приложение (B2C)",
+                Image = "mpB2C.jpg"
+            };
+        var ptc2 = new ProcessToConsider()
+            {
+                Id = 2,
+                Name = "Маркетинговая рассылка",
+                Image = "mi.png"
+            };
+        var ptc3 = new ProcessToConsider(){ Id = 3, 
+                Name = "Рекрутинг", 
+                Image = "hr.png"
+            };
+
+        ProcessToConsiderList.AddRange(new List<ProcessToConsider>() {
+            ptc1,
+            ptc2,
+            ptc3
+        } );
+
+
+        var spl1 = new SubProcess()
+            {
+                Id = 1,
+                Name = "Рассылка",
+                ProcessToConsiderId = 1,
+                ProcessToConsider = ptc1
+            };
+        var spl2 = new SubProcess()
+            {
+                Id = 2,
+                Name = "Опрос",
+                ProcessToConsiderId = 1,
+                ProcessToConsider = ptc2
+            };
+        var spl3 = new SubProcess()
+            {
+                Id = 3,
+                Name = "Основной функционал",
+                ProcessToConsiderId = 2,
+                ProcessToConsider = ptc2
+            };
+        var spl4 = new SubProcess()
+            {
+                Id = 4,
+                Name = "Телеметрия",
+                ProcessToConsiderId = 2,
+                ProcessToConsider = ptc3
+            };
+        SubProcessList.AddRange(new List<SubProcess>() 
+            { spl1, spl2, spl3, spl4 } );
+
+        ptc1.SubProcesses
+            .AddRange(new List<SubProcess>()
+                {spl1 });
+        ptc2.SubProcesses
+            .AddRange(new List<SubProcess>()
+                {spl2 });
+
+        CountryList.AddRange(new List<Country>() {
+            new Country(){ Id =1 , Name = "Китай"},
+            new Country(){ Id =1 , Name = "ОАЭ"},
+            new Country(){ Id =1 , Name = "Германия"},
+            new Country(){ Id =1 , Name = "Республика Кипр"},
+        });
+
+        var otvet_1 = new Otvet() { Id = 1, Text = "Рассылка" };
+        var otvet_2 = new Otvet() { Id = 2, Text = "Опрос" };
+        var otvet_3 = new Otvet() { Id = 3, Text = "Основной функционал" };
+        var otvet_4 = new Otvet() { Id = 4, Text = "Телеметрия" };
+
+        OtvetList.AddRange(new List<Otvet>()
+        { otvet_1, otvet_2, otvet_3, otvet_4 });
+
+        VoprosList = new(){
+            new() { Id = 1,
+                TextVoprosa = "Для какого процесса вы делаете анализ?",
+                TypeVopros = TypeVoprosEnum.CheckBox,
+                Otvets = new(){
+                    otvet_1,
+                    otvet_2
+            }},
+            new() { Id = 2,
+                TextVoprosa = "Для какого процесса вы делаете анализ?",
+                TypeVopros = TypeVoprosEnum.CheckBox,
+                Otvets = new(){
+                    otvet_3,
+                    otvet_4
+            }},
+            new() { Id = 3,
+                TextVoprosa = "Отметьте страны в которых у вас есть зарегистрированная компания, участвующая в данной обработка",
+                TypeVopros = TypeVoprosEnum.MultiSelect,
+                Otvets = new(){
+                    new() { Id = 1, Text = "Китай" },
+                    new() { Id = 2, Text = "ОАЭ" },
+                    new() { Id = 2, Text = "Германия" },
+                    new() { Id = 2, Text = "Республика Кипр" },
+            }}
+        };
+        ProcessToConsiderSeleceted = ptc1;
+    }
+
+
+    #endregion
+    // ---
+    #region Private methods
+
+    private void OnClickProcessToConsider(ProcessToConsider processToConsider)
+    {
+        ProcessToConsiderSeleceted = processToConsider;
+    }
+
+    #endregion
+
+    // private List<string> Countries() = {""};
+}

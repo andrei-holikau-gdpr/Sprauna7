@@ -1,0 +1,90 @@
+﻿@page "/ViewProductSp/{ProductSpId}"
+
+@using System.Diagnostics.CodeAnalysis;
+@inject IGetProductSpByIdUseCase GetProductSpByIdUseCase
+
+@if (productSp != null)
+{
+@*    <div>
+        <h1>Информация по товарам</h1>
+    </div>*@
+    
+    <div> <b>Тип товара и марка:</b>
+        <p>@productSp?.ProductTypeAndBrand</p>
+        <hr />
+    </div>
+    <div> <b>Количество:</b>
+        <p>@productSp?.Quantity</p>
+        <hr />
+    </div>
+    <div> <b>Ссылка на товар:</b>
+        <p>@productSp?.UrlToProduct</p>
+        <hr />
+    </div>
+    <div> <b>Цена в злотых:</b>
+        <p>@productSp?.Price</p>
+        <hr />
+    </div>
+    <div> <b>Трек номер:</b>
+        <p>@productSp?.TrackNumber</p>
+        <hr />
+    </div>
+    <div> <b>Ссылка на картинку:</b>
+        <img src="@productSp?.UrlToImage" width="100" height="100" />
+        <hr />
+    </div>
+    <div> <b>Посылка:</b>
+        <p>@productSp?.Purchase?.PurchaseId</p>
+        <hr />
+    </div>
+    <div> <b>Комментарий:</b>
+        <p>@productSp?.Description</p>
+        <hr />
+    </div>
+
+    <hr />
+
+    <ConsoleLogger @ref="Logger" class="mt-3" />
+}
+
+@code {
+    #region Parameters
+
+    [Parameter]
+    public string? ProductSpId { get; set; }
+
+    #endregion
+
+    #region private fields
+
+    [NotNull]
+    private ConsoleLogger? Logger { get; set; }
+
+    private ProductSp productSp = new ProductSp();
+
+    #endregion
+
+    #region override methods
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        if (int.TryParse(this.ProductSpId, out int iProductSpId))
+        {
+            productSp = GetProductSpByIdUseCase.Execute(iProductSpId);
+        }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        Logger.Log($"OnAfterRender ProductSpId: {this.ProductSpId}");
+    }
+
+    #endregion
+}

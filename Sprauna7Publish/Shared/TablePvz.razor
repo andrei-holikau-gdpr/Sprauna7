@@ -1,0 +1,55 @@
+﻿@using Plugins.ShopByShop;
+@using CoreBusiness.ShopByShop.Models
+
+@inject IJSRuntime JsRuntime
+
+@if (pvzs != null)
+{
+    <div class="div-for-table">
+        <table id="example" class="display nowrap" >
+            <thead>
+                <tr>
+                    <th> gipermall_id </th>
+                    <th> value </th>
+                    <th> hide </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in pvzs)
+                {
+                    <tr>
+                        <td> @item.gipermall_id </td>
+                        <td> @item.value </td>
+                        <td> @item.hide </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+
+@code {
+    #region Private fiels
+
+    [Parameter]
+    public List<PvzItem> pvzs { get; set; } = new();
+
+    [Parameter]
+    public bool Update { get; set; } = false;
+
+    #endregion
+    //---
+    #region Private methods / Override methods
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (Update)
+        {
+            await JsRuntime.InvokeVoidAsync("InitialiseTable");
+            Update = false;
+        }
+    }
+
+    #endregion
+}

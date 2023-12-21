@@ -1,0 +1,116 @@
+﻿@using Lixiang.CoreBusiness;
+<h3>@Title</h3>
+<br />
+<div style="width:50%;">
+    <div id="@((string)DivId)myCarousel" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+            @{
+                int i = 0;
+                @foreach (var img in CarOptionForComponent.Images)
+                {
+                    if (i == 0)
+                    {
+                        <button type="button" data-bs-target="#@((string)DivId)myCarousel" data-bs-slide-to="@i" aria-label="@img.Alt" class="active" aria-current="true"></button>
+                    }
+                    else
+                    {
+                        <button type="button" data-bs-target="#@((string)DivId)myCarousel" data-bs-slide-to="@i" aria-label="@img.Alt"></button>
+                    }
+                    i++;
+                }
+            }
+        </div>
+        <div class="carousel-inner">
+            @{
+                int j = 0;
+                @foreach (var img in CarOptionForComponent.Images)
+                {
+                    if (j == 0)
+                    {
+                        <div class="carousel-item active">
+                            <img class="bd-placeholder-img" width="100%" height="100%" src="/img/@img.FileName" alt="@img.Alt">
+                            <div class="container"></div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="carousel-item">
+                            <img class="bd-placeholder-img" width="100%" height="100%" src="/img/@img.FileName" alt="@img.Alt">
+                            <div class="container"></div>
+                        </div>
+                    }
+                    j++;
+                }
+            }
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#@((string)DivId)myCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#@((string)DivId)myCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+</div>
+<br />
+<div class="container">
+    <div class="row">
+        <div class="col-sm">
+            <p class="thumb">
+                @foreach (var carColorOption in CarColorOptions)
+                {
+                    <img src="/img/@carColorOption.Thumbnail" alt="@carColorOption.Name" width="50" height="50"
+                     onclick="@(() => OnClickCarFasad(carColorOption))" />
+                }
+            </p>
+            <strong>@CarOptionForComponent.Name</strong>
+        </div>
+        <div class="col-sm">
+            @CarOptionForComponent.Description
+        </div>
+    </div>
+</div>
+<hr />
+
+@code {
+    #region
+    [Parameter]
+    public string DivId { get; set; } = "";
+    [Parameter]
+    public string Title { get; set; } = "";
+    [Parameter]
+    public Car SelectedCar { get; set; } = new();
+    [Parameter]
+    public CarColorOption CarOptionForComponent { get; set; } = new();
+
+    [Parameter]
+    public EventCallback<CarColorOption> OnClickCarFasadCallback { get; set; }
+
+    [Parameter]
+    public List<CarColorOption> CarColorOptions { get; set; } = new();
+
+    #endregion
+    // ---
+    #region private fields
+
+    #endregion
+    //---
+    #region Protected Override methods
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+
+    #endregion
+    // ---
+    #region Private methods
+
+    private async Task OnClickCarFasad(CarColorOption carColorOption)
+    {
+        await OnClickCarFasadCallback.InvokeAsync(carColorOption);
+    }
+
+    #endregion
+}

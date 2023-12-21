@@ -1,0 +1,49 @@
+Executed DbCommand (27ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT 1
+Executed DbCommand (24ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT OBJECT_ID(N'[__EFMigrationsHistory]');
+Executed DbCommand (7ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT 1
+Executed DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT OBJECT_ID(N'[__EFMigrationsHistory]');
+Executed DbCommand (8ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [MigrationId], [ProductVersion]
+FROM [__EFMigrationsHistory]
+ORDER BY [MigrationId];
+Applying migration '20230902075022_CreateIdentitySchema_1'.
+Executed DbCommand (9ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+CREATE TABLE [Categories] (
+    [CategoryId] int NOT NULL IDENTITY,
+    [Name] nvarchar(max) NOT NULL,
+    [Description] nvarchar(max) NULL,
+    CONSTRAINT [PK_Categories] PRIMARY KEY ([CategoryId])
+);
+Executed DbCommand (8ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+CREATE TABLE [CostOfDeliveries] (
+    [CostOfDeliveryId] int NOT NULL IDENTITY,
+    [WeightKg] float NOT NULL,
+    [CostPln] float NOT NULL,
+    CONSTRAINT [PK_CostOfDeliveries] PRIMARY KEY ([CostOfDeliveryId])
+);
+Executed DbCommand (10ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+CREATE TABLE [DirectorySps] (
+    [DirectorySpId] int NOT NULL IDENTITY,
+    [DirectoryName] nvarchar(max) NOT NULL,
+    [CurrentUserId] nvarchar(max) NOT NULL,
+    CONSTRAINT [PK_DirectorySps] PRIMARY KEY ([DirectorySpId])
+);
+Failed executing DbCommand (15ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+CREATE TABLE [Packages] (
+    [PackageId] int NOT NULL IDENTITY,
+    [CurrentUserId] nvarchar(max) NOT NULL,
+    [Status] int NOT NULL,
+    [NumberPackage] nvarchar(max) NULL,
+    [TrackNumber] nvarchar(max) NULL,
+    [Weight] float NOT NULL,
+    [PricePLN] float NOT NULL,
+    [PriceBYN] float NOT NULL,
+    [IsCollectivePackage] bit NOT NULL,
+    [Description] nvarchar(max) NULL,
+    [InvoiceId] int NOT NULL,
+    CONSTRAINT [PK_Packages] PRIMARY KEY ([PackageId])
+);

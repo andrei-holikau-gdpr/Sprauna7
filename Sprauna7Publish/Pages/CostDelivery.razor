@@ -1,0 +1,217 @@
+﻿@page "/cost-delivery"
+
+@using Microsoft.JSInterop;
+
+@inject IJSRuntime JS
+
+<style>
+    h1{
+        font-family: SF Pro Display;
+        font-size: 24px;
+        font-weight: 600;
+        line-height: 29px;
+        letter-spacing: -0.023em;
+        text-align: left;
+
+    }
+    .product-type{
+        cursor: pointer;
+    }
+    .cost-delivery-notes{
+        font-family: SF Pro Display;
+        font-size: 20px;
+        font-weight: 400;
+        line-height: 24px;
+        letter-spacing: -0.023em;
+        text-align: left;
+
+        color: #929292;
+    }
+
+    .help{
+        font-family: SF Pro Display;
+        font-size: 20px;
+        font-weight: 600;
+        line-height: 24px;
+        letter-spacing: 0em;
+        text-align: left;
+
+        font-family: SF Pro Display;
+        font-size: 20px;
+        font-weight: 400;
+        line-height: 24px;
+        letter-spacing: 0em;
+        text-align: left;
+        padding: 25px;
+    }
+    .btn-close{
+        float: right; 
+        cursor: pointer;
+        /*margin-top:-20px;*/
+    }
+</style>
+
+<div class="p-3" style="max-width:770px;">
+    <div class="container ">
+        <div class="row">
+
+            <div class="col-sm-11 col-lg-11 p-1">
+                <div class="form-group">
+                    <h1 class="h3">Стоимость доставки</h1>
+                </div>
+            </div>
+            <div class="col-sm-1 col-lg-1 p-1">
+                <div class="form-group">
+                    <img src="/images/icons/help.png" style="cursor: pointer;" 
+                        @onclick="OnClickHelpModalOpen"/>
+                </div>
+            </div>
+
+            <div class="col-sm-12 col-lg-12 p-1">
+                <div class="form-group">
+                    <p class="cost-delivery-notes">Совет: консолидированная посылка (сборная ) – экономьте, объединяя несколько посылок, в одну!</p>
+                </div>
+            </div>
+
+            <div class="col-sm-12 col-lg-6 p-1">
+                <div class="form-group">
+                    <h2 class="h4">Доставка из</h2>
+                    <h2 class="h5">Страна</h2>
+
+                    <select disabled class="form-select" aria-label="Default select example">
+                        <option value="1" selected>Польша</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-sm-12 col-lg-6 p-1">
+                <div class="form-group">
+                    <h2 class="h4">Доставка в</h2>
+                    <h2 class="h5">Страна</h2>
+
+                    <select disabled class="form-select" aria-label="Default select example">
+                        <option value="1" selected>Беларусь</option>
+                    </select>
+                </div>
+            </div>
+
+@*            <div class="col-sm-12 col-lg-4 p-1">
+                <div class="form-group">
+                    <button ype="button" class="btn btn-primary" disabled>Выбрать</button>
+                </div>
+            </div>*@
+            
+            <br/>
+            <br/>
+            <br/>
+            
+            <div class="col-sm-6 col-lg-6 p-1">
+                <b>Вес посылки, lbs (0.05  кг.)</b>
+                <h2 id="sp-weight-1">0,1</h2>
+            </div>
+
+            <div class="col-sm-6 col-lg-6 p-1" style="text-align: right;">
+                <b>Стоимость, PLN</b>
+                <h2 id="sp-price-1">14,99</h2>
+            </div>
+
+            <div class="col-sm-12 col-lg-1 p-1"></div>
+            <div class="col-sm-12 col-lg-10 p-1">
+                <input type="text" class="js-range-slider-1" name="my_range" value=""
+                       data-min="0.5"
+                       data-max="30"
+                       data-from="15"
+                       data-grid="true"
+                       data-keyboard="true" />
+            </div>
+            <div class="col-sm-12 col-lg-1 p-1"></div>
+
+
+            @* https://developer.mozilla.org/en-US/docs/Web/CSS/cursor *@
+
+            <div class="col-sm-12 col-lg-2 p-1"></div>
+            <div class="product-type col-sm-6 col-lg-1 p-1" data-weight="2" >
+                <img src="/images/cost/2.jpg" />
+            </div>
+            <div class="product-type col-sm-6 col-lg-1 p-1" data-weight="3" >
+                <img src="/images/cost/3.jpg"  />
+            </div>
+            <div class="product-type col-sm-6 col-lg-1 p-1" data-weight="4" >
+                <img src="/images/cost/4.jpg" />
+            </div>
+            <div class="product-type col-sm-6 col-lg-1 p-1" data-weight="5" >
+                <img src="/images/cost/5.jpg" />
+            </div>
+            <div class="product-type col-sm-6 col-lg-1 p-1" data-weight="6" >
+                <img src="/images/cost/6.jpg" />
+            </div>
+            <div class="product-type col-sm-6 col-lg-1 p-1" data-weight="7" >
+                <img src="/images/cost/7.jpg" />
+            </div>
+            <div class="product-type col-sm-6 col-lg-1 p-1" data-weight="8" >
+                <img src="/images/cost/8.jpg" />
+            </div>
+            <div class="product-type col-sm-6 col-lg-1 p-1" data-weight="9" style="">
+                <img src="/images/cost/9.jpg" />
+            </div>
+            <div class="col-sm-12 col-lg-2 p-1">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ModalDialog Help -->
+<Modal @ref="ModalHelp"  IsBackdrop="false" IsKeyboard="true" IsVerticallyCentered="true">
+    <ModalDialog Title="Редактировать получателя" Size="Size.Large" 
+        ShowFooter="false" ShowHeader="false" IsDraggable="true">
+        <BodyTemplate>
+            <img src="/images/icons/close.png" class="btn-close"
+                    @onclick="OnClickHelpModal"
+                    alt="Закрыть"  />
+            <div class="help">               
+                
+                <b>Обязательное страхование посылки - 0.75% от стоимости всех вложений в посылке (не включено в таблицу).</b>
+                <br/>- поиск неопознанной посылки: 10 злотых (если заявка была размещена на сайте после доставки посылки на склад, в остальных случаях - бесплатно);
+                <br/>- разовое фото вложений: 10 злотых;
+                <br/>- хранение посылки свыше 15 дней: 3 злотых/день;
+                <br/>- оплата пошлины при получении (при доставке заказов из-за пределов Европейского Союза): 
+                <br/>до 50 злотых: 10 злотых + сумма к оплате,
+                <br/>50-100 злотых: 20 злотых + сумма к оплате,
+                <br/>от 100 злотых: сумма к оплате + 20%;
+                <br/>- расформирование готовой к отправке консолидированной посылки: 50 злотых.
+            </div>
+        </BodyTemplate>
+    </ModalDialog>
+</Modal>
+
+@code {
+
+    #region private field
+
+    [NotNull]
+    private Modal? ModalHelp { get; set; }
+
+    #endregion
+    #region override methods
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        // JS.InvokeVoidAsync("AddIonRangeSlider");
+        JS.InvokeVoidAsync("CostOfDelivery");
+    }
+
+    #endregion
+    #region private methods
+
+    private void OnClickHelpModalOpen()
+    {
+        ModalHelp.Toggle();
+    }
+
+    private void OnClickHelpModal()
+    {
+        ModalHelp.Close();
+    }
+
+    #endregion
+}

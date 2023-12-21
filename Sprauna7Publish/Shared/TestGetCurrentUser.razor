@@ -1,0 +1,11 @@
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor httpContextAccessor
+
+<h1>@GetCurrentUser()</h1>
+
+@code {
+    protected string? GetCurrentUser()
+    {
+        return httpContextAccessor?.HttpContext?.User?.Identity?.Name;
+    }
+}

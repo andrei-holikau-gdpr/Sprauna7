@@ -1,0 +1,89 @@
+﻿@page
+@model LoginModel
+
+
+@{
+    ViewData["Title"] = "Вход";
+}
+<style>
+
+</style>
+
+<div class="ld-outer">
+    <div class="ld-inner">
+        <div class="ld-card">
+            <div class="container">
+                <div class="row">
+
+                    <div class="col-6" style="text-align: left;">
+                        <h1>@ViewData["Title"]</h1>
+                    </div>
+
+                    <div class="col-6" style="text-align:right; padding-top: 20px;">
+                        <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Регистрация</a>
+                    </div>
+
+                    <div class="col-12">
+                        <br />
+                        <form id="account" method="post" style="text-align: left;">
+                            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+                            <div class="mb-3">
+                                @* form-floating *@
+                                <label asp-for="Input.Email" class="form-label" style="font-weight:600;">Email</label>
+                                <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="Ваш email" />
+                                <span asp-validation-for="Input.Email" class="text-danger"></span>
+                            </div>
+                            <div class=" mb-3">
+                                <label asp-for="Input.Password" class="form-label" style="font-weight:600;">Пароль</label>
+                                <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="Ваш пароль" />
+                                <span asp-validation-for="Input.Password" class="text-danger"></span>
+                            </div>
+                            <div class="outer">
+                                <div class="checkbox mb-3 inner" style="text-align: left;">
+                                    <label asp-for="Input.RememberMe" class="form-label">
+                                        <input class="form-check-input" asp-for="Input.RememberMe" />
+                                        Запомнить меня?
+                                        @*@Html.DisplayNameFor(m => m.Input.RememberMe)*@
+                                    </label>
+                                </div>
+
+                                <div class="mb-3 inner" style="width:228px; display: inline; text-align:right;">
+                                    <a id="forgot-password" asp-page="./ForgotPassword">Забыли пароль?</a>
+                                </div>
+                            </div>
+
+                            <div style="width:100%; text-align:center; ">
+                                <button id="login-submit" type="submit" class="btn ">Вход</button>
+                            </div>
+
+                            @*
+                            <script>
+                                function FillDemoLogin() {
+                                    document.querySelector("#Input_Email").value = "kudesnik.7@gmail.com";
+                                    document.querySelector("#Input_Password").value = "Qwe/321";
+                                }
+                            </script>
+
+                            <button onclick="FillDemoLogin()" type="submit">Test kudesnik.Net5@gmail.com</button>*@
+                        </form>
+                        <div style="width:100%; text-align:center; padding:24px; ">
+                                <span style="font-weight:600;">
+                                    Войти с помощью
+                                </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+           
+
+            <div>
+                <a id="resend-confirmation" asp-page="./ResendEmailConfirmation">Повторно отправить подтверждение по электронной почте</a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

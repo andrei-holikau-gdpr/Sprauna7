@@ -1,0 +1,3 @@
+﻿insert into AspNetUserClaims values('392e95bf-c5e8-42f8-a7fd-eb47b65d71f2', 'Position', 'Admin')
+insert into AspNetUserClaims values('4864ff7a-3fed-4440-bdec-92dc289781f0', 'Position', 'Admin')
+insert into AspNetUserClaims values('6524aca1-2364-462e-a15d-69bb9bad12ac', 'Position', 'Cashier')

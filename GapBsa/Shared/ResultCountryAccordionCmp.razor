@@ -1,0 +1,21 @@
+﻿@using Gap.CoreBusiness;
+
+<span class="h4">@Title</span>
+
+<div class="accordion accordion-flush" id="@AccordionId">
+    @foreach (var itemRS in ResultCountryList)
+    {
+        <ResultCountryAccordionItemCmp ResultCountryParameter="itemRS" AccordionId="AccordionId" />
+    }
+</div>
+
+@code {
+    #region Parameter
+    [Parameter]
+    public List<ResultCountry> ResultCountryList { get; set; } = new();
+    [Parameter]
+    public string Title { get; set; } = "";
+    [Parameter]
+    public string AccordionId { get; set; } = "";
+    #endregion
+}

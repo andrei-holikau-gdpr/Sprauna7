@@ -1,0 +1,196 @@
+﻿@using Plugins.ShopByShop;
+@using CoreBusiness.ShopByShop.Models
+@using UseCases.ShopByShop.UseCaseInterfaces
+
+@inject IViewTracksSbsUseCase ViewTracksSbsUseCase
+@inject IJSRuntime JsRuntime
+
+@inject NavigationManager NavigationManager
+
+<div class="div-for-table" id="sbsTracks">
+    @if (TrackSbss != null && TrackSbss.Count > 0)
+    {    
+        <table id="example" class="display">
+            <thead>
+                <tr>
+                    <th>id</th>
+
+                    <th>code</th>
+                    <th>recipient_id</th>
+                    <th>pvz</th>
+                    <th>store</th>
+
+                    <th><TextOverflowWithTooltip Text="@($"Products Count()")" /></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in TrackSbss)
+                    @if (item != null)
+                    {
+                        <tr @onclick="@( () => OnClickView(item) )">
+                            <td>@item?.Id?.ToString()</td>
+
+                            <td><TextOverflowWithTooltip Text="@item?.Code" /></td>
+                            <td>@item?.RecipientId?.ToString()</td>
+                            <td>@item?.Pvz</td>
+                            <td>@item?.Store</td>
+
+                            <td>@item?.Products?.Count().ToString()</td>
+                        </tr>
+                    }
+            </tbody>
+        </table>    
+    }
+    else
+    {
+        <p class="ListTrackIsNull">Посылки не найдены</p>
+    }
+</div>
+
+<br />
+<br />
+<button type="button" @onclick="OnClickAddNewPage" class="btn btn-primary" id="btnAddPurchase">Добавить посылку</button>
+<br/>
+
+<br />
+<ConsoleLoggerSp Owner="SbsTrackTable" LogerEnable="@LogerEnable">
+    <ConsoleLogger @ref="Logger" />
+</ConsoleLoggerSp>
+
+@code {
+    #region Private fiels
+
+    [Parameter]
+    public int? SelectTrackSbsId { get; set; } 
+
+    [Parameter]
+    public List<TrackItem> TrackSbss { get; set; } = new();
+
+    [Parameter]
+    public bool Update { get; set; } = false;
+
+    [Parameter, NotNull]
+    public EventCallback<TrackItem> OnClickViewCallback { get; set; }
+
+    [Parameter, NotNull]
+    public EventCallback<TrackItem> OnClickAddCallback { get; set; }
+
+    [Parameter, NotNull]
+    public EventCallback<TrackItem> OnClickEditCallback { get; set; }
+
+    [Parameter, NotNull]
+    public EventCallback<int> OnClickDeleteCallback { get; set; }
+
+    #endregion
+    //---
+    #region Private fields
+
+    [NotNull]
+    private ConsoleLogger? Logger { get; set; }
+    private bool LogerEnable = true;
+
+    private bool InitialiseTableСompleted = false;
+
+    #endregion
+    //---
+    #region Protected Override methods
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        #if DEBUG
+            LogerEnable = true;
+        #endif
+
+        LoadAll();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (Update && TrackSbss != null && TrackSbss.Count > 0)
+            {
+                await JsRuntime.InvokeVoidAsync("InitialiseTable");
+                InitialiseTableСompleted = true;
+                #if DEBUG
+                    Logger.Log($"InitialiseTable()");
+                #endif
+            }
+        }
+
+        if (Update && TrackSbss != null && TrackSbss.Count > 0)
+        {
+            // await JsRuntime.InvokeVoidAsync("InitialiseTable");
+            Update = false;
+            #if DEBUG
+                Logger.Log($"TrackSbss.Count = {TrackSbss.Count}");
+            #endif
+        }
+
+        if (TrackSbss == null) Logger.Log($"TrackSbss == null");
+        else if (TrackSbss.Count == 0) Logger.Log($"TrackSbss.Count == 0");
+    }
+
+    #endregion
+    // ---
+    #region Private methods
+
+    private async void LoadAll()
+    {
+        var templistTrackSbss = await ViewTracksSbsUseCase.ExecuteAsync();
+        if (templistTrackSbss != null)
+        {
+            TrackSbss = (List<TrackItem>)templistTrackSbss;  
+            #if DEBUG
+                Logger.Log($"LoadAll() TrackSbss.Count = {TrackSbss.Count}");
+            #endif
+            StateHasChanged();
+        }
+        
+
+        if (!InitialiseTableСompleted && TrackSbss != null && TrackSbss.Count > 0)
+        {
+            InitialiseTableСompleted = true;
+            await JsRuntime.InvokeVoidAsync("InitialiseTable");            
+            #if DEBUG
+                Logger.Log($"LoadAll() + InitialiseTable()");
+            #endif
+        }
+    }
+
+    private void UpdateData()
+    {
+        //JsRuntime.InvokeVoidAsync("DataTablesRemove");
+        LoadAll();
+        //JsRuntime.InvokeVoidAsync("InitialiseTable");
+    }
+
+    private void OnClickView(TrackItem track)
+    {
+        #if DEBUG
+            // Logger.Log($"OnClickView SelectTrackSbsId: {track.id}");
+        #endif
+
+        SelectTrackSbsId = track.Id;
+        OnClickViewCallback.InvokeAsync(track);
+    }
+
+    private void OnClickAddNewPage()
+    {
+        NavigationManager.NavigateTo($"/AddSbsTrack");
+    }
+
+    private void OnClickEdit(TrackItem track)
+    {
+        OnClickEditCallback.InvokeAsync(track);
+    }
+
+    private void OnClickDelete(int Id)
+    {
+        OnClickDeleteCallback.InvokeAsync(Id);
+    }
+
+    #endregion
+}

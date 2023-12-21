@@ -1,0 +1,262 @@
+﻿@using System
+@using System.IO
+@using Lixiang.CoreBusiness;
+@using Microsoft.AspNetCore.Hosting
+@using Microsoft.AspNetCore.Mvc;
+@using Microsoft.Extensions.Logging
+@using System.Security.Policy;
+@*@using UseCasesSp.UseCaseInterfaces;*@
+@using static System.Net.WebRequestMethods;
+@inject IWebHostEnvironment Environment
+@inject NavigationManager NavigationManager
+
+@*@inject IAddFileSpUseCase AddFileSpUseCase
+@inject IGetFileSpByIdUseCase GetFileSpByIdUseCase*@
+
+@inject IJSRuntime JS
+
+@*@inject ILogger<FileUplaodComponent> LoggerInFile*@
+
+@if (ErrorMessages.Count > 0)
+{
+    <ErrorMessagesCmp ErrorMessages="ErrorMessages" />
+}
+
+@if (FullParameters)
+{
+    @*<h1 class="h3">Загрузка файлов</h1>*@
+    <br />
+    <p>
+        <label>
+            Максимальный размер файла:
+            <input type="number" @bind="maxFileSize" class="form-control" />
+        </label>
+    </p>
+
+    @*
+    <p>
+        <label>
+            Максимальное количество файлов:
+            <input type="number" @bind="maxAllowedFiles" />
+        </label>
+    </p>
+    *@
+    <br />
+}
+<p>
+    <label>      
+        @if (SelectedFileLi != null && SelectedFileLi.FileLiId > 0)
+        {
+            <button class="btn btn-outline-primary" style="margin-right:10px;"
+                @onclick="ClearSelectedFileLi">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z" />
+                    <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466" />
+                </svg>
+            </button>
+
+            <img src="img/@SelectedFileLi.FileName" width="50"
+                data-bs-toggle="tooltip" data-bs-placement="top" title="@SelectedFileLi.FileName"
+                alt="@SelectedFileLi.FileName" />
+            <span>@SelectedFileLi.FileName</span>
+
+            @*<button @onclick="@(() => DownloadFileFromStream(SelectedFileLi?.FileLiId ?? 0))" 
+                class="form-control my-1">
+                Скачать @SelectedFileLi?.FileName 
+            </button>*@
+            
+        } else {
+            @*multiple*@
+            <InputFile OnChange="@LoadFiles" accept=".png,.jpg,.jpeg,.gif,.pdf" class="form-control" />
+        }
+    </label>
+</p>
+
+@if (isLoading)
+{
+    <p>Uploading...</p>
+}
+else
+{
+    if (FullParameters)
+    {
+        <ul>
+            @foreach (var file in loadedFiles)
+            {
+                <li>
+                    @file.Name
+                    <button @onclick="@(() => DownloadFileFromStream(SelectedFileLi.FileLiId))"> Скачать </button>
+                    
+                    <ul>
+                        <li>Last modified: @file.LastModified.ToString()</li>
+                        <li>Size (bytes):  @file.Size</li>
+                        <li>Content type:  @file.ContentType</li>
+                        <li>Path: @path</li>
+                    </ul>
+                </li>
+            }
+        </ul>
+    }
+}
+
+
+@code {
+    #region Parameters
+    [Parameter]
+    public int? FileId { get; set; }
+    [Parameter]
+    public FileLi? SelectedFileLi { get; set; }
+
+    [Parameter]
+    public bool FullParameters { get; set; } = false;
+    [Parameter]
+    public ImageHtmlTag ParentImageHtmlTag { get; set; }
+
+
+    [Parameter]
+    public EventCallback<FileLi> LoadedFilesCallback { get; set; }
+    #endregion
+    // ---
+    #region private fields
+
+    private List<string> ErrorMessages = new();
+
+    private List<IBrowserFile> loadedFiles = new();
+    private long maxFileSize = 1024 * 2000;
+    private int maxAllowedFiles = 1;
+    private bool isLoading;
+    private string AllowedContentType = "image";
+    private string path = "";
+
+    #endregion
+    // ---
+    #region protected override
+
+    protected override void OnParametersSet()
+    {
+        if (FileId != null && FileId > 0)
+        {
+            //SelectedFileLi = GetFileSpByIdUseCase.Execute((int)FileId);
+        }
+    }
+
+    #endregion
+    // ---
+    #region private Methods
+
+    private void ClearSelectedFileLi()
+    {
+        SelectedFileLi = null;
+        ShouldRender();
+    }
+
+    private async Task LoadFiles(InputFileChangeEventArgs e)
+    {
+        isLoading = true;
+        loadedFiles.Clear();
+
+        foreach (var file in e.GetMultipleFiles(maxAllowedFiles))
+        {
+            try
+            {
+                if (maxFileSize < file.Size)
+                {
+                    var errorMessage = $"Размер файла {file.Name} превышает допустимый. MaxSize = {maxFileSize}b";
+                    ErrorMessages.Add(errorMessage);
+                    //LoggerInFile.LogError("\t Sp, " + errorMessage + ", " + DateTime.Now.ToLongTimeString());
+                    break;
+                }
+                //if (AllowedContentType != file.ContentType)
+                //{
+                //    var errorMessage = $"Тип файла {file.Name} не соответствует допустимым. {AllowedContentType}";
+                //    ErrorMessages.Add(errorMessage);
+                //    //LoggerInFile.LogError($"\t Sp, " + errorMessage + ", " + DateTime.Now.ToLongTimeString());
+                //    break;
+                //}
+
+                loadedFiles.Add(file);
+
+                // ToDo: Настроить таблицу соответствия рандомных файлов и загружаемых
+                // ToDo: Проверить, что файл с таким именем не существует.
+                var trustedFileNameForFileStorage = Path.GetRandomFileName();
+                // string filePrefix = "sp_";
+                // string filePostfix = "_sp";
+                // var trustedFileNameForFileStorage = filePrefix + file.Name + filePostfix;
+
+                var _ContentRootPath = Environment.ContentRootPath;
+                var _EnvironmentName = Environment.EnvironmentName;
+
+                // ToDo: Настроить отдельные папки для разных пользователей
+
+                //path = Path.Combine(_ContentRootPath, "wwwroot/img",
+                //        trustedFileNameForFileStorage);
+
+                path = Path.Combine(_ContentRootPath, "wwwroot/img",
+                        file.Name);
+
+                await using FileStream fs = new(path, FileMode.Create);
+                await file.OpenReadStream(maxFileSize).CopyToAsync(fs);
+
+                SelectedFileLi = new() 
+                {
+                    FileName = file.Name,
+                    FileNameForFileStorage = trustedFileNameForFileStorage,
+                    FilePath = path,
+                    CreationDate = DateTime.Now,
+                        ParentImageHtmlTag = this.ParentImageHtmlTag
+                };
+
+                await LoadedFilesCallback.InvokeAsync(SelectedFileLi);
+
+                //SelectedFileLi.FileSpId = (int)AddFileSpUseCase.Execute(SelectedFileLi);
+            }
+            catch (Exception ex)
+            {
+                //LoggerInFile.LogError("File: {Filename} Error: {Error}",
+                //    file.Name, ex.Message);
+            }
+        }
+
+        isLoading = false;
+    }
+
+    //<button @onclick="DownloadFileFromURL">
+    //    Download File From URL
+    //</button>
+    //private async Task DownloadFileFromURL()
+    //{
+    //    var fileName = "unsafe_uploads/example.jpeg";
+    //    var fileURL = "https://localhost:5001/img/example.jpeg";
+    //    await JS.InvokeVoidAsync("triggerFileDownload", fileName, fileURL);
+    //}
+
+
+    private Stream GetFileStream(string path)
+    {
+        return System.IO.File.OpenRead(path);
+
+        // var randomBinaryData = new byte[50 * 1024];
+        // var fileStream = new MemoryStream(randomBinaryData);
+
+        // return fileStream;
+    }
+
+    private async Task DownloadFileFromStream(int fileId)
+    {
+        if (SelectedFileLi != null && fileId > 0)
+        {
+            //SelectedFileLi = GetFileSpByIdUseCase.Execute(fileId);
+
+            string path = SelectedFileLi?.FilePath + SelectedFileLi?.FileNameForFileStorage; // @"D:\VisualStudioProjects\Sprauna7\Sprauna7Publish\unsafe_uploads\n4h2siez.fjv";
+            var fileStream = GetFileStream(path);
+
+            var fileName = SelectedFileLi?.FileName;
+
+            using var streamRef = new DotNetStreamReference(stream: fileStream);
+
+            await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
+        }
+    }
+
+    #endregion
+}

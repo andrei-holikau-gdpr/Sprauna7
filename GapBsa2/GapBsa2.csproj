@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="Jsons\processes.json" />
+    <Content Remove="Shared\MainCarouselCmp.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MudBlazor" Version="6.11.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Gap2.CoreBusiness\Gap2.CoreBusiness.csproj" />
+    <ProjectReference Include="..\Gap2.Plugins.DataStore.InMemory\Gap2.Plugins.DataStore.InMemory.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Jsons\processes.json" />
+    <None Include="Shared\MainCarouselCmp.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Shared\MainCarouselCmp.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Shared\MainCarouselCmp.razor" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,165 @@
+﻿@page "/ViewReceiver/{ReceiverId}"
+
+@using System.Diagnostics.CodeAnalysis;
+
+@inject IGetReceiverByIdUseCase GetReceiverByIdUseCase
+
+@if (receiver != null)
+{
+    @*<div><h1>Информация по покупке</h1></div>*@
+    <div>
+        <b>
+            @ViewField(receiver?.SecondName)
+            @ViewField(receiver?.FirstName)
+            @ViewField(receiver?.Surname)
+        </b>
+        <br/>
+        <span><a href="tel:@receiver?.Phone">@receiver?.Phone</a></span>
+        <br />
+        <span><a href="mailto:@(receiver?.Email)">@receiver?.Email</a></span>
+        <hr />
+    </div>
+
+    <div><b>Дата рождения:</b><p>@receiver?.Birthdate?.ToString("dd.MM.yyyy")</p><hr /></div>
+
+    <div><b>Паспортные данные:</b>
+        <p>
+            @ViewField(receiver?.PassportSeries)
+            @ViewField(receiver?.PassportID)
+            <br/>
+            @($"Действителен до: {receiver?.PassportIssueDate.ToString("dd.MM.yyyy")}")
+            <br />
+            @($"Выдан: {receiver?.PassportIssuedBy}")
+            <br />
+            @($" ИИН: {receiver?.Iin}")
+
+        </p>
+        <hr />
+    </div>
+
+    <div><b>Адрес прописки:</b>
+        <p>
+            @ViewField(receiver?.Country)
+            @ViewField(receiver?.Region)
+            @ViewField(receiver?.City)
+            @ViewField(receiver?.Street)
+            @ViewField(receiver?.House)
+            @ViewField(receiver?.HouseBuildingNumber)
+            @ViewField(receiver?.Flat)
+            @($" Индекс: {receiver?.Index}")
+        </p>
+        <hr />
+    </div>
+
+
+    <div><p>@ViewField(receiver?.Description)</p><hr /></div>
+
+    @*
+    <table>
+        <tbody>
+            <tr><th>ReceiverId: </th><th>@ViewField(receiver.ReceiverId)</th></tr>
+            <tr><th>CurrentUserId: </th><th>@ViewField(receiver?.CurrentUserId)</th></tr>
+
+            <tr><th>PassportScan: </th><th>@ViewField(receiver?.PassportScan)</th></tr>
+            
+            <tr><th>Passport: </th><th>@ViewField(receiver?.Passport)</th></tr>
+            <tr><th>SbsId: </th><th>@ViewField(receiver?.SbsId)</th></tr>
+
+           
+
+        <tr><th>CreatedAt: </th><th>@ViewField(receiver?.CreatedAt)</th></tr>
+        <tr><th>UpdatedAt: </th><th>@ViewField(receiver?.UpdatedAt)</th></tr>
+        <tr><th>Hide: </th><th>@ViewField(receiver?.Hide)</th></tr>
+        <tr><th>Type: </th><th>@ViewField(receiver?.Type)</th></tr>
+        <tr><th>IsDefault: </th><th>@ViewField(receiver?.IsDefault)</th></tr>
+
+            <tr><th>SecondName: </th><th>@ViewField(receiver?.SecondName)</th></tr>
+            <tr><th>FirstName: </th><th>@ViewField(receiver?.FirstName)</th></tr>
+            <tr><th>Surname: </th><th>@ViewField(receiver?.Surname)</th></tr>
+            <tr><th>Birthdate: </th><th>@ViewField(receiver?.Birthdate)</th></tr>
+            <tr><th>Fullname: </th><th>@ViewField(receiver?.Fullname)</th></tr>
+            <tr><th>Phone: </th><th>@ViewField(receiver?.Phone)</th></tr>
+            <tr><th>Email: </th><th>@ViewField(receiver?.Email)</th></tr>
+
+        <tr><th>Nationality: </th><th>@ViewField(receiver?.Nationality)</th></tr>
+
+        <tr><th>PassportSeries: </th><th>@ViewField(receiver?.PassportSeries)</th></tr>
+        <tr><th>PassportID: </th><th>@ViewField(receiver?.PassportID)</th></tr>
+        <tr><th>PassportIssueDate: </th><th>@ViewField(receiver?.PassportIssueDate)</th></tr>
+        <tr><th>PassportIssuedBy: </th><th>@ViewField(receiver?.PassportIssuedBy)</th></tr>
+
+        <tr><th>Country: </th><th>@ViewField(receiver.Country)</th></tr>
+        <tr><th>Region: </th><th>@ViewField(receiver.Region)</th></tr>
+        <tr><th>City: </th><th>@ViewField(receiver?.City)</th></tr>
+        <tr><th>Street: </th><th>@ViewField(receiver?.Street)</th></tr>
+        <tr><th>House: </th><th>@ViewField(receiver?.House)</th></tr>
+        <tr><th>HouseBuildingNumber: </th><th>@ViewField(receiver?.HouseBuildingNumber)</th></tr>
+        <tr><th>Flat: </th><th>@ViewField(receiver?.Flat)</th></tr>
+
+        <tr><th>Index: </th><th>@ViewField(receiver?.Index)</th></tr>
+
+        <tr><th>PassportHumanDate: </th><th>@ViewField(receiver?.PassportHumanDate)</th></tr>
+        <tr><th>PassportDateForm: </th><th>@ViewField(receiver?.PassportDateForm)</th></tr>
+        <tr><th>BirthdateForm: </th><th>@ViewField(receiver?.BirthdateForm)</th></tr>
+
+            
+
+        </tbody>
+    </table>
+    *@
+}
+
+<br />
+<br />
+<ConsoleLoggerSp Owner="SbsTracks" LogerEnable="@LogerEnable">
+    <ConsoleLogger @ref="Logger" />
+</ConsoleLoggerSp>
+
+@code {
+    #region Parameters Receiver
+
+    [Parameter]
+    public string? ReceiverId { get; set; }
+
+    #endregion
+    // ---
+    #region private fields Receiver
+
+    [NotNull]
+    private ConsoleLogger? Logger { get; set; }
+    private bool LogerEnable = false;
+
+    private Receiver? receiver;
+
+    #endregion
+    // ---
+    #region override methods Receiver
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        if (int.TryParse(this.ReceiverId, out int iReceiverId))
+        {
+            receiver = GetReceiverByIdUseCase.Execute(iReceiverId);
+        }
+    }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        Logger.Log($"OnAfterRender ReceiverId: {this.ReceiverId}");
+
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
+    #endregion
+    // ---
+    #region private methods
+
+    private string ViewField(object? field)
+    {
+        return field?.ToString() + " " ?? " ";
+    }
+
+    #endregion
+}

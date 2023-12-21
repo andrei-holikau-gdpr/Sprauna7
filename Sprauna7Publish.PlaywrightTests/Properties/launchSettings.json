@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Sprauna7Publish.PlaywrightTests": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:34051;http://localhost:34052"
+    }
+  }
+}

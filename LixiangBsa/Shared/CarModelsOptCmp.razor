@@ -1,0 +1,163 @@
+﻿@using Lixiang.CoreBusiness;
+
+@inject IJSRuntime JSRuntime
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h3>
+                @Title
+                <button type="button" @onclick="AddModel" class="btn btn-link">
+                    Добавить
+                </button>
+            </h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col col-6">
+            <table id="@TableId" class="display" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Description</th>
+                        <th>miniImage</th>
+                        <th>CRUD</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var model in CarModels)
+                    {
+                        <tr @onclick="(() => EditModel(model))">
+                            <td>@model.Id</td>
+                            <td>@model.Name</td>
+                            <td>@model.Price</td>
+                            <td>@model.Description</td>
+                            <td>
+                                @if (model?.Thumbnail != null)
+                                {
+                                    @if (!string.IsNullOrWhiteSpace(model?.Thumbnail?.FileName))
+                                    {
+                                        <img src="/img/@model?.Thumbnail?.FileName" width="50" alt="..."
+                                     class="img-circle" />
+                                    }
+                                }
+                            </td>
+                            <td>
+                                <button @onclick="(() => DelModel(model))"
+                                    type="button" class="btn btn-link">
+                                    Удалить
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="col col-6">
+            @if (SelectedCarModel != null)
+            {
+                <div class="row" style="border:solid 1px grey; border-radius:10px; padding:20px;">
+                    <div class="col col-12">
+                        <label for="optionId" class="form-label">Id</label>
+                        <input type="text" class="form-control  form-control-sm"
+                           id="optionId" @bind="SelectedCarModel.Id" disabled readonly>
+                    </div>
+
+                    <div class="col col-12">
+                        <label for="optionName" class="form-label">Name</label>
+                        <input type="text" class="form-control  form-control-sm"
+                           id="optionName" @bind="SelectedCarModel.Name">
+                    </div>
+
+                    <div class="col col-12">
+                        <label for="optionPrice" class="form-label">Price</label>
+                        <input type="number" class="form-control  form-control-sm"
+                           id="optionPrice" @bind="SelectedCarModel.Price">
+                    </div>
+
+                    @if (SelectedCarModel?.Thumbnail != null)
+                    {
+                        <div class="col col-12">
+                            <UploadImageCmp SelectedFileLi="
+                                new FileLi{  FileLiId = SelectedCarModel.Thumbnail.ImageHtmlTagId,
+                                             FileName = SelectedCarModel.Thumbnail.FileName, }"
+                                    LoadedFilesCallback="LoadedFilesCallback"
+                                    ParentImageHtmlTag="SelectedCarModel.Thumbnail" />
+                        </div>
+                    }
+
+                    <div class="col col-12">
+                        <label for="optionDescription" class="form-label">Description</label>
+                        <textarea class="form-control  form-control-sm"
+                              id="optionDescription" rows="2" @bind="SelectedCarModel.Description"></textarea>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+    
+</div>
+
+@code {
+    [Parameter]
+    public string Title { get; set; } = "";
+    [Parameter]
+    public List<CarModel> CarModels { get; set; } = new();
+    [Parameter]
+    public List<ImageHtmlTag> ImageHtmlTags { get; set; } = new();
+
+    private CarModel? SelectedCarModel;
+    private string? TableId;
+
+    #region protected override
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        TableId = "table" + (new Random()).Next(1000000);
+    }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        JSRuntime.InvokeAsync<object>("TestDataTablesAdd", $"#{TableId}");
+        return base.OnAfterRenderAsync(firstRender);
+    }
+    #endregion
+    #region private CRUD
+    private void AddModel()
+    {
+        int maxId = CarModels.Max(t => t.Id) + 1;
+        CarModels.Add(
+            new CarModel()
+                {
+                    Id = maxId,
+                    Price = 0
+                }
+        );
+        ShouldRender();
+    }
+    private void DelModel(CarModel model)
+    {
+        CarModels.Remove(model);
+        ShouldRender();
+    }
+    private void EditModel(CarModel model)
+    {
+        SelectedCarModel = model;
+        ShouldRender();
+    }
+
+    private void LoadedFilesCallback(FileLi SelectedFileLi)
+    {
+        var img = SelectedFileLi.ParentImageHtmlTag;
+
+        // Если нашли обьект для обновления, то обновляем
+        if (img != null)
+        {
+            img.FileName = SelectedFileLi.FileName;
+        }
+    }
+    #endregion
+}
